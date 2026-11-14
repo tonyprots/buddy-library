@@ -1,0 +1,26 @@
+name: Проверки библиотеки
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - run: npm run check
+      - run: npm install --ignore-scripts --no-package-lock
+      - run: mkdir -p drafts/package && npm pack --pack-destination drafts/package
+      - run: python3 scripts/check-package.py drafts/package/*.tgz
+      - run: npm run export -- drafts/public-export
+      - run: |
+          cd "drafts/public-export/buddy-$(node -p "require('./package.json').version")-source"
+          npm run check
+          npm run test:all

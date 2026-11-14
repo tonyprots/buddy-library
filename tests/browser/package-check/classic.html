@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<title>Бадди: один файл</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='9' r='7' fill='%231340e0'/%3E%3Cpath d='M7 31v-9q0-9 9-9t9 9v9' fill='%231340e0'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="stage">
+  <section class="slide cover on">
+    <h1>Мой доклад</h1>
+    <div class="cards">
+      <div class="card">Первая мысль</div>
+      <div class="card">Вторая мысль</div>
+    </div>
+  </section>
+  <section class="slide">
+    <h2>Рост за год</h2>
+    <strong class="big">+42%</strong>
+    <div class="cards"><div class="card" data-buddy-land>Сюда он упадёт</div><div class="card">Факт</div></div>
+  </section>
+  <section class="slide">
+    <h2>Три шага</h2>
+    <div class="stairs" data-buddy-stairs>
+      <div class="card" style="height:110px">Идея</div>
+      <div class="card" style="height:200px">Прототип</div>
+      <div class="card" style="height:290px">Запуск</div>
+    </div>
+  </section>
+  <section class="slide">
+    <h2>Спасибо!</h2>
+    <div class="cards"><div class="card" data-buddy-fly data-buddy-like style="width:420px"><span data-buddy-text>Вопросы?</span></div></div>
+  </section>
+</div>
+<script src="node_modules/@tony-prots/buddy/dist/buddy.js" data-stage="#stage"></script>
+<script>
+  const slides = [...document.querySelectorAll('#stage > .slide')]
+  let current = 0
+  addEventListener('keydown', event => {
+    if (event.key !== 'ArrowRight' && event.key !== 'ArrowLeft') return
+    current = Math.max(0, Math.min(slides.length - 1, current + (event.key === 'ArrowRight' ? 1 : -1)))
+    slides.forEach((slide, index) => slide.classList.toggle('on', index === current))
+  })
+</script>
+</body>
+</html>

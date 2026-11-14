@@ -1,0 +1,6 @@
+node_modules/
+drafts/
+*.tgz
+.DS_Store
+manifest.sha256.json
+__pycache__/

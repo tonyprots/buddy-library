@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<title>Бадди: ES-модули</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='9' r='7' fill='%231340e0'/%3E%3Cpath d='M7 31v-9q0-9 9-9t9 9v9' fill='%231340e0'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="stage">
+  <section class="slide cover on">
+    <h1>Мой доклад</h1>
+    <div class="cards">
+      <div class="card">Первая мысль</div>
+      <div class="card">Вторая мысль</div>
+    </div>
+  </section>
+  <section class="slide">
+    <h2>Рост за год</h2>
+    <strong class="big">+42%</strong>
+    <div class="cards"><div class="card" data-buddy-land>Сюда он упадёт</div><div class="card">Факт</div></div>
+  </section>
+  <section class="slide">
+    <h2>Три шага</h2>
+    <div class="stairs" data-buddy-stairs>
+      <div class="card" style="height:110px">Идея</div>
+      <div class="card" style="height:200px">Прототип</div>
+      <div class="card" style="height:290px">Запуск</div>
+    </div>
+  </section>
+  <section class="slide">
+    <h2>Спасибо!</h2>
+    <div class="cards"><div class="card" data-buddy-fly data-buddy-like style="width:420px"><span data-buddy-text>Вопросы?</span></div></div>
+  </section>
+</div>
+<script type="importmap">
+  { "imports": { "@tony-prots/buddy": "./node_modules/@tony-prots/buddy/index.js", "@tony-prots/buddy/effects": "./node_modules/@tony-prots/buddy/effects.js" } }
+</script>
+<script type="module">
+  import { createBuddy } from '@tony-prots/buddy'
+  import { attachDeckEffects } from '@tony-prots/buddy/effects'
+  const query = new URLSearchParams(location.search), stage = document.getElementById('stage')
+  const show = index => document.querySelectorAll('#stage > .slide').forEach((slide, i) => slide.classList.toggle('on', i === index))
+  window.show = show
+  window.buddy = await createBuddy({ stage, ...JSON.parse(query.get('o') || '{}') })
+  if (query.has('fx')) { window.effects = attachDeckEffects({ stage, buddy: window.buddy, show }); window.effects.armIntro(query.get('fx')) }
+</script>
+</body>
+</html>

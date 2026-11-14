@@ -1,0 +1,117 @@
+{
+  "name": "@tony-prots/buddy",
+  "version": "0.9.0",
+  "description": "Анимированный 3D-человечек для HTML-презентаций: сам ходит по слайдам, лазает по блокам и реагирует на содержание",
+  "keywords": [
+    "presentation",
+    "slides",
+    "deck",
+    "character",
+    "mascot",
+    "animation",
+    "html-presentation",
+    "vanilla-javascript",
+    "offline",
+    "three.js",
+    "webgl"
+  ],
+  "license": "MIT",
+  "author": "Anton Protsenko",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tonyprots/buddy-library.git"
+  },
+  "homepage": "https://github.com/tonyprots/buddy-library#readme",
+  "bugs": {
+    "url": "https://github.com/tonyprots/buddy-library/issues"
+  },
+  "type": "module",
+  "types": "./index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./index.d.ts",
+      "import": "./index.js",
+      "default": "./index.js"
+    },
+    "./effects": {
+      "types": "./effects.d.ts",
+      "import": "./effects.js",
+      "default": "./effects.js"
+    },
+    "./intelligence": {
+      "types": "./slide-intelligence.d.ts",
+      "import": "./slide-intelligence.js",
+      "default": "./slide-intelligence.js"
+    },
+    "./presets/y360": {
+      "types": "./presets/y360.d.ts",
+      "import": "./presets/y360.js",
+      "default": "./presets/y360.js"
+    },
+    "./context": {
+      "types": "./slide-context.d.ts",
+      "import": "./slide-context.js",
+      "default": "./slide-context.js"
+    }
+  },
+  "files": [
+    "index.js",
+    "index.d.ts",
+    "runtime.js",
+    "outfit.js",
+    "behavior.js",
+    "brand.js",
+    "playback.js",
+    "vendor.js",
+    "new-abilities.js",
+    "ability-props.js",
+    "slide-intelligence.js",
+    "slide-intelligence.d.ts",
+    "slide-context.js",
+    "slide-context.d.ts",
+    "context-abilities.js",
+    "context-props.js",
+    "context-source.js",
+    "context-stories.js",
+    "context-story-props.js",
+    "camera.js",
+    "effects.js",
+    "effects.d.ts",
+    "presets",
+    "dist",
+    "index.html",
+    "docs/slide-context.md",
+    "docs/api.md",
+    "docs/agent-integration.md",
+    "docs/publishing.md",
+    "llms.txt",
+    "examples",
+    "CONTRIBUTING.md",
+    "docs/slide-reactions.md",
+    "docs/slide-intelligence.md",
+    "docs/buddy-preview.png",
+    "README.md",
+    "CHANGELOG.md",
+    "LICENSE",
+    "THIRD_PARTY_NOTICES.md"
+  ],
+  "sideEffects": [
+    "./vendor.js"
+  ],
+  "scripts": {
+    "test": "node --test tests/*.test.mjs",
+    "test:slow": "node --test tests/slow/*.test.mjs",
+    "test:all": "node --test tests/*.test.mjs tests/slow/*.test.mjs",
+    "test:browser": "node tests/browser/browser-check.mjs",
+    "check": "node --check index.js && node --check runtime.js && node --check effects.js && node --check new-abilities.js && node --check ability-props.js && node --check slide-intelligence.js && node --check camera.js && node --check slide-context.js && node --check context-abilities.js && node --check context-source.js && node --check context-props.js && node --check context-stories.js && node --check context-story-props.js && node --check outfit.js && node --check behavior.js && node --check playback.js && node --check brand.js",
+    "build": "node scripts/build.mjs",
+    "prepack": "node scripts/build.mjs",
+    "export": "python3 scripts/export-public.py"
+  },
+  "devDependencies": {
+    "esbuild": "^0.21.5"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

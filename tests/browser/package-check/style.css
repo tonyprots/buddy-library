@@ -1,0 +1,8 @@
+body { margin: 0; background: #f3f1ec; font: 18px/1.4 system-ui, sans-serif; color: #1d1d1f }
+#stage { position: relative; width: 1280px; height: 720px; background: #fff; overflow: hidden; --paper: #fff; --flame: #ff5a1f }
+.slide { position: absolute; inset: 0; padding: 72px 96px; box-sizing: border-box; display: none; background: #fff }
+.slide.on { display: block }
+.cards, .stairs { position: absolute; left: 96px; right: 96px; bottom: 110px; display: flex; gap: 32px; align-items: flex-end }
+.card { background: #e9eefc; border-radius: 16px; padding: 20px 24px; width: 260px; min-height: 120px; box-sizing: border-box }
+.stairs .card { min-height: 0 }
+.big { display: block; font-size: 96px; font-weight: 800 }

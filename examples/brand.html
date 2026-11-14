@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Бадди — бренд презентации</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='9' r='7' fill='%232a5350'/%3E%3Cpath d='M7 31v-9q0-9 9-9t9 9v9' fill='%232a5350'/%3E%3C/svg%3E">
+<style>
+* { box-sizing: border-box }
+body { margin: 0; background: #fff; color: #203734; font: 18px/1.5 system-ui, sans-serif }
+main { width: min(100% - 32px, 1280px); margin: 24px auto; display: grid; gap: 24px }
+#viewport { position: relative; width: 100%; aspect-ratio: 16/9 }
+#deck { position: absolute; width: 1280px; height: 720px; overflow: hidden; transform-origin: 0 0; background: #f4faf8 }
+.pages > article { display: none; position: absolute; inset: 0; padding: 64px 80px }
+.pages > article.is-active { display: block }
+.copy { display: grid; gap: 40px; max-width: 1040px }
+h1, h2, p { margin: 0 }
+h1, h2 { font-size: 64px; line-height: 1.15; font-weight: 650; letter-spacing: -.02em }
+.copy p { font-size: 30px; max-width: 900px }
+.props { position: absolute; left: 80px; bottom: 110px; display: flex; align-items: end; gap: 40px }
+.prop { width: 340px; height: 120px; padding: 28px; border-radius: 16px; background: #c8ded5; font-size: 28px }
+nav { display: flex; align-items: center; flex-wrap: wrap; gap: 16px }
+button { min-height: 44px; padding: 8px 18px; border: 0; border-radius: 8px; background: #dcebe4; color: #203734; font: inherit; cursor: pointer }
+button:hover { background: #c8ded5 }
+button:focus-visible { outline: 3px solid #2a5350; outline-offset: 3px }
+button:disabled { opacity: .55; cursor: default }
+output { min-width: 48px; text-align: center; font-variant-numeric: tabular-nums }
+.hint { max-width: 760px; color: #465e58 }
+</style>
+<script type="application/json" id="deck-brand">
+{
+  "logo": "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2048%2048%22%3E%3Cpath%20fill%3D%22%23267052%22%20d%3D%22M24%202%2046%2024%2024%2046%202%2024z%22%2F%3E%3Ccircle%20cx%3D%2224%22%20cy%3D%2224%22%20r%3D%228%22%20fill%3D%22%23fff%22%2F%3E%3C%2Fsvg%3E",
+  "products": [
+    "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2048%2048%22%3E%3Ccircle%20cx%3D%2224%22%20cy%3D%2224%22%20r%3D%2221%22%20fill%3D%22%23267052%22%2F%3E%3Cpath%20d%3D%22M13%2027h22M24%2012v23%22%20stroke%3D%22%23fff%22%20stroke-width%3D%225%22%20stroke-linecap%3D%22round%22%2F%3E%3C%2Fsvg%3E",
+    "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2048%2048%22%3E%3Cpath%20d%3D%22M5%2042V6h38v36z%22%20fill%3D%22%23267052%22%2F%3E%3Cpath%20d%3D%22m13%2024%208%208%2014-17%22%20fill%3D%22none%22%20stroke%3D%22%23fff%22%20stroke-width%3D%225%22%2F%3E%3C%2Fsvg%3E"
+  ],
+  "accent": "#267052"
+}
+</script>
+<script defer src="../dist/buddy.js" data-stage="#deck" data-slide-selector=".pages > article" data-active-class="is-active" data-brand="#deck-brand"></script>
+</head>
+<body>
+<main>
+  <div id="viewport">
+    <div id="deck">
+      <div class="pages">
+        <article class="is-active">
+          <div class="copy"><h1>Лаборатория «Лист»</h1><p>Вымышленный бренд: один главный знак, два продукта и свой цвет. Герой уже использует этот набор.</p></div>
+          <div class="props"><div class="prop">Лист · Идеи</div><div class="prop">Лист · Дела</div></div>
+        </article>
+        <article>
+          <div class="copy"><h2>От идеи к действию</h2><p>Бадди замечает содержание и сам выбирает подходящие жесты и трюки.</p></div>
+          <div class="props"><div class="prop">Идея</div><div class="prop" style="height:180px">Прототип</div></div>
+        </article>
+        <article>
+          <div class="copy"><h2>Спасибо!</h2><p>К финалу — больше движения и способностей. Останьтесь здесь немного и посмотрите.</p></div>
+          <div class="props"><div class="prop" data-buddy-fly>Вопросы?</div></div>
+        </article>
+      </div>
+    </div>
+  </div>
+  <nav aria-label="Управление презентацией">
+    <button id="previous" type="button" disabled>Назад</button>
+    <output id="counter" aria-live="polite">1 / 3</output>
+    <button id="next" type="button">Дальше</button>
+    <button id="pause" type="button" aria-pressed="false" disabled>Пауза героя</button>
+    <button type="button" data-technique="disk" disabled>Диск</button>
+    <button type="button" data-technique="mail" disabled>Письмо</button>
+    <button type="button" data-technique="calendar" disabled>Встреча</button>
+    <button type="button" data-technique="tracker" disabled>Готово</button>
+    <button type="button" data-technique="shield" disabled>Продукты на орбите</button>
+  </nav>
+  <p class="hint" role="status">Набор находится в этой HTML-странице. Никаких изменений в коде библиотеки и внешних загрузок.</p>
+</main>
+<script>
+const stage = document.getElementById('deck'), viewport = document.getElementById('viewport'),
+  slides = [...stage.querySelectorAll('.pages > article')],
+  previous = document.getElementById('previous'), next = document.getElementById('next'),
+  counter = document.getElementById('counter'), pause = document.getElementById('pause'),
+  resize = () => { stage.style.transform = 'scale(' + viewport.clientWidth / 1280 + ')' }
+let current = 0
+function show(index) {
+  current = Math.max(0, Math.min(slides.length - 1, index))
+  slides.forEach((slide, i) => {
+    slide.classList.toggle('is-active', i === current)
+    slide.setAttribute('aria-hidden', String(i !== current))
+  })
+  previous.disabled = current === 0
+  next.disabled = current === slides.length - 1
+  counter.textContent = (current + 1) + ' / ' + slides.length
+}
+previous.addEventListener('click', () => show(current - 1))
+next.addEventListener('click', () => show(current + 1))
+addEventListener('keydown', event => {
+  if (event.target.closest('input,textarea,select,[contenteditable]')) return
+  if (event.key !== 'ArrowRight' && event.key !== 'ArrowLeft') return
+  event.preventDefault()
+  show(current + (event.key === 'ArrowRight' ? 1 : -1))
+})
+addEventListener('resize', resize)
+resize()
+show(0)
+addEventListener('DOMContentLoaded', async () => {
+  try {
+    const buddy = await window.buddy
+    if (!buddy) return
+    window.buddy = buddy
+    for (const button of document.querySelectorAll('[data-technique]')) {
+      button.disabled = buddy.state().reducedMotion
+      button.addEventListener('click', () => {
+        const id = button.dataset.technique, reason = buddy.can(id)
+        document.querySelector('.hint').textContent = reason || ('Номер: ' + button.textContent)
+        if (!reason) buddy.perform(id)
+      })
+    }
+    pause.disabled = buddy.state().reducedMotion
+    pause.addEventListener('click', () => {
+      const paused = !buddy.paused
+      paused ? buddy.pause() : buddy.resume()
+      pause.setAttribute('aria-pressed', String(paused))
+      pause.textContent = paused ? 'Продолжить' : 'Пауза героя'
+    })
+  } catch { pause.disabled = true }
+}, { once: true })
+</script>
+</body>
+</html>

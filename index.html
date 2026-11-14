@@ -1,0 +1,366 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Бадди · библиотека движений</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath d='M7 31v-9q0-9 9-9t9 9v9' fill='%231340e0'/%3E%3Ccircle cx='16' cy='9' r='7' fill='%23efc3a2'/%3E%3Cpath d='M9 7q1-9 10-5l4 5' fill='%233a281d'/%3E%3C/svg%3E">
+<style>
+:root{--ink:#20252f;--muted:#566173;--paper:#fff;--scene:#edf4ff;--control:#e0eafa;--blue:#123aa6;--rule:#8696ae;--flame:#1340e0;--peach:#edf4ff;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:var(--ink);background:var(--paper);font-synthesis:none}
+*{box-sizing:border-box}body{margin:0}button,input,select{font:inherit}button,a,input,select{-webkit-tap-highlight-color:transparent}button{cursor:pointer;color:inherit;border:0;background:var(--control);border-radius:7px;padding:10px 14px;min-height:44px;white-space:nowrap}button:hover{background:#cfdef4}button[aria-pressed=true],button.selected{background:var(--ink);color:white}button:disabled{cursor:default;opacity:.55}a{color:var(--blue)}:focus-visible{outline:3px solid #123aa6;outline-offset:3px}h1,h2,p{margin:0}h1{font-size:32px;letter-spacing:-1px}header{max-width:1600px;margin:auto;padding:24px 30px;display:flex;align-items:center;justify-content:space-between;gap:24px}header p{color:var(--muted);font-size:14px;margin-top:8px}header a{font-size:14px}main{max-width:1600px;margin:auto;display:grid;grid-template-columns:292px minmax(0,1fr);gap:28px;padding:0 30px 28px}aside{display:flex;flex-direction:column;gap:14px}label{display:block;font-size:14px;color:var(--muted)}input[type=search],select{width:100%;margin-top:8px;border:1px solid #748197;padding:10px 12px;border-radius:7px;background:white;color:var(--ink);min-height:44px}#list{overflow-x:hidden;max-height:calc(100vh - 330px);min-height:260px;overflow:auto;display:flex;flex-direction:column;gap:8px;padding:4px}#list button{flex:none;line-height:1.4;min-width:0;overflow-wrap:anywhere;text-align:left;background:white;white-space:normal;padding:10px 12px;font-size:15px}#list button:hover{background:var(--scene)}#list button.selected{background:var(--ink);color:#fff}#list small{display:block;font-size:13px;opacity:.8;margin-top:8px;font-family:ui-monospace,monospace}#count{font-size:13px;color:var(--muted)}.workspace{min-width:0;display:flex;flex-direction:column;gap:20px}.scene-controls{display:flex;align-items:center;gap:12px;flex-wrap:wrap}.scene-controls label{min-width:180px;flex:1}.scene-controls select{margin:0 0 0 10px;width:auto;max-width:250px}.scene-controls .plain{background:transparent;text-decoration:underline;text-underline-offset:3px}.viewport{width:100%;height:clamp(330px,47vw,540px);overflow:hidden;position:relative;border-radius:14px;background:var(--scene);isolation:isolate}.stage{width:1280px;height:720px;position:absolute;left:0;top:0;transform-origin:0 0;--paper:#edf4ff;--flame:#1340e0;--ink:#20252f;--peach:#e0eafa}.slide{position:absolute;inset:0;padding:70px 70px 120px;display:none;background:var(--scene)}.slide.on{display:block}.slide h2{font-size:52px;line-height:1.12;letter-spacing:-1.5px;max-width:1000px}.slide p{font-size:24px;margin-top:24px;line-height:1.4;max-width:750px}.stage .brand{position:absolute;left:45px;bottom:20px;font-size:20px;color:#495878;display:flex;align-items:center;gap:14px;height:38px}.stage .brand span:first-child{font-weight:750}.block{position:absolute;background:#ccdcf5;border-radius:14px;padding:24px;color:#233554}.block p{font-size:22px;margin:30px 0 0}.block svg{width:48px;height:48px;display:block}.stairs{position:absolute;inset:0}.stairs .block{width:220px;height:170px}.tile.main{position:absolute;left:420px;top:300px;width:480px;height:230px;background:#d1e2ff;border-radius:20px;padding:60px;text-align:center;font-size:36px}.tile.main span{display:block}.art{position:absolute;left:480px;top:280px;width:580px;height:310px}.stat{font-size:132px;font-weight:750;position:absolute;left:480px;top:300px}.detail{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:16px;align-items:start}.detail h2{font-size:24px;line-height:1.2}.detail p{color:var(--muted);line-height:1.5;max-width:760px;margin-top:12px;font-size:15px}.transport{display:flex;gap:10px;flex-wrap:wrap}.toolbar{display:flex;gap:12px;flex-wrap:wrap;align-items:center}.toolbar label{display:flex;gap:8px;align-items:center;min-height:44px}.toolbar input{width:18px;height:18px;accent-color:#123aa6}.toolbar select{width:auto;margin:0;max-width:180px}.code{display:flex;align-items:center;justify-content:space-between;gap:16px;background:#edf4ff;border-radius:9px;padding:14px 16px;min-height:60px}.code code{font-size:13px;overflow-wrap:anywhere;line-height:1.5}.code button{background:transparent}#status{font-size:13px;color:var(--muted);min-height:20px;line-height:1.5;font-variant-numeric:tabular-nums}.notice{color:#8c2e1c!important}footer{max-width:1600px;margin:auto;padding:12px 30px 28px;color:var(--muted);font-size:13px;line-height:1.6}.empty{padding:20px 12px;font-size:14px;color:var(--muted)}@media(min-width:1500px){header{padding-top:32px}}@media(max-width:800px){header{padding:20px;align-items:start}header p{max-width:240px}main{grid-template-columns:1fr;padding:0 20px 20px;gap:20px}aside{display:grid;grid-template-columns:1fr 1fr;gap:12px}#list{grid-column:1/-1;min-height:0;max-height:180px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));grid-auto-rows:max-content;align-content:start}#count{grid-column:1/-1}#list small{display:none}.viewport{height:360px}.detail{grid-template-columns:1fr}.transport{gap:8px}.scene-controls label{width:100%;display:flex;align-items:center}.scene-controls select{flex:1}.code{align-items:start}.code code{font-size:12px}footer{padding:12px 20px 24px}}@media(max-width:380px){header{padding:16px}header a{max-width:85px}main{padding:0 16px 20px}h1{font-size:28px}.viewport{height:320px}.scene-controls select{max-width:190px}.toolbar{gap:8px}.code{flex-direction:column;gap:8px}}
+input[type=search],select{font-size:16px}.diagnostics{padding:20px;background:#f4f7fc;border-radius:10px;display:flex;flex-direction:column;gap:12px}.diagnostics h2{font-size:20px;line-height:1.25}.diagnostics p{max-width:80ch;font-size:14px;line-height:1.5;color:var(--muted)}.diagnostic-actions{display:flex;flex-wrap:wrap;align-items:center;gap:12px}.diagnostic-actions label{display:flex;align-items:center;gap:8px;min-height:44px}.diagnostic-actions input{width:18px;height:18px}.diagnostics .explanation{font-size:13px}#targetOutline{display:none;position:absolute;pointer-events:none;border:3px dashed #9d3c15;background:#ffb93b12;z-index:3}.scene-controls label{display:flex;align-items:center;gap:8px}.scene-controls select{margin:0;min-width:0}@media(max-width:500px){.scene-controls label{flex-basis:100%}.scene-controls button{flex:1;padding:10px 8px;font-size:13px}.diagnostics{padding:16px}.diagnostic-actions{gap:8px}}
+.context-controls{display:flex;flex-wrap:wrap;align-items:end;gap:12px}.context-controls label{flex:1;min-width:180px}.context-controls select{margin-top:8px}.context-controls button{flex-shrink:0}.context-controls label:has(select:disabled){opacity:.7}.context-note{position:absolute;left:120px;top:180px;width:460px;padding:28px;background:#d1e2ff;border-radius:14px;font-size:32px;line-height:1.35;font-weight:600}.slide .context-caption{position:absolute;left:70px;top:555px;max-width:610px;font-size:24px}.context-word{position:absolute;left:160px;top:240px;font-size:76px;font-weight:700;letter-spacing:-2px}.context-object{position:absolute;left:900px;top:270px;width:160px;height:160px}.slide[data-scene="context-cards"] .context-caption{top:230px;max-width:600px}.context-card h3{margin:0;font-size:24px;line-height:1.2}.context-card p{margin-top:20px;font-size:22px}.context-controls button:disabled{opacity:.55}@media(max-width:500px){.context-controls{align-items:stretch}.context-controls label{min-width:0;flex-basis:100%}.context-controls button{width:100%}}
+header a{display:inline-flex;align-items:center;min-height:44px;padding:0 4px}
+.story-caption{position:absolute;left:70px;top:190px!important;max-width:980px!important;font-size:22px!important}.story-area{position:absolute;left:240px;top:300px;width:800px;height:320px}.story-pair{display:flex;gap:80px;align-items:start}.story-value{width:300px;min-height:180px;background:#d1e2ff;border-radius:14px;padding:24px;display:flex;flex-direction:column;gap:16px}.story-value span{font-size:24px}.story-value strong{font-size:76px;line-height:1.1;letter-spacing:-2px}.story-pictures{left:200px;top:315px;width:900px}.story-pictures svg{width:360px;height:220px;flex:none}.story-chart{position:absolute;left:350px;top:290px;width:760px;height:300px}.story-steps{position:absolute;inset:0}.story-step{position:absolute;width:180px;background:#c9dcf6;border-radius:12px;padding:24px}.story-step h3{font-size:25px;margin:0;line-height:1.2}.story-step p{font-size:22px;line-height:1.35;margin-top:20px}.story-flow{position:absolute;left:200px;top:300px;width:900px;height:300px}.story-flow>svg{position:absolute;inset:0;width:900px;height:300px}.story-node{position:absolute;width:220px;height:100px;background:#d1e2ff;border-radius:14px;padding:28px 20px;font-size:28px;text-align:center}.story-list{position:absolute;left:350px;top:280px;width:580px;margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:18px}.story-list li{background:#d1e2ff;border-radius:12px;padding:18px 24px;font-size:28px;line-height:1.3;display:flex;gap:16px;align-items:center}.story-list input{width:22px;height:22px;accent-color:#123aa6;pointer-events:none}.story-detail{position:absolute;left:300px;top:280px;width:650px;height:300px}.story-detail svg{display:block;width:650px;height:300px}.story-crop{fill:none;stroke:#b44b23;stroke-width:3;stroke-dasharray:8 5}
+.story-controls{display:flex;flex-wrap:wrap;align-items:center;gap:12px}.story-controls p{flex-basis:100%;font-size:14px;line-height:1.5;color:var(--muted)}
+</style>
+</head>
+<body>
+<header><div><h1>Бадди</h1><p>Каталог движений и сцен</p></div><a href="README.md">Как подключить</a></header>
+<main>
+<aside aria-label="Каталог приёмов">
+  <label>Найти приём<input id="search" type="search" placeholder="Например, книга или полёт"></label>
+  <label>Группа<select id="group"><option value="">Все приёмы</option></select></label>
+  <p id="count" aria-live="polite"></p>
+  <div id="list"></div>
+</aside>
+<section class="workspace" aria-label="Проигрыватель">
+  <div class="scene-controls"><label>Сцена<select id="scene"><option value="empty">Свободный пол</option><option value="platforms">Карточки и иконки</option><option value="stairs">Лестница</option><option value="finale">Финальный слайд</option><option value="image">Большая картинка</option><option value="numbers">Крупное число</option><option value="divider">Перебивка</option><option value="context-text">Контекст · тезис</option><option value="context-keywords">Контекст · понятия</option><option value="context-cards">Контекст · карточки</option><option value="context-values">Контекст · два значения</option><option value="context-images">Контекст · было и стало</option><option value="context-chart">Контекст · линия графика</option><option value="context-bars">Контекст · столбцы</option><option value="context-route">Контекст · маршрут</option><option value="context-flow">Контекст · связи</option><option value="context-list">Контекст · список</option><option value="context-detail">Контекст · фрагмент</option><option value="intro">Взрыв обложки</option></select></label><button id="autoFrame" aria-pressed="true">Автокадр</button><button id="zoom" aria-pressed="false">Крупный план</button><button id="overview" aria-pressed="false">Весь слайд</button></div>
+  <div class="viewport" id="viewport"><div class="stage" id="stage">
+    <section class="slide on" data-scene="empty"><h2>У бадди есть характер</h2><p>Он смотрит, думает, радуется и иногда хулиганит.</p></section>
+    <section class="slide" data-scene="platforms"><h2>Слайд становится площадкой</h2><div class="block" data-buddy-land style="left:360px;top:420px;width:300px;height:200px"><svg viewBox="0 0 48 48" aria-label="Звезда"><path d="M24 3l6 14 15 1-12 10 4 16-13-8-13 8 4-16L3 18l15-1z" fill="#1340e0"/></svg><p>На кромку можно<br>забраться</p></div><div class="block" style="left:790px;top:350px;width:280px;height:220px"><svg viewBox="0 0 48 48" aria-label="Кольцо"><circle cx="24" cy="24" r="17" fill="none" stroke="#1340e0" stroke-width="9"/></svg><p>Иконку можно<br>притянуть</p></div></section>
+    <section class="slide" data-scene="stairs" data-buddy-kind="divider"><h2>От первой ступени до парашюта</h2><div class="stairs" data-buddy-stairs><div class="block" style="left:280px;top:470px"><p>Начало</p></div><div class="block" style="left:530px;top:390px"><p>Следующий шаг</p></div><div class="block" style="left:780px;top:310px"><p>Можно лететь</p></div></div></section>
+    <section class="slide" data-scene="finale" data-buddy-kind="finale"><h2>Спасибо, что были рядом</h2><div class="tile main" data-buddy-fly data-buddy-like><span data-buddy-text>До встречи</span></div></section>
+    <section class="slide" data-scene="image" data-buddy-kind="image"><h2>Картинку хочется рассмотреть</h2><svg class="art" viewBox="0 0 580 310" data-buddy-focus role="img" aria-label="Пейзаж с холмами"><rect width="580" height="310" rx="20" fill="#d0e4ff"/><circle cx="445" cy="78" r="41" fill="#ffe49c"/><path d="M0 240L150 96l169 166L445 150l135 107v53H0z" fill="#7ea3ce"/><path d="M0 283l215-91 129 91 110-38 126 65H0z" fill="#365f90"/></svg></section>
+    <section class="slide" data-scene="numbers" data-buddy-kind="stat"><h2>За большой цифрой есть история</h2><div class="stat" data-buddy-number data-buddy-focus data-buddy-context="number" data-buddy-context-id="demo-number">42%</div><p>Доля ошибок в эксперименте.</p></section>
+    <section class="slide divider" data-scene="divider" data-buddy-kind="divider"><h2 style="margin-top:200px">Пора двигаться дальше</h2></section>
+    <section class="slide cover" data-scene="intro"><h2 style="font-size:90px;margin-top:130px">Сейчас начнётся</h2><p>Обложка разобьётся, и появится бадди.</p></section>
+    <section class="slide" data-scene="context-text" data-buddy-scene="content"><h2>Сначала результат, потом инструменты</h2><div class="context-note" data-buddy-context="text" data-buddy-context-id="demo-note" data-buddy-focus>Сначала договоримся о результате, затем проверим на примере.</div><p class="context-caption">Бадди может записать эту мысль или выделить её на слайде.</p></section>
+    <section class="slide" data-scene="context-keywords" data-buddy-scene="content"><h2>Идея становится предметом</h2><div class="context-word" data-buddy-context="keyword" data-buddy-context-id="demo-concept" data-buddy-concept="memory" data-buddy-focus>Контекст</div><svg class="context-object" data-buddy-context="object" data-buddy-context-id="demo-object" viewBox="0 0 160 160" role="img" aria-label="Иконка облака"><title>Облако</title><path d="M40 117a28 28 0 0 1-1-56 42 42 0 0 1 81-6 31 31 0 0 1 2 62Z" fill="#7399c8"/><path d="M81 108V71m-15 15 15-15 15 15" fill="none" stroke="#fff" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/></svg><p class="context-caption">Слово задаёт объёмный образ, иконка — точную световую копию.</p></section>
+    <section class="slide" data-scene="context-cards" data-buddy-scene="content"><h2>У каждой карточки есть своя история</h2><div class="context-card block" data-buddy-card data-buddy-context="card" data-buddy-context-id="demo-card" data-buddy-text="Пример" style="left:820px;top:430px;width:250px;height:160px"><h3>Пример</h3><p>Посмотрим,<br>как это работает.</p></div><p class="context-caption">Кромка служит опорой: можно выглянуть, забраться и прочитать.</p></section>
+    <section class="slide" data-scene="context-values" data-buddy-scene="content"><h2>Сопоставить два значения</h2><p class="story-caption">Демонстрационные данные. Одинаковые единицы, без оценки «лучше» или «хуже».</p><div class="story-area story-pair" data-buddy-context="values" data-buddy-context-id="demo-values" data-buddy-text="Доля ошибок" data-buddy-focus><div class="story-value"><span>Было</span><strong data-buddy-item="before" aria-label="Было">42%</strong></div><div class="story-value"><span>Стало</span><strong data-buddy-item="after" aria-label="Стало">27%</strong></div></div></section>
+    <section class="slide" data-scene="context-images" data-buddy-scene="content"><h2>Показать разницу в устройстве</h2><p class="story-caption">Два авторских изображения: бадди представляет каждое, сохраняя подписи.</p><div class="story-area story-pair story-pictures" data-buddy-context="images" data-buddy-context-id="demo-images" data-buddy-text="Было и стало" data-buddy-focus><svg data-buddy-item="before" viewBox="0 0 360 220" aria-label="Было: отдельные блоки" role="img"><rect width="360" height="220" rx="16" fill="#d1e2ff"/><text x="28" y="40" font-family="system-ui,sans-serif" font-size="24" fill="#233554">Было</text><rect x="38" y="82" width="78" height="82" rx="12" fill="#7399c8"/><rect x="140" y="82" width="78" height="82" rx="12" fill="#7399c8"/><rect x="242" y="82" width="78" height="82" rx="12" fill="#7399c8"/></svg><svg data-buddy-item="after" viewBox="0 0 360 220" aria-label="Стало: связанные блоки" role="img"><rect width="360" height="220" rx="16" fill="#d1e2ff"/><text x="28" y="40" font-family="system-ui,sans-serif" font-size="24" fill="#233554">Стало</text><path d="M80 120H280" fill="none" stroke="#365f90" stroke-width="10"/><rect x="38" y="82" width="78" height="82" rx="12" fill="#365f90"/><rect x="140" y="82" width="78" height="82" rx="12" fill="#365f90"/><rect x="242" y="82" width="78" height="82" rx="12" fill="#365f90"/><circle cx="180" cy="123" r="18" fill="#ffe49c"/></svg></div></section>
+    <section class="slide" data-scene="context-chart" data-buddy-scene="content"><h2>Следовать настоящей линии</h2><p class="story-caption">Демонстрационная траектория с подъёмами и снижением. Указатель повторяет точки графика.</p><svg class="story-chart" data-buddy-context="chart" data-buddy-context-id="demo-chart" data-buddy-text="Динамика по этапам" data-buddy-focus viewBox="0 0 760 300" role="img" aria-label="Пример линии графика"><path d="M30 20V265H730" fill="none" stroke="#7399c8" stroke-width="3"/><polyline data-buddy-chart-line points="50,235 210,145 370,190 540,70 710,95" fill="none" stroke="#365f90" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/><g fill="#365f90"><circle cx="50" cy="235" r="9"/><circle cx="210" cy="145" r="9"/><circle cx="370" cy="190" r="9"/><circle cx="540" cy="70" r="9"/><circle cx="710" cy="95" r="9"/></g></svg></section>
+    <section class="slide" data-scene="context-bars" data-buddy-scene="content"><h2>Столбцы становятся ступенями</h2><p class="story-caption">Демонстрационные значения. Каждая вершина — настоящая опора с доступной кромкой.</p><div class="story-steps" data-buddy-context="bars" data-buddy-context-id="demo-bars" data-buddy-text="Три значения" data-buddy-focus style="left:350px;top:380px;width:650px;height:290px"><div class="story-step" data-buddy-bar="bar-a" data-buddy-step="1" data-buddy-value="20%" style="left:0;top:140px;width:150px;height:150px"><h3>20%</h3></div><div class="story-step" data-buddy-bar="bar-b" data-buddy-step="2" data-buddy-value="35%" style="left:250px;top:70px;width:150px;height:220px"><h3>35%</h3></div><div class="story-step" data-buddy-bar="bar-c" data-buddy-step="3" data-buddy-value="50%" style="left:500px;top:0;width:150px;height:290px"><h3>50%</h3></div></div></section>
+    <section class="slide" data-scene="context-route" data-buddy-scene="content"><h2>Пройти по этапам</h2><p class="story-caption">Автор задаёт порядок. На каждой остановке бадди касается карточки и читает её.</p><div class="story-steps" data-buddy-context="route" data-buddy-context-id="demo-route" data-buddy-text="От замысла к проверке" data-buddy-focus style="left:300px;top:400px;width:790px;height:270px"><article class="story-step" data-buddy-item="idea" data-buddy-step="1" data-buddy-text="Замысел" style="left:0;top:100px;width:190px;height:170px"><h3>Замысел</h3><p>Определить<br>результат</p></article><article class="story-step" data-buddy-item="build" data-buddy-step="2" data-buddy-text="Сборка" style="left:300px;top:50px;width:190px;height:220px"><h3>Сборка</h3><p>Сделать<br>рабочий пример</p></article><article class="story-step" data-buddy-item="verify" data-buddy-step="3" data-buddy-text="Проверка" style="left:600px;top:0;width:190px;height:270px"><h3>Проверка</h3><p>Сверить<br>с задачей</p></article></div></section>
+    <section class="slide" data-scene="context-flow" data-buddy-scene="content"><h2>Показать существующие связи</h2><p class="story-caption">Импульс проходит только по указанным автором стрелкам.</p><div class="story-flow" data-buddy-context="flow" data-buddy-context-id="demo-flow" data-buddy-text="Путь запроса" data-buddy-focus><svg viewBox="0 0 900 300" role="img" aria-label="Связи между этапами"><polyline data-buddy-from="request" data-buddy-to="process" points="220,70 340,70" fill="none" stroke="#7399c8" stroke-width="6"/><polyline data-buddy-from="process" data-buddy-to="answer" points="560,70 620,70 620,220 680,220" fill="none" stroke="#7399c8" stroke-width="6"/></svg><div class="story-node" data-buddy-node="request" style="left:0;top:20px">Запрос</div><div class="story-node" data-buddy-node="process" style="left:340px;top:20px">Обработка</div><div class="story-node" data-buddy-node="answer" style="left:680px;top:170px">Ответ</div></div></section>
+    <section class="slide" data-scene="context-list" data-buddy-scene="content"><h2>Собрать точный список</h2><p class="story-caption">Порядок и отметки берутся из источника. Бадди не отмечает незавершённое за автора.</p><ul class="story-list" data-buddy-context="list" data-buddy-context-id="demo-list" data-buddy-text="Проверка результата" data-buddy-focus><li data-buddy-item="brief" data-buddy-checked="true"><input type="checkbox" checked disabled aria-label="Уточнить задачу: готово">Уточнить задачу</li><li data-buddy-item="example" data-buddy-checked="true"><input type="checkbox" checked disabled aria-label="Собрать пример: готово">Собрать пример</li><li data-buddy-item="check" data-buddy-checked="false"><input type="checkbox" disabled aria-label="Проверить результат: не готово">Проверить результат</li></ul></section>
+    <section class="slide" data-scene="context-detail" data-buddy-scene="content"><h2>Рассмотреть выбранный фрагмент</h2><p class="story-caption">Рамка показывает область источника. В лупе появится её точная увеличенная копия.</p><div class="story-detail" data-buddy-context="detail" data-buddy-context-id="demo-detail" data-buddy-text="Узел соединения" data-buddy-crop="[650,340,150,120]" data-buddy-focus><svg data-buddy-item="image" viewBox="0 0 650 300" role="img" aria-label="Схема с узлом соединения"><rect width="650" height="300" rx="18" fill="#d1e2ff"/><path d="M70 155H220L290 100H435L490 205H590" fill="none" stroke="#7399c8" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"/><rect x="45" y="115" width="85" height="80" rx="15" fill="#365f90"/><rect x="240" y="60" width="90" height="80" rx="15" fill="#365f90"/><circle cx="435" cy="100" r="38" fill="#ffe49c" stroke="#365f90" stroke-width="6"/><path d="M418 100H452M435 83V117" stroke="#365f90" stroke-width="6" stroke-linecap="round"/><rect x="540" y="165" width="85" height="80" rx="15" fill="#365f90"/><rect class="story-crop" x="350" y="60" width="150" height="120" rx="6"/></svg></div></section>
+    <div class="brand"><span data-perch role="img" aria-label="Аватарка бадди" style="width:38px;height:38px"><svg width="38" height="38" viewBox="0 0 32 32" aria-hidden="true" style="display:block"><rect width="32" height="32" rx="8" fill="#d0e4ff"/><path d="M7 32v-9q0-9 9-9t9 9v9" fill="#1340e0"/><circle cx="16" cy="9" r="7" fill="#efc3a2"/><path d="M9 7q1-9 10-5l4 5" fill="#3a281d"/></svg></span><span data-perch-text>Digital Review</span></div>
+    <div id="targetOutline" aria-hidden="true"></div>
+  </div></div>
+  <div class="detail"><div><h2 id="title" aria-live="polite">Помахать</h2><p id="description">Согнутая рука, ладонь обращена к зрителям.</p></div><div class="transport"><button id="play">Повторить</button><button id="pause" aria-pressed="false">Пауза</button><button id="step">Кадр +</button></div></div>
+  <div class="toolbar"><label>Ритм<select id="profile"><option value="calm">Спокойный</option><option value="live">Живой</option><option value="show" selected>Шоу</option></select></label><label>Режим<select id="mode"><option value="manual">Ручной</option><option value="companion">Спутник</option><option value="show" selected>Шоу</option></select></label><label>Характер<select id="character"><option value="business">Деловой</option><option value="curious" selected>Любопытный</option><option value="playful">Озорной</option></select></label><label><input id="smart" type="checkbox" checked>Реагировать на слайд</label><label><input id="y360" type="checkbox">Знаки Я360</label><label>Мимика<select id="bubble"><option value="">Выбрать</option><option value="!">Удивление !</option><option value="?">Вопрос ?</option><option value="…">Размышление …</option><option value="heart">Сердце</option><option value="bulb">Идея</option><option value="z">Сон z</option></select></label></div>
+  <div class="story-controls"><button id="focus" aria-pressed="false">Дать залу сосредоточиться</button><button id="storyPlay">Взгляд → жест → поклон</button><button id="storyCancel" disabled>Завершить историю</button><p id="storyStatus" role="status">История связывает несколько движений; отмена заканчивает текущий номер.</p></div>
+  <section class="diagnostics" aria-labelledby="visionTitle">
+    <h2 id="visionTitle">Что бадди видит на слайде</h2>
+    <p id="analysis" aria-live="polite">Изучаю разметку сцены…</p>
+    <div class="context-controls"><label>Источник номера<select id="contextSource"><option value="">Автоматический выбор</option></select></label><label>Понятие в демосцене<select id="contextConcept"><option value="memory">Контекст</option><option value="target">Цель</option><option value="team">Команда</option><option value="chain">Цепочка</option><option value="link">Связь</option><option value="cloud">Облако</option><option value="rules">Правила</option><option value="search">Поиск</option></select></label><button id="contextPlay">Показать историю</button></div>
+    <p id="contextSummary" aria-live="polite">Ищу источники для контекстных номеров…</p>
+    <p id="surfaces"></p>
+    <p id="reaction"></p>
+    <div class="diagnostic-actions"><button id="reactNow">Показать реакцию</button><button id="brandUp">На подпись</button><button id="brandDown">Спуститься</button><label><input id="showTarget" type="checkbox">Показать цель</label></div>
+    <p class="explanation">Бадди находит числа, слова и объекты в видимой разметке. Графики, связи, пары и маршруты задаёт автор. Для выбора образа откройте сцену «Контекст · понятия». Пиксели картинок не распознаются. <a href="docs/slide-context.md">Правила контекста</a></p>
+  </section>
+  <div class="code"><code id="code">buddy.play('wave')</code><button id="copy">Скопировать</button></div>
+  <p id="status" role="status">Подключаю персонажа…</p>
+</section>
+</main>
+<footer>Бадди · локальная библиотека · <a href="docs/api.md#каталог-приёмов">Справочник</a>. Все файлы работают без внешних загрузок. Фирменные знаки включаются отдельно.</footer>
+<script type="module">
+import { createBuddy, techniques } from './index.js'
+import { attachDeckEffects } from './effects.js'
+import { createPreviewCamera } from './camera.js'
+import { logos as y360Logos } from './presets/y360.js'
+
+const $ = id => document.getElementById(id), stage = $('stage'), slides = [...stage.querySelectorAll(':scope > .slide')],
+  groups = [...new Set(techniques.map(item => item.group))], camera = createPreviewCamera(),
+  contextIds = new Set(techniques.filter(item => item.contextKinds?.length).map(item => item.id)),
+  contextScenes = { laptopNotes: 'context-text', thinkNumber: 'numbers', hologramObject: 'context-keywords', hologramKeyword: 'context-keywords', traceFocus: 'context-text', peekCard: 'context-cards', perchRead: 'context-cards', thinkKeyword: 'context-keywords', quoteIdea: 'context-text', compareValues: 'context-values', showBeforeAfter: 'context-images', followChart: 'context-chart', chartClimb: 'context-bars', cardRoute: 'context-route', traceFlow: 'context-flow', assembleList: 'context-list', inspectDetail: 'context-detail' },
+  contextNames = { number: 'Число', text: 'Тезис', keyword: 'Понятие', object: 'Объект', card: 'Карточка', values: 'Два значения', images: 'Два изображения', chart: 'Линия графика', bars: 'Столбцы', route: 'Маршрут', flow: 'Связи', list: 'Список', detail: 'Фрагмент' }
+let buddy, effects, selected = techniques.find(item => item.id === 'wave'), viewWidth = 800, viewHeight = 540, cameraTarget = null, lastFrame = 0, lastDiagnosis = 0,
+  lastStatus = 0, error = '', notice = '', switching = false, mountVersion = 0, playVersion = 0,
+  mountQueue = Promise.resolve(), contextPanelKey = '', storyRun = null
+
+for (const group of groups) $('group').add(new Option(group, group))
+const find = id => techniques.find(item => item.id === id)
+const setText = (id, value) => { if ($(id).textContent !== value) $(id).textContent = value }
+
+function renderList() {
+  const query = $('search').value.trim().toLocaleLowerCase('ru'), group = $('group').value,
+    items = techniques.filter(item => (!group || item.group === group || group === 'Контекст слайда' && item.tags?.includes('context')) && (!query || `${item.id} ${item.title} ${item.description} ${item.tags?.includes('context') ? 'Контекст слайда' : ''}`.toLocaleLowerCase('ru').includes(query)))
+  $('list').replaceChildren(...items.map(item => {
+    const button = document.createElement('button'), code = document.createElement('small')
+    button.type = 'button'; button.dataset.id = item.id; button.append(item.title)
+    button.classList.toggle('selected', selected.id === item.id); button.setAttribute('aria-pressed', selected.id === item.id)
+    code.textContent = item.id + (item.preset === 'brand' && !$('y360').checked ? ' · включит Я360' : ''); button.append(code)
+    return button
+  }))
+  if (!items.length) { const p = document.createElement('p'); p.className = 'empty'; p.textContent = 'Приёмов не найдено. Измените запрос или выберите другую группу.'; $('list').append(p) }
+  $('count').textContent = `${items.length} из ${techniques.length} приёмов`
+}
+function show(index) {
+  slides.forEach((slide, i) => slide.classList.toggle('on', i === index))
+}
+function scene(name) {
+  effects?.destroy(); effects = null
+  for (const slide of slides) stage.insertBefore(slide, stage.querySelector('.brand'))
+  const index = slides.findIndex(slide => slide.dataset.scene === name)
+  show(index)
+  buddy.reset(); buddy.progress(1); buddy.rescan(); cameraTarget = null; camera.reset(); updateDiagnosis()
+}
+function describe() {
+  $('title').textContent = selected.title
+  $('description').textContent = selected.description + (selected.preset === 'brand' && !$('y360').checked
+    ? ' При запуске стенд включит знаки Я360 и подготовит сцену.' : '')
+  $('code').textContent = selected.preset === 'brand'
+    ? `import { logos } from './presets/y360.js';\nconst buddy = await createBuddy({ stage, presets: { y360: true }, logos });\nbuddy.play('${selected.id}')`
+    : `buddy.play('${selected.id}')`
+  renderList()
+}
+async function play() {
+  const request = ++playVersion, technique = selected, preparations = []
+  error = ''; notice = ''
+  try {
+    if (switching) await mountQueue
+    if (request !== playVersion || technique !== selected) return
+    if (!buddy) throw new Error('Персонаж не подключён. Переключите пресет, чтобы повторить подключение.')
+    if (technique.preset === 'brand' && !buddy.presets.y360) {
+      $('y360').checked = true
+      $('status').textContent = 'Подключаю знаки Я360 для выбранного номера…'
+      await mount()
+      if (request !== playVersion || technique !== selected || !buddy) return
+    }
+    if (technique.preset === 'brand') preparations.push('Пресет Я360 включён')
+    const requirement = technique.requires, current = $('scene').value,
+      needed = ['wall', 'platform', 'icon', 'land', 'brand', 'elevated'].includes(requirement) || technique.id === 'tracker' ? 'platforms'
+        : requirement === 'stairs' ? 'stairs' : requirement === 'finale' ? 'finale' : current
+    buddy.rescan()
+    const context = buddy.context()
+    if (contextIds.has(technique.id) && !context.selectedId && !context.facts.some(fact => technique.contextKinds.includes(fact.kind))) {
+      $('scene').value = contextScenes[technique.id]; scene($('scene').value)
+      preparations.push(`Подготовлен источник: ${$('scene').selectedOptions[0]?.textContent || $('scene').value}`)
+    }
+    if (!contextIds.has(technique.id) && buddy.can(technique.id) && needed !== current) {
+      $('scene').value = needed; scene(needed)
+      preparations.push(`Подготовлена сцена: ${$('scene').selectedOptions[0]?.textContent || needed}`)
+    }
+    if (requirement === 'elevated' && buddy.state().surf === 'floor') {
+      buddy.play('land'); buddy.step(4); buddy.resume()
+    }
+    if (contextIds.has(technique.id) && !contextFact(technique)) throw new Error(buddy.can(technique.id) || 'Выберите подходящий источник номера в панели контекста.')
+    const reason = buddy.can(technique.id), returnToFloor = requirement === 'floor' && (buddy.state().surf !== 'floor' || buddy.state().grounded === false)
+    if (reason && !returnToFloor) throw new Error(`Не удалось подготовить номер «${technique.title}»: ${reason}`)
+    const accepted = returnToFloor ? buddy.sequence(['descend', technique.id]) : buddy.play(technique.id)
+    if (returnToFloor) preparations.push('Сначала спускается на пол')
+    if (!accepted) throw new Error(buddy.reducedMotion ? 'Системный режим уменьшенного движения: персонаж остаётся неподвижным.'
+      : `Номер «${technique.title}» не запущен: планировщик не нашёл подходящего места.`)
+    notice = preparations.join(' · ')
+    describe()
+    buddy.resume(); $('pause').textContent = 'Пауза'; $('pause').setAttribute('aria-pressed', 'false')
+    updateCameraTarget(); updateDiagnosis()
+  } catch (exception) { error = exception.message; $('status').textContent = error; $('status').classList.add('notice') }
+}
+function mount() {
+  const version = ++mountVersion, y360 = $('y360').checked
+  switching = true; $('status').textContent = y360 ? 'Подключаю персонажа и знаки Я360…' : 'Подключаю персонажа…'
+  mountQueue = mountQueue.catch(() => null).then(async () => {
+    if (version !== mountVersion) return null
+    effects?.destroy(); effects = null; buddy?.destroy(); buddy = null
+    try {
+      const instance = await createBuddy({ stage, mode: $('mode').value || 'show', character: $('character').value || 'curious', reactions: $('smart').checked, profile: $('profile').value || 'show', keyboard: false, seed: 14, presets: { superhuman: true, y360 }, logos: y360 ? y360Logos : {} })
+      if (version !== mountVersion) { instance.destroy(); return null }
+      buddy = instance; globalThis.buddy = buddy
+      buddy.progress(1); buddy.rescan(); buddy.reset()
+      error = ''; switching = false
+      cameraTarget = null; contextPanelKey = ''; camera.reset(); updateDiagnosis()
+      describe(); return buddy
+    } catch (exception) {
+      if (version === mountVersion) { error = exception.message; switching = false; $('status').textContent = `Не удалось подключить: ${error}` }
+      return null
+    }
+  })
+  return mountQueue
+}
+$('list').addEventListener('click', event => { const button = event.target.closest('button[data-id]'); if (!button) return; selected = find(button.dataset.id); describe(); play() })
+$('search').addEventListener('input', renderList)
+$('group').addEventListener('change', renderList)
+$('play').addEventListener('click', play)
+$('pause').addEventListener('click', () => { if (!buddy) return; if (buddy.paused) buddy.resume(); else buddy.pause(); $('pause').textContent = buddy.paused ? 'Продолжить' : 'Пауза'; $('pause').setAttribute('aria-pressed', buddy.paused) })
+$('step').addEventListener('click', () => { buddy?.step(); $('pause').textContent = 'Продолжить'; $('pause').setAttribute('aria-pressed', 'true') })
+function cameraMode(mode) { camera.setMode(mode); camera.reset(); for (const [id, value] of [['autoFrame', 'auto'], ['zoom', 'closeup'], ['overview', 'overview']]) $(id).setAttribute('aria-pressed', mode === value) }
+$('autoFrame').addEventListener('click', () => { cameraMode('auto'); updateCameraTarget() })
+$('zoom').addEventListener('click', () => cameraMode('closeup'))
+$('overview').addEventListener('click', () => cameraMode('overview'))
+$('mode').addEventListener('change', () => {
+  if (!buddy) return
+  buddy.setMode($('mode').value)
+  $('smart').checked = $('mode').value !== 'manual'
+  $('profile').value = buddy.profile
+  updateDiagnosis()
+})
+$('character').addEventListener('change', () => { buddy?.setCharacter($('character').value); updateDiagnosis() })
+$('focus').addEventListener('click', () => {
+  if (!buddy) return
+  buddy.focus(!buddy.state().focusing)
+  updateDiagnosis()
+})
+$('storyPlay').addEventListener('click', async () => {
+  if (!buddy || switching) return
+  buddy.focus(false)
+  const steps = [...(buddy.state().surf !== 'floor' ? ['descend'] : []), 'lookSlide', { wait: .4 }, 'present', { wait: .5 }, 'bow'],
+    run = buddy.story(steps)
+  storyRun = run; $('storyCancel').disabled = false
+  $('storyStatus').textContent = 'Смотрит на слайд, представляет содержимое и кланяется.'
+  $('code').textContent = `const run = buddy.story(${JSON.stringify(steps)}); await run.finished`
+  buddy.resume(); $('pause').textContent = 'Пауза'; $('pause').setAttribute('aria-pressed', 'false')
+  const result = await run.finished
+  if (storyRun !== run) return
+  storyRun = null; $('storyCancel').disabled = true
+  $('storyStatus').textContent = result.status === 'completed' ? 'История завершена.'
+    : result.status === 'cancelled' ? 'История остановлена.'
+    : result.status === 'skipped' ? 'Системная настройка уменьшенного движения: история пропущена.'
+    : `История не запущена: ${result.reason}`
+})
+$('storyCancel').addEventListener('click', () => {
+  storyRun?.cancel()
+  $('storyStatus').textContent = 'Заканчивает текущий номер. Следующие шаги отменены.'
+})
+$('y360').addEventListener('change', async () => {
+  ++playVersion; notice = ''; error = ''
+  await mount()
+  if (!buddy) return
+  if (selected.preset === 'brand' && !$('y360').checked) {
+    notice = 'Пресет Я360 выключен. Нажмите выбранный номер, чтобы включить его и запустить.'
+    return
+  }
+  await play()
+})
+$('bubble').addEventListener('change', () => { if ($('bubble').value) buddy?.say($('bubble').value); $('bubble').value = '' })
+$('copy').addEventListener('click', async () => { try { await navigator.clipboard.writeText($('code').textContent); $('copy').textContent = 'Скопировано'; setTimeout(() => $('copy').textContent = 'Скопировать', 1800) } catch { error = 'Копирование недоступно в этом браузере. Код можно выделить вручную.' } })
+$('scene').addEventListener('change', () => {
+  if (!buddy) return
+  ++playVersion; error = ''; notice = ''; cameraMode('overview')
+  if ($('scene').value === 'intro') {
+    // Модуль стекла считает первый слайд обложкой: создаём временный порядок DOM.
+    const cover = slides.find(slide => slide.dataset.scene === 'intro'), next = slides.find(slide => slide.dataset.scene === 'platforms')
+    stage.prepend(next); stage.prepend(cover)
+    const ordered = [...stage.querySelectorAll(':scope > .slide')]
+    const commit = index => ordered.forEach((slide, i) => slide.classList.toggle('on', i === index))
+    effects?.destroy(); effects = attachDeckEffects({ stage, buddy, show: commit })
+    buddy.pause(); effects.armIntro('line')
+    setTimeout(() => { if (effects) { buddy.resume(); effects.go(1, 0) } }, 500)
+    $('title').textContent = 'Взрыв обложки'; $('description').textContent = 'Три удара, трещины, разлёт осколков, вылет бадди и посадка на блок.'
+    $('code').textContent = "effects.armIntro('line'); effects.go(1, 0)"
+  } else { for (const slide of slides) stage.insertBefore(slide, stage.querySelector('.brand')); scene($('scene').value) }
+})
+$('smart').addEventListener('change', () => { buddy?.setReactions($('smart').checked); updateDiagnosis() })
+$('profile').addEventListener('change', () => { buddy?.setProfile($('profile').value); updateDiagnosis() })
+$('reactNow').addEventListener('click', () => {
+  const candidate = buddy?.intelligence.inspect().candidates.find(item => !item.reason)
+  if (!candidate) { notice = 'Для этой сцены доступен взгляд на цель'; const target = buddy?.intelligence.state().analysis?.target; if (target) buddy.lookAt({ x: target.x, y: target.y, z: 0 }, 2.4); return }
+  selected = find(candidate.id); describe(); play()
+})
+for (const [button, id] of [['brandUp', 'logo'], ['brandDown', 'descend']]) $(button).addEventListener('click', () => { selected = find(id); describe(); play() })
+$('showTarget').addEventListener('change', updateCameraTarget)
+$('contextSource').addEventListener('change', () => {
+  if (!buddy) return
+  try { stopContextStory(); buddy.selectContext($('contextSource').value || null); error = ''; updateCameraTarget(); updateDiagnosis() }
+  catch (exception) { error = exception.message }
+})
+$('contextConcept').addEventListener('change', () => {
+  const element = stage.querySelector('[data-buddy-context-id="demo-concept"]')
+  if (!element) return
+  const concept = $('contextConcept').value
+  stopContextStory()
+  element.dataset.buddyConcept = concept; element.textContent = $('contextConcept').selectedOptions[0]?.textContent || concept
+  buddy?.selectContext(null); buddy?.rescan(); updateCameraTarget(); updateDiagnosis()
+})
+$('contextPlay').addEventListener('click', () => {
+  if (!buddy) return
+  const context = buddy.context(), fact = context.facts.find(item => item.id === context.selectedId) || context.facts[0],
+    preferred = { number: 'thinkNumber', text: 'laptopNotes', keyword: 'hologramKeyword', object: 'hologramObject', card: 'peekCard', values: 'compareValues', images: 'showBeforeAfter', chart: 'followChart', bars: 'chartClimb', route: 'cardRoute', flow: 'traceFlow', list: 'assembleList', detail: 'inspectDetail' },
+    id = preferred[fact?.kind]
+  if (!id) { error = 'На этом слайде нет подходящего источника.'; return }
+  selected = find(id); $('group').value = 'Контекст слайда'; describe(); play()
+})
+function stopContextStory() {
+  if (buddy && contextIds.has(buddy.state().act)) { buddy.sequence(['idle']); notice = 'Источник изменён; запустите номер заново.' }
+}
+function contextFact(technique = selected) {
+  if (!buddy) return null
+  const snapshot = buddy.context(), matching = snapshot.facts.filter(fact => !technique.contextKinds || technique.contextKinds.includes(fact.kind))
+  if (snapshot.selectedId) return matching.find(fact => fact.id === snapshot.selectedId) || null
+  return matching.length && matching[0].priority !== matching[1]?.priority ? matching[0] : null
+}
+function updateContextPanel() {
+  const snapshot = buddy.context(), key = `${snapshot.measures}:${snapshot.selectedId || ''}`
+  if (key !== contextPanelKey) {
+    contextPanelKey = key
+    $('contextSource').replaceChildren(new Option('Автоматический выбор', ''), ...snapshot.facts.map(fact => new Option(`${contextNames[fact.kind]} · ${fact.text.length > 60 ? fact.text.slice(0, 57) + '…' : fact.text}`, fact.id)))
+    $('contextSource').value = snapshot.selectedId || ''
+  }
+  const fact = contextFact(), contextual = contextIds.has(selected.id), structure = fact?.structure,
+    issue = contextual ? snapshot.issues?.find(item => selected.contextKinds.includes(item.kind)) : null,
+    parts = structure ? [structure.items?.length ? `элементов: ${structure.items.length}` : '',
+      structure.points?.length ? `точек: ${structure.points.length}` : '', structure.edges?.length ? `связей: ${structure.edges.length}` : ''].filter(Boolean) : [],
+    reason = contextual && fact && !buddy.state().busy ? buddy.can(selected.id) : null
+  setText('contextSummary', fact ? `${snapshot.selectedId ? 'Выбранный' : 'Автоматический'} источник: ${contextNames[fact.kind].toLocaleLowerCase('ru')} «${fact.text}». ${fact.reason}.${parts.length ? ` В структуре ${parts.join(', ')}.` : ''}${contextual ? ` Номер: «${selected.title}».` : ' Нажмите «Показать историю», чтобы использовать источник.'}${reason ? ` Условие запуска: ${reason}.` : ''}` : issue ? `Ошибка разметки источника: ${issue.reason}.` : contextual ? 'Для этого номера выберите подходящий источник: ' + selected.contextKinds.map(kind => contextNames[kind].toLocaleLowerCase('ru')).join(', ') + '.' : snapshot.reason)
+  $('contextPlay').disabled = !snapshot.facts.length
+  $('contextConcept').disabled = $('scene').value !== 'context-keywords'
+  return snapshot
+}
+const asBounds = target => target ? [target.x - target.width / 2, target.y - target.height / 2, target.x + target.width / 2, target.y + target.height / 2] : null
+function updateCameraTarget() {
+  if (!buddy) return
+  const analysis = buddy.intelligence.state().analysis,
+    id = buddy.state().act || selected.id, activeTechnique = find(id) || selected,
+    target = contextIds.has(activeTechnique.id) ? contextFact(activeTechnique)?.target : analysis?.target
+  cameraTarget = (['present', 'spotlight', 'point', 'lookSlide'].includes(id) || contextIds.has(activeTechnique.id)) ? asBounds(target) : null
+  if (['tracker', 'land', 'climb', 'stairs', 'finale'].includes(id)) {
+    const element = stage.querySelector('.slide.on [data-buddy-land], .slide.on [data-buddy-stairs], .slide.on [data-buddy-fly]')
+    if (element) { const a = element.getBoundingClientRect(), b = stage.getBoundingClientRect(), k = b.width / 1280 || 1; cameraTarget = [(a.left - b.left) / k, (a.top - b.top) / k, (a.right - b.left) / k, (a.bottom - b.top) / k] }
+  }
+  if (['logo', 'descend'].includes(id)) {
+    const element = stage.querySelector(analysis?.brand?.surface === 'text' ? '[data-perch-text]' : '[data-perch]')
+    if (element) { const a = element.getBoundingClientRect(), b = stage.getBoundingClientRect(), k = b.width / 1280 || 1; cameraTarget = [(a.left - b.left) / k, (a.top - b.top) / k, (a.right - b.left) / k, (a.bottom - b.top) / k] }
+  }
+  const outline = $('targetOutline'), bounds = asBounds(target)
+  outline.style.display = $('showTarget').checked && bounds ? 'block' : 'none'
+  if (bounds) Object.assign(outline.style, { left: bounds[0] + 'px', top: bounds[1] + 'px', width: (bounds[2] - bounds[0]) + 'px', height: (bounds[3] - bounds[1]) + 'px' })
+}
+function updateDiagnosis() {
+  if (!buddy) return
+  updateContextPanel()
+  const state = buddy.state()
+  $('focus').setAttribute('aria-pressed', String(!!state.focusing))
+  $('focus').textContent = state.focusing ? 'Вернуть активность' : 'Дать залу сосредоточиться'
+  const info = buddy.intelligence.inspect(), a = info.analysis, world = info.world,
+    kinds = { content: 'Содержимое', image: 'Картинка', number: 'Крупное число', title: 'Обложка', divider: 'Перебивка', finale: 'Финал', off: 'Без реакции' },
+    candidates = info.candidates.map(item => `${find(item.id)?.title || item.id}${item.reason ? ` — ${item.reason}` : ''}`)
+  if (observedMeasures !== info.measures) { observedMeasures = info.measures; updateCameraTarget() }
+  setText('analysis', a ? `${kinds[a.kind] || a.kind}: ${a.reason}. Цель: ${a.target ? ({ image: 'картинка', number: 'число', title: 'заголовок', explicit: 'явная метка' }[a.target.kind] || a.target.kind) : 'не задана'}.` : 'Слайд пока не определён.')
+  setText('surfaces', `Найденные опоры: площадки — ${world?.plats?.length || 0}, кромки — ${world?.walls?.length || 0}. Digital Review: ${a?.brand ? a.brand.surface === 'text' ? 'верх букв подписи' : a.brand.surface === 'avatar' ? 'аватарка рядом с подписью' : 'область бренда' : 'не найден'}. Приёмы: «На подпись» и «Спуститься».`)
+  setText('reaction', `Сейчас: ${info.verdict.reason || 'можно реагировать'}. ${candidates.length ? 'Реакции: ' + candidates.join('; ') + '.' : 'В этой сцене — взгляд на цель.'} Последнее событие: ${info.last.action ? find(info.last.action)?.title || info.last.action : info.last.reason}.`)
+  $('reactNow').disabled = !a?.target && !candidates.length
+  $('brandUp').disabled = !!buddy.can('logo'); $('brandDown').disabled = !!buddy.can('descend')
+}
+new ResizeObserver(entries => { viewWidth = entries[0].contentRect.width; viewHeight = entries[0].contentRect.height; camera.reset(); updateCameraTarget() }).observe($('viewport'))
+let observedAction = '', observedMeasures = -1
+function update(now) {
+  if (buddy && !switching) {
+    const state = buddy.state(), framing = buddy.framing()
+    if (observedAction !== state.act) { observedAction = state.act; updateCameraTarget() }
+    const frame = camera.update({ width: viewWidth, height: viewHeight, actor: framing.actor,
+      props: framing.props, detail: framing.detail, planned: framing.planned, context: cameraTarget, dt: (now - lastFrame) / 1000, reducedMotion: buddy.reducedMotion })
+    const transform = `translate(${frame.x}px,${frame.y}px) scale(${frame.scale})`
+    if (stage.style.transform !== transform) stage.style.transform = transform
+    if (now - lastDiagnosis > 750) { lastDiagnosis = now; updateDiagnosis() }
+    if (now - lastStatus > 250) { lastStatus = now; setText('status', error || `${notice ? notice + ' · ' : ''}${state.renderer === 'webgl' ? '3D / WebGL' : 'SVG'} · ${state.paused ? 'пауза' : 'в движении'} · ${state.act || 'ожидание'} · опора: ${state.surf} · уровень ${state.level + 1}`); $('status').classList.toggle('notice', !!error) }
+  }
+  lastFrame = now; requestAnimationFrame(update)
+}
+renderList(); describe(); mount().then(play); requestAnimationFrame(update)
+</script>
+</body>
+</html>
