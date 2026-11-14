@@ -101,7 +101,7 @@ try {
     const metadata = await ev(`globalThis.qaModule=await import('./index.js');qaModule.techniques.filter(t=>${JSON.stringify(cases.map(([id]) => id))}.includes(t.id)).map(t=>({id:t.id,kinds:t.contextKinds,tags:t.tags}))`)
     assert.deepEqual(metadata.map(item => item.id).sort(), cases.map(item => item[0]).sort())
     assert.ok(metadata.every(item => item.kinds.length && item.tags.includes('context')))
-    await choose('group', 'Контекст слайда')
+    await choose('group', 'Slide context')
     const listed = await ev(`[...document.querySelectorAll('#list [data-id]')].map(el=>el.dataset.id)`)
     assert.ok(cases.every(([id]) => listed.includes(id)))
     return { metadata, listed }

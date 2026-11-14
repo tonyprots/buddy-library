@@ -214,7 +214,7 @@ test('пары значений явные, точные и сопоставим
     assert.throws(() => values().structure.items.push({}), TypeError)
     second.childNodes[0].nodeValue = '42 ₽'; assert.equal(values(), undefined)
     const issue = analyzeSlideContext(f.slide, f.stage).issues[0]
-    assert.equal(issue.kind, 'values'); assert.match(issue.reason, /единицы/u)
+    assert.equal(issue.kind, 'values'); assert.match(issue.reason, /units/u)
     assert.throws(() => issue.reason = 'Другое', TypeError)
     first.childNodes[0].nodeValue = '18'; second.childNodes[0].nodeValue = '42'
     assert.deepEqual(values().structure.items.map(item => item.unit), ['', ''])
@@ -292,7 +292,7 @@ test('матрица SVG калибруется по viewport при пропу�
     svg.style.transform = 'matrix(0,1,-1,0,0,0)'
     const rejected = analyzeSlideContext(f.slide, f.stage)
     assert.ok(!rejected.facts.some(item => item.kind === 'chart'))
-    assert.match(rejected.issues[0].reason, /поворот|наклон|отражение/iu)
+    assert.match(rejected.issues[0].reason, /rotation|skew|reflection/iu)
   } finally { f.close() }
 })
 
@@ -331,7 +331,7 @@ test('схема имеет только явные связи между сущ
     const edge = flow.append(f.make('polyline', '', { 'data-buddy-from': 'a', 'data-buddy-to': 'b', 'data-buddy-points': '[[100,100],[300,100]]' }))
     assert.deepEqual(structure().structure.edges, [{ from: 'a', to: 'b', points: [{ x: 100, y: 100 }, { x: 300, y: 100 }] }])
     edge.attrs['data-buddy-to'] = 'missing'; assert.equal(structure(), undefined)
-    assert.match(analyzeSlideContext(f.slide, f.stage).issues[0].reason, /узел/u)
+    assert.match(analyzeSlideContext(f.slide, f.stage).issues[0].reason, /node/u)
     edge.attrs['data-buddy-to'] = 'b'; b.style.display = 'none'; assert.equal(structure(), undefined)
     b.style.display = 'block'; b.attrs['data-buddy-node'] = 'a'; assert.equal(structure(), undefined)
     assert.equal(a.textContent, 'Источник')
@@ -417,7 +417,7 @@ test('SVG copy marker измеряется при анализе, запреща
       matrix = unsupported; manager.refresh()
       const media = manager.resolve('showBeforeAfter').parts[0].media
       assert.equal(media.copyable, false)
-      assert.match(media.reason, /поворот|отражение|наклон/iu)
+      assert.match(media.reason, /rotation|reflection|skew/iu)
     }
     matrix = { a: 2, b: 1e-13, c: -1e-13, d: 3, e: 100, f: 200 }; manager.refresh()
     assert.equal(manager.resolve('showBeforeAfter').parts[0].media.copyable, true, 'Положительное масштабирование и числовой шум разрешены')

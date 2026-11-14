@@ -2,27 +2,27 @@
 export function createPlayback({ raw, registry, launch, context, lookAt, changed }) {
   let current = null, launching = false
   const seconds = (value, max = 300) => {
-    if (!Number.isFinite(value) || value < 0 || value > max) throw new RangeError(`Длительность должна быть от 0 до ${max} секунд`)
+    if (!Number.isFinite(value) || value < 0 || value > max) throw new RangeError(`Duration must be between 0 and ${max} seconds`)
   }, validate = steps => {
-    if (!Array.isArray(steps) || !steps.length || steps.length > 128) throw new TypeError('История принимает от 1 до 128 шагов')
+    if (!Array.isArray(steps) || !steps.length || steps.length > 128) throw new TypeError('A story requires 1 to 128 steps')
     return steps.map(step => {
       if (typeof step === 'string') step = { play: step }
-      if (!step || typeof step !== 'object' || Array.isArray(step)) throw new TypeError('Нужен шаг play, lookAt или wait')
-      if (['play', 'lookAt', 'wait'].filter(key => Object.hasOwn(step, key)).length !== 1) throw new TypeError('Шаг содержит ровно одно действие: play, lookAt или wait')
+      if (!step || typeof step !== 'object' || Array.isArray(step)) throw new TypeError('Expected a play, lookAt or wait step')
+      if (['play', 'lookAt', 'wait'].filter(key => Object.hasOwn(step, key)).length !== 1) throw new TypeError('A step must contain exactly one action: play, lookAt or wait')
       if (Object.hasOwn(step, 'play')) {
-        if (!registry.has(step.play)) throw new RangeError(`Неизвестный приём: ${step.play}`)
-        if (step.contextId !== undefined && step.contextId !== null && typeof step.contextId !== 'string') throw new TypeError('contextId — строка или null')
+        if (!registry.has(step.play)) throw new RangeError(`Unknown action: ${step.play}`)
+        if (step.contextId !== undefined && step.contextId !== null && typeof step.contextId !== 'string') throw new TypeError('contextId must be a string or null')
         if (step.play === 'nap') {
           seconds(step.duration)
-          if (step.duration < 3) throw new RangeError('Для сна задайте duration от 3 до 300 секунд')
-        } else if (step.duration !== undefined) throw new TypeError('duration у play задаётся только для nap')
+          if (step.duration < 3) throw new RangeError('Set a nap duration between 3 and 300 seconds')
+        } else if (step.duration !== undefined) throw new TypeError('play duration is supported only for nap')
         return Object.freeze({ play: step.play, contextId: step.contextId, duration: step.duration })
       }
       if (Object.hasOwn(step, 'wait')) { seconds(step.wait); return Object.freeze({ wait: step.wait }) }
       const target = step.lookAt
-      if (!target || ![target.x, target.y, target.z ?? 0].every(Number.isFinite)) throw new TypeError('lookAt принимает конечную точку {x,y,z?}')
+      if (!target || ![target.x, target.y, target.z ?? 0].every(Number.isFinite)) throw new TypeError('lookAt expects a finite point {x,y,z?}')
       seconds(step.duration, 60)
-      if (step.duration < .05) throw new RangeError('Для взгляда нужна duration от 0.05 до 60 секунд')
+      if (step.duration < .05) throw new RangeError('Set a gaze duration between 0.05 and 60 seconds')
       return Object.freeze({ lookAt: Object.freeze({ x: target.x, y: target.y, z: target.z ?? 0 }), duration: step.duration })
     })
   }, finish = (job, status, reason) => {
@@ -81,7 +81,7 @@ export function createPlayback({ raw, registry, launch, context, lookAt, changed
     get running() { return !!current },
     start(input, { signal } = {}) {
       const steps = validate(input)
-      if (signal && (typeof signal.addEventListener !== 'function' || typeof signal.removeEventListener !== 'function')) throw new TypeError('signal должен быть AbortSignal')
+      if (signal && (typeof signal.addEventListener !== 'function' || typeof signal.removeEventListener !== 'function')) throw new TypeError('signal must be an AbortSignal')
       if (signal?.aborted || raw.reduced) return Object.freeze({
         finished: Promise.resolve(Object.freeze({ status: signal?.aborted ? 'cancelled' : 'skipped', step: 0, reason: signal?.aborted ? 'aborted' : 'reduced-motion' })), cancel() {}
       })

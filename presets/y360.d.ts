@@ -1,6 +1,6 @@
 import type { LogoId, BrandSnapshot } from '../index.js'
 
-/** Фирменные знаки; импорт этого файла сам по себе не включает пресет. */
+/** Trademark images. Importing this module does not enable the preset. */
 export const logos: Readonly<Record<LogoId, string>>
-/** Тот же демонстрационный набор в общем формате бренда. */
+/** The same example assets in the general brand format. */
 export const brand: BrandSnapshot

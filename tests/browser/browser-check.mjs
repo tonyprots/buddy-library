@@ -78,7 +78,7 @@ try {
   assert.equal(await ev('globalThis.THREE.host'), true)
   check('Библиотека сохраняет THREE основного приложения')
   assert.equal(await ev('testBuddy.presets.y360'), false)
-  assert.match(await ev(`testBuddy.can('disk')`), /выключен/)
+  assert.match(await ev(`testBuddy.can('disk')`), /is off/)
   assert.equal(browser.requests.some(url => url.includes('/presets/y360.js')), false)
   check('Я360 выключен и не загружается по умолчанию')
   await ev(`globalThis.otherStage=makeStage(); otherStage.style.position='absolute';otherStage.style.top='0';otherStage.style.left='0'; globalThis.otherBuddy=await module.createBuddy({stage:otherStage,autoplay:false,reactions:false});otherBuddy.pause()`)

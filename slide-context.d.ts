@@ -19,7 +19,7 @@ export interface ContextStructure {
   items: ContextItem[]
   points?: ContextPoint[]
   edges?: { from: string; to: string; points: ContextPoint[] }[]
-  /** Область в координатах сцены; x/y — верхний левый угол, не центр. */
+  /** Crop in stage coordinates; x/y is the top-left corner, not the center. */
   crop?: { x: number; y: number; width: number; height: number }
 }
 export interface ContextFact {
@@ -54,7 +54,7 @@ export interface ResolvedContext {
     readonly id: string
     readonly element: HTMLElement | SVGElement
     readonly bounds: readonly [number, number, number, number]
-    /** Внутренний снимок viewport и допустимости точной копии корневого SVG. */
+    /** Internal snapshot of the viewport and whether the root SVG can be copied accurately. */
     readonly media?: Readonly<{ width: number; height: number; copyable: boolean; reason: string | null }>
   }[]
 }

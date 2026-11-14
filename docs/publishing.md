@@ -1,48 +1,43 @@
-# Подготовка публикации
+# Publishing
 
-Локальная поставка готовится отдельно от создания репозитория и загрузки релиза.
-Репозиторий: https://github.com/tonyprots/buddy-library. Публичное имя автора —
-Anton Protsenko, как в профиле GitHub. Имя пакета и существующий копирайт сохранены.
+Repository: https://github.com/tonyprots/buddy-library.
+Author: Anton Protsenko. The package name remains `@tony-prots/buddy`;
+the npm scope and GitHub account intentionally differ.
 
-## Страница репозитория
+## Repository page
 
-Предлагаемое About:
+About:
 
-> Анимированный 3D-герой для HTML-презентаций: один локальный скрипт, автономные
-> трюки и реакции на слайды, без сервера и внешних зависимостей.
+> An animated 3D companion for HTML presentations. One local script, autonomous tricks and slide reactions. No server required.
 
-Точные topics: `html-presentation`, `presentation`, `javascript`, `animation`,
-`threejs`, `webgl`, `mascot`, `offline`.
-Это тематические метки, не обещание роста позиций или звёзд.
+Topics: html-presentation, presentation, javascript, animation, threejs, webgl,
+mascot, offline. These describe the project; they do not promise search ranking.
 
-README уже содержит назначение, реальное изображение, готовый файл в dist,
-минимальное подключение и ссылку на инструкцию агенту. Демо пока локальное;
-не указывать вымышленную ссылку на Pages.
+README links to the ready bundle, examples, Releases and the agent integration
+guide. There is no hosted Pages demo; do not add an unverified demo URL.
 
-## Первый выпуск
+## Release workflow
 
-После явного разрешения на публикацию:
+1. Update the version, changelog and package metadata. Keep source history free
+   of private notes; use the allowlisted export when working from a private tree.
+2. Build, run the appropriate checks and pack. Export web/source ZIPs to a new
+   directory. Never overwrite an existing release's files.
+3. Commit the public tree and wait for GitHub Actions to pass.
+4. Create a version tag and GitHub Release containing buddy-X.Y.Z-web.zip,
+   buddy-X.Y.Z-source.zip, tony-prots-buddy-X.Y.Z.tgz and checksums-X.Y.Z.json.
+5. Download every asset without authentication, verify SHA-256 and check the
+   downloaded web example in a browser.
 
-1. Создать репозиторий из чистого source-экспорта без прежней git-истории.
-2. Сверить repository/homepage/bugs/author и ссылки на Releases в README и
-   docs/api.md; затем обновить упаковку.
-3. Убрать пометку кандидата у публикуемой версии в CHANGELOG.
-   Исторические локальные поставки не выдавать за уже опубликованные релизы.
-4. Подготовить тег v0.9.0 и GitHub Release с buddy-0.9.0-web.zip,
-   tony-prots-buddy-0.9.0.tgz и checksums-0.9.0.json. Если в контрольных суммах
-   указан source ZIP, приложить и buddy-0.9.0-source.zip.
-5. Проверить скачивание по ссылкам релиза и подключение из скачанного архива.
-   До отдельного решения не выполнять npm publish и не обещать установку из реестра.
+manifest.sha256.json describes an export, not the working source tree; it belongs
+in ZIPs and is ignored by git. npm publication is separate and has not been enabled.
+Do not advertise registry installation until that publication actually exists.
 
-manifest.sha256.json относится к конкретному экспорту, а не к исходникам:
-он включён в ZIP и исключён из git.
+## Discovery
 
-## О видимости проекта
+GitHub searches repository names, descriptions, topics and README with `in:readme`.
+Npm uses description and keywords. llms.txt is navigation for coding agents,
+not a guarantee of search ranking or automatic agent discovery.
 
-GitHub ищет репозитории по имени, описанию и topics; README ищется при
-`in:readme`. Npm использует description и keywords. llms.txt здесь — навигация
-для агентов, а не средство улучшить ранжирование Google.
-
-Документация: [поиск GitHub](https://docs.github.com/en/search-github/searching-on-github/searching-for-repositories),
+References: [GitHub repository search](https://docs.github.com/en/search-github/searching-on-github/searching-for-repositories),
 [topics](https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/classifying-your-repository-with-topics),
-[поля npm](https://docs.npmjs.com/cli/v11/configuring-npm/package-json/).
+[npm package fields](https://docs.npmjs.com/cli/v11/configuring-npm/package-json/).

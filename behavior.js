@@ -1,24 +1,24 @@
 import { resolveAutoplayProfile } from './slide-intelligence.js'
 
 export const behaviorModes = Object.freeze({
-  manual: Object.freeze({ title: 'Ручной', profile: 'live' }),
-  companion: Object.freeze({ title: 'Спутник', profile: 'live' }),
-  show: Object.freeze({ title: 'Шоу', profile: 'show' })
+  manual: Object.freeze({ title: 'Manual', profile: 'live' }),
+  companion: Object.freeze({ title: 'Companion', profile: 'live' }),
+  show: Object.freeze({ title: 'Show', profile: 'show' })
 })
 
 export const characters = Object.freeze({
-  business: Object.freeze({ title: 'Деловой' }),
-  curious: Object.freeze({ title: 'Любопытный' }),
-  playful: Object.freeze({ title: 'Озорной' })
+  business: Object.freeze({ title: 'Business' }),
+  curious: Object.freeze({ title: 'Curious' }),
+  playful: Object.freeze({ title: 'Playful' })
 })
 
 export function validateMode(id) {
-  if (!Object.hasOwn(behaviorModes, id)) throw new RangeError(`Неизвестный режим: ${id}`)
+  if (!Object.hasOwn(behaviorModes, id)) throw new RangeError(`Unknown mode: ${id}`)
   return id
 }
 
 export function validateCharacter(id) {
-  if (!Object.hasOwn(characters, id)) throw new RangeError(`Неизвестный характер: ${id}`)
+  if (!Object.hasOwn(characters, id)) throw new RangeError(`Unknown character: ${id}`)
   return id
 }
 

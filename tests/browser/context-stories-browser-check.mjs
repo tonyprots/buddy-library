@@ -265,7 +265,7 @@ try {
   report.testOverrides = svgOnly ? { renderer: 'svg' } : {}
   if (svgOnly) assert.equal(report.renderer, 'svg')
   const metadata = await ev(`qaModule.techniques.filter(t=>${JSON.stringify(ids)}.includes(t.id)).map(t=>({id:t.id,duration:t.duration,kinds:t.contextKinds,tags:t.tags}))`)
-  await choose('group', 'Контекст слайда')
+  await choose('group', 'Slide context')
   await check('Десять различных историй есть в метаданных и каталоге', async () => {
     assert.deepEqual(metadata.map(t => t.id).sort(), [...ids].sort())
     assert.ok(metadata.every(t => t.kinds.length && t.tags.includes('context')))

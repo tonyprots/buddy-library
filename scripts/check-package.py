@@ -1,4 +1,4 @@
-"""Сверяет файлы готового TGZ с разрешённой поставкой и текущими исходниками."""
+"""Compare TGZ contents with the package allowlist and current source files."""
 import json
 from pathlib import Path
 import sys
@@ -15,9 +15,9 @@ for entry in package["files"] + ["package.json"]:
             expected["package/" + file.relative_to(root).as_posix()] = file.read_bytes()
 with tarfile.open(sys.argv[1], "r:gz") as archive:
     members = [member for member in archive.getmembers() if not member.isdir()]
-    assert len(members) == len(expected), "Количество файлов TGZ не совпало"
-    assert {member.name for member in members} == set(expected), "Состав TGZ не совпал"
+    assert len(members) == len(expected), "TGZ file count mismatch"
+    assert {member.name for member in members} == set(expected), "TGZ file list mismatch"
     for member in members:
         assert member.isfile(), member.name
         assert archive.extractfile(member).read() == expected[member.name], member.name
-print(f"TGZ {package['version']}: {len(expected)} файлов сверены с исходниками")
+print(f"TGZ {package['version']}: {len(expected)} files match the source tree")

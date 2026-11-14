@@ -10,17 +10,17 @@ const script = typeof document !== 'undefined' ? document.currentScript : null,
 if (selector) {
   const mount = () => {
     const stage = document.querySelector(selector)
-    if (!stage) { console.error(`Бадди: сцена ${selector} не найдена`); return }
+    if (!stage) { console.error(`Buddy: stage ${selector} not found`); return }
     let brand
     if (script.dataset.brand) {
       try {
         const data = document.querySelector(script.dataset.brand)
-        if (!data || data.type !== 'application/json') throw new TypeError('Нужен script type="application/json" с набором бренда')
+        if (!data || data.type !== 'application/json') throw new TypeError('Expected a script type="application/json" containing the brand configuration')
         brand = JSON.parse(data.textContent)
-      } catch (error) { console.error('Бадди: не удалось прочитать data-brand:', error); return }
+      } catch (error) { console.error('Buddy: could not read data-brand:', error); return }
     }
     window.buddy = createBuddy({ stage, slideSelector: script.dataset.slideSelector, activeClass: script.dataset.activeClass, brand })
-    window.buddy.then(buddy => { window.buddy = buddy }, error => console.error('Бадди не запустился:', error))
+    window.buddy.then(buddy => { window.buddy = buddy }, error => console.error('Buddy failed to start:', error))
   }
   document.readyState === 'loading' ? document.addEventListener('DOMContentLoaded', mount, { once: true }) : mount()
 }

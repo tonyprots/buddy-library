@@ -14,6 +14,8 @@ const browser = await openBrowser({ width: 1440, height: 1000, dpr: 1 }), ev = b
 try {
   await browser.navigate(pathToFileURL(join(root, 'examples', page)).href)
   for (let attempt = 0; attempt < 200 && !await ev('!!window.buddy?.state'); attempt++) await browser.sleep(50)
+  assert.equal(await ev('document.documentElement.lang'), 'en')
+  assert.doesNotMatch(await ev('document.body.innerText'), /[А-Яа-яЁё]/u)
   assert.deepEqual(await ev('[buddy.mode,buddy.profile,buddy.state().character,buddy.state().autonomous,buddy.renderer]'),
     ['show', 'show', 'curious', true, 'webgl'])
   await browser.sleep(1500)

@@ -97,10 +97,10 @@ export function createRuntime({ deck, host, presentation = null, brand: brandOpt
   // Одна страница без слайдов: смелости не к чему расти, поэтому сразу средний уровень — лазает по блокам.
   const SINGLE_PAGE_PROGRESS = .5;
   const LEVELS = [
-    { upTo: .12, name: 'присматривается', floor: [176, 470], climb: 0, reach: 0, down: 'climb', tricks: 0 },
-    { upTo: .32, name: 'осваивается', floor: [176, 900], climb: 300, reach: 110, down: 'climb', tricks: 1 },
-    { upTo: .66, name: 'лазает', floor: [176, 1080], climb: 560, reach: 150, down: 'hang', tricks: 1 },
-    { upTo: 1.01, name: 'хулиганит', floor: [176, 1080], climb: 700, reach: 175, down: 'jump', tricks: 2 },
+    { upTo: .12, name: 'observing', floor: [176, 470], climb: 0, reach: 0, down: 'climb', tricks: 0 },
+    { upTo: .32, name: 'settling in', floor: [176, 900], climb: 300, reach: 110, down: 'climb', tricks: 1 },
+    { upTo: .66, name: 'climbing', floor: [176, 1080], climb: 560, reach: 150, down: 'hang', tricks: 1 },
+    { upTo: 1.01, name: 'showing off', floor: [176, 1080], climb: 700, reach: 175, down: 'jump', tricks: 2 },
   ];
 
   // Репертуар на полу: веса по уровням 0–3. Недавние действия штрафуются, так что повторов подряд нет.
@@ -857,14 +857,14 @@ export function createRuntime({ deck, host, presentation = null, brand: brandOpt
       if (walls.some(w => Math.abs(w.x - wx) < 4 && Math.abs(w.top - P.y) < 4)) continue;
       const cov = boxes.filter(q => Math.abs((side < 0 ? q.x1 : q.x2) - wx) < 2.5 && q.y2 > P.y - 1).map(q => [q.y1, q.y2]).sort((a, c) => a[0] - c[0]);
       let bottom = P.y; for (const [a, c] of cov) if (a <= bottom + 16) bottom = Math.max(bottom, c);
-      if (FLOOR - bottom > LEVELS[LEVELS.length - 1].reach) { why.push(tag + 'высоко ' + Math.round(FLOOR - bottom)); continue; }
+      if (FLOOR - bottom > LEVELS[LEVELS.length - 1].reach) { why.push(tag + 'too high ' + Math.round(FLOOR - bottom)); continue; }
       const footX = wx + side * 12;
-      if (!inSpans(W.floor.spans, footX)) { why.push(tag + 'нет пола'); continue; }
-      if (!zoneFree(Math.min(wx + side * .8, wx + side * 21), P.y - 50, Math.max(wx + side * .8, wx + side * 21), FLOOR)) { why.push(tag + 'текст у стены'); continue; }
+      if (!inSpans(W.floor.spans, footX)) { why.push(tag + 'no floor'); continue; }
+      if (!zoneFree(Math.min(wx + side * .8, wx + side * 21), P.y - 50, Math.max(wx + side * .8, wx + side * 21), FLOOR)) { why.push(tag + 'text by the wall'); continue; }
       const cx1 = Math.min(wx + side * 1.5, wx + side * 14.5), cx2 = Math.max(wx + side * 1.5, wx + side * 14.5);
-      if (boxes.some(q => q.x2 > cx1 && q.x1 < cx2 && q.y2 > P.y - 30 && q.y1 < FLOOR)) { why.push(tag + 'тесно'); continue; }
+      if (boxes.some(q => q.x2 > cx1 && q.x1 < cx2 && q.y2 > P.y - 30 && q.y1 < FLOOR)) { why.push(tag + 'not enough room'); continue; }
       const topX = wx - side * (Math.max(P.rad, 3) + 10);
-      if (!inSpans(P.spans, topX)) { why.push(tag + 'наверху текст'); continue; }
+      if (!inSpans(P.spans, topX)) { why.push(tag + 'text on top'); continue; }
       walls.push({ x: wx, side, plat: P, top: P.y, bottom, gap: FLOOR - bottom, grab: Math.max(P.y, Math.min(bottom - 4, FLOOR - 50)), footX, topX, h: FLOOR - P.y });
     }
     W.why = why;
@@ -3786,7 +3786,7 @@ export function createRuntime({ deck, host, presentation = null, brand: brandOpt
     resizeCanvas(w, h, ratio, dev); G3.reserveMs += performance.now() - at;
   }
   function reserveCanvasBounds(bounds) {
-    if (!validBounds(bounds) || bounds[2] <= bounds[0] || bounds[3] <= bounds[1]) throw new RangeError('Нужны конечные границы [x1,y1,x2,y2] с положительной площадью');
+    if (!validBounds(bounds) || bounds[2] <= bounds[0] || bounds[3] <= bounds[1]) throw new RangeError('Expected finite bounds [x1,y1,x2,y2] with positive area');
     if (!G3?.on) return false;
     const at = performance.now(), scale = S * B.scale * 1.15,
       actor = [B.x + FIG_BOX[0] * scale - 4, B.y + FIG_BOX[1] * scale - 4, B.x + FIG_BOX[2] * scale + 4, B.y + FIG_BOX[3] * scale + 4];
@@ -3843,23 +3843,23 @@ export function createRuntime({ deck, host, presentation = null, brand: brandOpt
     },
     availability(name) {
       if (name === 'parachute') {
-        if (B.mode !== 'ground' || B.surf.kind !== 'floor') return 'Для запуска парашюта нужна стойка на полу';
-        if (parachuteLaunchSite(440) == null) return 'Нет свободного достижимого коридора для запуска парашюта';
+        if (B.mode !== 'ground' || B.surf.kind !== 'floor') return 'Parachute launch requires a standing pose on the floor';
+        if (parachuteLaunchSite(440) == null) return 'No clear, reachable corridor for parachute launch';
       }
       if (['climb', 'grapple', 'web', 'pullups'].includes(name) && W.time - B.downAt < 15)
-        return 'После спуска нужна пауза 15 секунд перед новым подъёмом';
+        return 'Wait 15 seconds after descending before climbing again';
       if (name === 'web') {
-        if (B.surf.kind !== 'floor' || B.mode !== 'ground') return 'Для паутины нужна стойка на полу';
-        if (!webWalls().length) return 'Нет кромки блока, до которой дотянется нить';
+        if (B.surf.kind !== 'floor' || B.mode !== 'ground') return 'Web swing requires a standing pose on the floor';
+        if (!webWalls().length) return 'No block edge within reach of the thread';
       }
-      if (name === 'grapple' && !grappleTargets().length) return 'Нет площадки для крюка в досягаемости';
+      if (name === 'grapple' && !grappleTargets().length) return 'No platform within grappling-hook range';
       if (name === 'pullups') {
-        if (B.surf.kind !== 'floor' || B.mode !== 'ground') return 'Для подтягиваний нужна стойка на полу';
-        if (!pullupCandidates(W, B, LV(), floorRange()).length) return 'Нет достижимой кромки для подтягиваний';
+        if (B.surf.kind !== 'floor' || B.mode !== 'ground') return 'Pull-ups require a standing pose on the floor';
+        if (!pullupCandidates(W, B, LV(), floorRange()).length) return 'No reachable edge for pull-ups';
       }
       if (name === 'tracker') {
-        if (B.surf.kind !== 'floor' || B.mode !== 'ground') return 'Для отметки готовности нужна стойка на полу';
-        if (!trackerCandidates(W, B, FLOOR).length) return 'Нет подходящей свободной кромки для отметки готовности';
+        if (B.surf.kind !== 'floor' || B.mode !== 'ground') return 'Stamping requires a standing pose on the floor';
+        if (!trackerCandidates(W, B, FLOOR).length) return 'No suitable clear edge for stamping';
       }
       return null;
     },

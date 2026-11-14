@@ -67,7 +67,7 @@ test('реестр содержит десять неизменяемых ист
   assert.ok(Object.isFrozen(storyTechniques))
   for (const entry of storyTechniques) {
     assert.ok(Object.isFrozen(entry) && Object.isFrozen(entry.contextKinds) && Object.isFrozen(entry.tags))
-    assert.equal(entry.requires, 'floor'); assert.equal(entry.group, 'Контекст слайда')
+    assert.equal(entry.requires, 'floor'); assert.equal(entry.group, 'Slide context')
     assert.ok(entry.duration > 6 && entry.duration <= 25)
   }
 })

@@ -1,121 +1,82 @@
-# Объёмный реквизит новых способностей
+# Volumetric ability props
 
-Новые номера используют объёмные предметы того же рига, что книга, блокнот
-и парашют. Геометрия создаётся лениво при первом показе, материалы используют
-общий toon-шейдер, цветную контактную тень и экранный контур. Готовых изображений,
-SVG-наклеек и внешних загрузок здесь нет.
-
-## Подключение к номеру
+Additional actions use the same 3D rig as books, notebooks and parachutes.
+Geometry is created lazily, using shared toon materials, colored contact shadows
+and screen-space outlines. No external images or downloads are needed.
 
 ```js
 import { createAbilityPropBuilders } from './ability-props.js'
-
-raw.tools.registerPropBuilders(createAbilityPropBuilders) // один раз на экземпляр
+raw.tools.registerPropBuilders(createAbilityPropBuilders) // Once per instance
 const prop = raw.tools.prop3('abilityOrb', (state, skeleton) => ({
-  at: skeleton.arms[0].hand,
-  t: state.t,
-  fade: state.fade,
-  charge: state.charge,
-  box: state.box
+  at: skeleton.arms[0].hand, t: state.t, fade: state.fade,
+  charge: state.charge, box: state.box
 }))
-// В каждом кадре живого действия:
-prop.ping = true
-// При завершении или прерывании:
-prop.done = true
+prop.ping = true // Every active action frame
+prop.done = true // On completion or interruption
 ```
 
-Это внутренний интерфейс постановки, не замена публичному `buddy.play()`.
-Обычные номера не должны работать с Three.js напрямую.
+This is an internal authoring interface. Consumers use buddy.play/perform/story.
+Ordinary actions should not access Three.js directly.
 
-Общие параметры: `at` — точка скелета, `atW` — точка сцены в пикселях,
-`dir`/`to` — направление или цель, `up` — верх предмета, `grip` — точка хвата,
-`k` — масштаб. `t` — время номера в секундах, `fade` — видимость от 0 до 1.
-`box` задаёт границы предмета в пикселях сцены и расширяет маленький WebGL-холст:
-длинный хвост, луч и дождь нужно включать в эту рамку явно.
+Common fields: at is a skeleton point, atW a stage pixel point, dir/to direction
+or target, up orientation, grip local holding point, k scale, t simulation seconds,
+fade visibility 0…1. box covers the prop in stage pixels and expands the small
+WebGL canvas; explicitly include long trails, beams and rain.
 
-Геометрия предмета использует координаты Three.js: **x — поперёк, y — вверх,
-z — вперёд**. Размеры ниже указаны в единицах скелета, не в метрах и не в
-пикселях сцены. Для привязки предмета к кисти используют `grip`; для поз рук
-сначала решают контакт в 3D, затем проектируют в кадр. После выпуска стрелы
-или кометы её траектория перестаёт зависеть от движения ладони.
+Builder geometry uses Three.js axes: x lateral, y up, z forward. Dimensions below
+are skeleton units, not meters or stage pixels. Solve hand contact in 3D before
+projection. Released arrows and comets must move independently of the hands.
 
-## Предметы и точки хвата
+## Builders
 
-| Builder | Геометрия и точки | Параметры |
+| Builder | Geometry | Parameters |
 |---|---|---|
-| `abilityComet` | Неровное каменное ядро R5,5; объёмный хвост за −z до 38; маленькие угли | `tail`, `heat`: 0…1; `spin`: отдельное время вращения ядра |
-| `abilityOrb` | Полупрозрачная оболочка базового R6, синяя толща, объёмное светлое ядро и сферические блики; ладони по противоположным сторонам | `charge`: 0…1; `radius`: 6…18, для крупного номера 18 |
-| `abilityBow` | Рукоять в 0, дуга выпукла вперёд (+z); концы `[0, ±18, −5]`; зарубка тетивы `[0, 0, −5−12*draw]` | `draw`: 0…1 |
-| `abilityArrow` | Стрела вдоль +z; хвост −14, металлическое остриё до +11 | Общие параметры |
-| `abilityUmbrella` | Ручка в 0, древко y−5…49; восемь панелей, обод y31,7, R23,8; в закрытом состоянии тканевый свёрток y26…48 с восемью складками и ремешком | `open`, `rain`: 0…1; `dropLength`: 20…180, по умолчанию 90 |
-| `abilitySnowflake` | Шесть объёмных ветвей, R7; лицевая сторона +z | `melt`: 0…1; `spin`: радианы |
-| `abilityStar` | Пятиконечная звезда R7, толщина 2,1, фаски по кромке | `spin`: радианы |
-| `abilityOrbit` | Центральное тело, три планеты с разными плоскостями орбит и кольцом | `speed`: 0…3; `radius`: 0,4…2; `clock`: интеграл скорости без обратной перемотки |
-| `abilityCrate` | Деревянный ящик 24×24×24 с объёмной рамой из досок, боковыми рейками и швами; точка привязки — центр нижней грани | `tilt`: наклон вокруг локальной x, радианы; положение полёта/скольжения задаётся общими `at`/`atW` |
-| `abilityForceWall` | Полупрозрачная пластина 25×42×1,4, жёсткая рама, отражение и волны удара | `impact`: 0…1 |
-| `abilityTimeBubble` | Пространственная оболочка вокруг тела, одна группа двенадцати осколков и два пояса; осколки не зациклены | `freeze`: 0…1; `clock`: отдельное время частиц; `radius`: 18…64, для тела 52; `fragmentScale`: 1…3,5, независимо от радиуса |
-| `abilityForceWave` | Три кольца силового толчка; прежний вариант `sonic` сохранён внутри построителя и не используется в `sonicPulse` | `kind`: `push` или внутренний `sonic`; `spread`: 0…1 |
-| `abilityFlashlight` | Фонарь, хват `[0,0,−3]`; объектив z6; мягкий объёмный конус | `beam`: 0…1; `beamLength`: 12…8000; `beamRadius`: 3…80 |
-| `abilityConfetti` | 96 разноцветных лент 3×7 и квадратов 4×4 с толщиной; после полёта ложатся на пол и сохраняют размер до уборки | `t`: секунды после хлопка; `floorDrop`: расстояние до пола в единицах скелета; прежний `burst`: 0…1 |
+| abilityComet | Irregular rock radius 5.5, trail along −z to 38, embers | tail/heat 0…1; independent spin time |
+| abilityOrb | Shell radius 6, blue volume, bright core and highlights | charge 0…1; radius 6…18 |
+| abilityBow | Grip at origin, bow curves toward +z; tips [0,±18,−5], nock [0,0,−5−12*draw] | draw 0…1 |
+| abilityArrow | Along +z, tail −14, tip +11 | Common fields |
+| abilityUmbrella | Grip at origin, shaft y−5…49, eight panels; rim y31.7 radius23.8; folded cloth y26…48 | open/rain 0…1; dropLength 20…180, default90 |
+| abilitySnowflake | Six 3D branches, radius7, face +z | melt 0…1; spin radians |
+| abilityStar | Five points, radius7, thickness2.1, beveled edges | spin radians |
+| abilityOrbit | Central body, three orbital planes and a ring | speed0…3, radius0.4…2, integrated clock |
+| abilityCrate | 24³ wooden crate with frame and seams; anchor at bottom center | tilt around local x; at/atW movement |
+| abilityForceWall | Translucent 25×42×1.4 panel, rigid frame, reflections and impact waves | impact0…1 |
+| abilityTimeBubble | Body shell, twelve non-looping fragments and two belts | freeze 0…1, particle clock, radius 18…64, fragmentScale 1…3.5 |
+| abilityForceWave | Three push rings; legacy sonic variant remains internal | kind push or sonic; spread0…1 |
+| abilityFlashlight | Grip [0,0,−3], lens z6, soft 3D cone | beam0…1, beamLength12…8000, beamRadius3…80 |
+| abilityConfetti | 96 thick ribbons3×7 and squares4×4, settling flat on the floor | t after clap, floorDrop, legacy burst0…1 |
 
-У зонта `dropLength` — путь от обода купола вниз. Дождь внутри купола
-перехватывается панелями, внешние капли идут дальше. Конус фонаря намеренно
-слабый: это свет от предмета, а не непрозрачный треугольник поверх слайда.
-У кометы угли и хвост гаснут отдельно от каменного ядра, поэтому после ловли
-можно оставить в ладони небольшой предмет и убрать большую огненную форму.
+## Placement details
 
-Ширина закрытого тканевого свёртка зонта — от 3,2 до 6,8 единицы; складки
-повторяют конус ткани, ремешок охватывает его на радиусе 3. Ящик служит
-видимой целью силового толчка: сначала стоит на полу, после попадания волны
-постановка перемещает и слегка наклоняет его. Сам builder не решает физику
-столкновения, чтобы её момент оставался синхронным с жестом и волной.
+Umbrella rain starts at the rim; panels intercept interior drops while exterior
+drops continue. The folded fabric spans width3.2…6.8, with a radius3 strap.
+Use both dir and up to tilt the closed umbrella. Its raised canopy must visibly
+clear the head after opening.
 
-Купол зонта поднят относительно кисти: верх y49, нижний обод y31,7. Для
-наклона закрытого зонта постановка передаёт и `dir`, и `up`: одного `up`
-недостаточно, если у предмета не задано направление. Наклон ткани вперёд
-нужен до раскрытия; открытый купол остаётся над головой с видимым зазором.
+A flashlight cone stays subtle. A separate soft SVG spot marks the actual target
+surface and disappears before the flashlight is put away. The spot is action-owned.
+Comet heat and embers fade separately from the rock so the caught object can cool.
 
-Для крупной сферы передавайте `radius:18`, а не только общий `k`: точки
-контакта ладоней должны соответствовать новому радиусу. `abilityTimeBubble`
-позволяет отдельно увеличить оболочку (`radius:52`) и сами фрагменты
-(`fragmentScale:2.2`); общий `k` после этого можно оставить равным 1.
-Лук направлен по +z: рукоять и середина дуги находятся впереди тетивы,
-а задняя кисть при полном натяжении — в z−17. Стрела проходит от хвоста
-z−14 к острию z+11; после выпуска направление не меняется.
+The crate is the visible target of forcePush. The action moves and tilts it after
+the wave arrives; the builder does not solve collisions independently of choreography.
+For the large orb use radius 18, not only k, so palm contacts match the radius.
+Time bubble uses radius52 and fragmentScale2.2 independently, usually with k=1.
+The drawn bow's rear hand reaches z−17. Arrow direction stays fixed after release.
 
-Туча конфетти требует расширенной рамки: ориентир для полного номера —
-±115 пикселей сцены по горизонтали и 130 пикселей вверх от источника при
-стандартном масштабе персонажа. Это 96 бумажек, но всего 1536 треугольников:
-каждая имеет простую геометрию с толщиной вместо тяжёлого скруглённого блока.
-`floorDrop` задаёт нижнюю границу полёта. Каждая бумажка останавливается
-на ней и поворачивается плашмя; общее `fade` начинает уборку уже на полу.
-Оклик «Эй!» в `sonicPulse` рисуется отдельным SVG-облачком без 3D-волн.
+Confetti needs bounds around ±115 stage pixels horizontally and 130 upward at
+standard character scale. Its 96 pieces use 1536 triangles. Each settles at
+floorDrop, lies flat, then fades. sonicPulse uses a separate Hey! SVG bubble,
+not 3D sound waves.
 
-При попадании фонаря в содержимое слайда постановка дополнительно показывает
-мягкое плоское SVG-пятно на целевой плоскости. Это след света на поверхности;
-сам фонарь и конус остаются объёмными. Пятно исчезает перед убиранием фонаря
-и очищается при прерывании вместе с остальными эффектами номера.
+## Fingers and cleanup
 
-## Пальцы
+`handShape: {kind:'thumbsUp',side:0,amount:1}` curls four real model fingers and
+points the thumb upward. handOpen and handFist are two-element 0…1 arrays.
+Absent metadata preserves existing hand behavior; no extra spheres replace fingers.
 
-`p.handShape = {kind:'thumbsUp', side:0, amount:1}` сворачивает четыре настоящих
-пальца модели и ориентирует большой палец вверх. `side` выбирает кисть 0 или 1,
-`amount` задаёт степень жеста. Это кости исходной модели; дополнительные шары
-вместо пальцев не создаются.
-
-`p.handOpen = [0…1, 0…1]` постепенно распрямляет пальцы, а
-`p.handFist = [0…1, 0…1]` сжимает кисть. Если эти поля отсутствуют, действует
-прежняя форма кистей: старые движения и реквизит не меняются.
-
-## Ресурсы и проверки
-
-Во время обновления предметы меняют трансформации и uniform-параметры.
-Новые Mesh, Geometry, Material и текстуры в кадре не создаются. Все ресурсы
-достижимы обходом сцены и освобождаются общим `destroy()` рига. Прерывание
-скрывает предмет; повторный запуск использует уже созданную геометрию.
-
-`tests/ability-props.test.mjs` создаёт все предметы на настоящем Three.js,
-прогоняет их параметры, проверяет конечность координат и отсутствие новых
-мешей/материалов в кадрах. Отдельный тест проверяет настоящий большой палец
-и неизменность другой кисти. Эти проверки не заменяют полный визуальный цикл
-каждого номера с обеих сторон.
+Update transforms and uniforms in place. Do not allocate meshes, geometry,
+materials or textures each frame. Resources are reachable from the rig and disposed
+by destroy(). Interruption hides a prop; replay reuses its geometry.
+Tests in ability-props.test.mjs use real Three.js and validate finite parameters,
+allocation stability and finger behavior. They do not replace full visual cycles
+from both facing directions.

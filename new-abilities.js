@@ -1,23 +1,23 @@
 import { createAbilityPropBuilders } from './ability-props.js'
 
 const entries = [
-  ['salute', 'Приветствовать', 'Поворачивается к залу, поднимает открытую ладонь и приветствует коротким кивком.', 3.6],
-  ['bow', 'Поклониться', 'Прикладывает руку к груди, переносит вес и делает спокойный поклон.', 4],
-  ['present', 'Представить содержимое', 'Сначала смотрит на слайд, затем раскрывает ладони и приглашает зрителей посмотреть.', 4.8],
-  ['thumbsUp', 'Одобрить', 'Поднимает настоящий большой палец, кивает и опускает руку.', 4.2],
-  ['spotlight', 'Подсветить главное', 'Достаёт фонарик, наводит свет на содержимое и убирает фонарик.', 6.4],
-  ['celebrate', 'Выпустить конфетти', 'Приседает, хлопает над головой и следит за разлетающимися бумажными конфетти.', 5.8],
-  ['energyOrb', 'Собрать сферу', 'Выращивает большое энергетическое ядро, поднимает его над ладонями и осторожно гасит.', 6.8],
-  ['forcePush', 'Силовой толчок', 'Готовится всем телом, резко выталкивает волну двумя ладонями и гасит отдачу.', 5.4],
-  ['sonicPulse', 'Позвать через зал', 'Подносит ладони ко рту, зовёт «Эй!», машет в зал и прислушивается к ответу.', 5.6],
-  ['energyBow', 'Энергетический лук', 'Поднимает объёмный лук, натягивает тетиву, выпускает стрелу и провожает её взглядом.', 6.6],
-  ['orbit', 'Запустить орбиту', 'Подымает маленькую объёмную систему, запускает спутники и возвращает её в ладонь.', 6.8],
-  ['comet', 'Поймать комету', 'Замечает летящую комету, ловит её с отдачей, остужает камень и отпускает его на пол.', 6.8],
-  ['rain', 'Раскрыть зонт', 'Достаёт сложенный зонт, раскрывает купол над головой, пережидает дождь и складывает его.', 7.8],
-  ['snow', 'Поймать снежинку', 'Подставляет ладонь под объёмный кристалл, рассматривает его и сдувает в сторону.', 7],
-  ['starcatch', 'Поймать звезду', 'Встречает падающую звезду ладонью, амортизирует, показывает её и отпускает вверх.', 6.8],
-  ['forceWall', 'Выставить силовую стену', 'Ставит щит, упирается обеими руками, принимает видимый удар и убирает защиту.', 6.4],
-  ['timeBubble', 'Остановить время', 'Замедляет летящие осколки, рассматривает застывшие предметы и возвращает им скорость.', 7.4]
+  ['salute', 'Greet', 'Turns toward the audience, raises an open palm and gives a short nod.', 3.6],
+  ['bow', 'Bow', 'Places a hand on the chest, shifts weight and bows gently.', 4],
+  ['present', 'Present the content', 'Looks at the slide, then opens both palms to invite the audience to look.', 4.8],
+  ['thumbsUp', 'Thumbs up', 'Raises a fully articulated thumb, nods and lowers the hand.', 4.2],
+  ['spotlight', 'Spotlight', 'Takes out a flashlight, aims at the content and puts it away.', 6.4],
+  ['celebrate', 'Confetti', 'Crouches, claps overhead and watches paper confetti scatter.', 5.8],
+  ['energyOrb', 'Energy sphere', 'Builds a large energy core, raises it above the palms and carefully extinguishes it.', 6.8],
+  ['forcePush', 'Force push', 'Braces the whole body, pushes a wave with both palms and absorbs the recoil.', 5.4],
+  ['sonicPulse', 'Call across the room', 'Cups both hands around the mouth, calls out Hey!, waves and listens for a reply.', 5.6],
+  ['energyBow', 'Energy bow', 'Raises a 3D bow, draws the string, releases an arrow and follows it with the eyes.', 6.6],
+  ['orbit', 'Start an orbit', 'Raises a small 3D system, sets its satellites in motion and returns it to the palm.', 6.8],
+  ['comet', 'Catch a comet', 'Spots an incoming comet, catches it with recoil, cools the rock and drops it to the floor.', 6.8],
+  ['rain', 'Open an umbrella', 'Takes out a folded umbrella, opens it overhead, waits out the rain and folds it away.', 7.8],
+  ['snow', 'Catch a snowflake', 'Catches a 3D crystal on one palm, examines it and blows it aside.', 7],
+  ['starcatch', 'Catch a star', 'Catches a falling star, absorbs its impact, shows it and releases it upward.', 6.8],
+  ['forceWall', 'Force wall', 'Raises a shield, braces it with both hands, absorbs a visible impact and lowers it.', 6.4],
+  ['timeBubble', 'Stop time', 'Slows flying fragments, studies the suspended objects and restores their speed.', 7.4]
 ]
 
 const gestures = new Set(['salute', 'bow', 'present', 'thumbsUp', 'sonicPulse', 'celebrate']),
@@ -25,7 +25,7 @@ const gestures = new Set(['salute', 'bow', 'present', 'thumbsUp', 'sonicPulse', 
 
 export const extraTechniques = Object.freeze(entries.map(([id, title, description, duration]) =>
   Object.freeze({ id, title, description, duration,
-    group: gestures.has(id) ? 'Жесты' : ordinaryProps.has(id) ? 'Реквизит' : 'Суперхьюман',
+    group: gestures.has(id) ? 'Gestures' : ordinaryProps.has(id) ? 'Props' : 'Superhuman',
     requires: 'floor', preset: gestures.has(id) || ordinaryProps.has(id) ? 'base' : 'superhuman' })))
 
 const registry = new Map(extraTechniques.map(item => [item.id, item])),
@@ -337,7 +337,7 @@ export function createAbilityPlayer(raw, { host } = {}) {
         raw.tools.mk('path', { d: 'M4 12L0 25L14 15Z', fill: '#fff', stroke: '#64738a', 'stroke-width': .7 }, g)
         raw.tools.mk('rect', { x: 0, y: 0, width: 31, height: 19, rx: 6, fill: '#fff', stroke: '#64738a', 'stroke-width': .7 }, g)
         raw.tools.mk('text', { x: 15.5, y: 13.5, 'text-anchor': 'middle', 'font-family': 'system-ui, sans-serif',
-          'font-size': 11, 'font-weight': 650, fill: '#20252f' }, g).textContent = 'Эй!'
+          'font-size': 11, 'font-weight': 650, fill: '#20252f' }, g).textContent = 'Hey!'
         return g
       }, o => {
         if (dead || B.act !== action) { o.age = o.life; o.el.remove(); return }
@@ -571,9 +571,9 @@ export function createAbilityPlayer(raw, { host } = {}) {
   return Object.freeze({
     create,
     can(id) {
-      if (!registry.has(id)) return 'Неизвестная дополнительная способность'
-      if (dead) return 'Проигрыватель отключён'
-      return B.surf?.kind !== 'floor' || B.mode !== 'ground' ? 'Нужна стойка на полу' : null
+      if (!registry.has(id)) return 'Unknown extra ability'
+      if (dead) return 'Player has been destroyed'
+      return B.surf?.kind !== 'floor' || B.mode !== 'ground' ? 'Requires a standing pose on the floor' : null
     },
     play(id) {
       const action = create(id)

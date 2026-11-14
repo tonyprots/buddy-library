@@ -78,7 +78,7 @@ try {
   for (let i = 0; i < 200 && !await ev('!!globalThis.buddy'); i++) await browser.sleep(50)
   assert.equal(await ev('!!globalThis.buddy'), true)
   report.browser = await ev('navigator.userAgent')
-  await choose('group', 'Контекст слайда')
+  await choose('group', 'Slide context')
   for (const [id, concept] of [['laptopNotes', null], ['thinkNumber', null], ...concepts.map(concept => ['hologramKeyword', concept])]) {
     try {
       const fact = await launch(id, concept)

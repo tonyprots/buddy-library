@@ -18,8 +18,8 @@ test('пустой слайд: крюк и паутина объясняют о�
   const f = runtimeFixture()
   try {
     f.raw.rescan(); f.raw.step(1 / 120, 120)
-    assert.match(f.raw.availability('grapple'), /крюк/)
-    assert.match(f.raw.availability('web'), /нит/)
+    assert.match(f.raw.availability('grapple'), /grappling-hook/)
+    assert.match(f.raw.availability('web'), /thread/)
     assert.equal(f.raw.run(['grapple']), false)
     assert.equal(f.raw.run(['web']), false)
   } finally { f.close() }

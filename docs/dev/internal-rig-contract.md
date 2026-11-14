@@ -1,177 +1,112 @@
-# Внутренний контракт рига и реквизита
+# Internal rig and prop contract
 
-Документ для авторов движений библиотеки. Он описывает текущие реализации
-`runtime.js`, `vendor.js`, `new-abilities.js` и контекстного реквизита на
-11 ноября 2026 года. Это внутренние каналы: `buddy.experimental`,
-`raw.tools` и API рига могут меняться. Они не расширяют стабильный API
-`createBuddy()` и не гарантируют одинаковую детализацию SVG и WebGL.
+For movement authors. These are implementation details of runtime.js, vendor.js
+and the action modules, not stable createBuddy API. `experimental`, `raw.tools`
+and the rig can change in 0.x. SVG and WebGL do not promise identical detail.
 
-## Поза и необязательные каналы кистей
+## Pose and hand channels
 
-Индекс `0` соответствует стороне `.L` модели, `1` — `.R`.
-Это не экранные «слева/справа»: видимая сторона меняется с `yaw` и `face`.
-Значения интенсивности передают конечными числами в диапазоне `0…1`.
-Отсутствие поля и нулевой вес выключают соответствующую добавочную ветку.
+Side 0 is model .L and side 1 is .R, not screen-left/right. Visible sides depend
+on yaw and facing. Intensity values must be finite in 0…1; absent fields or zero
+weights disable the corresponding addition.
 
-| Поле позы | Форма и действие | Значение при отсутствии | Реализация |
-|---|---|---|---|
-| `handFacing` | `[left, right]`: поворачивает Wrist вокруг оси предплечья, направляя нормаль ладони к зрителю с учётом `o.yaw`. Положение Wrist и локтя эта ветка не переносит. | Дополнительного поворота нет. | `vendor.js:4794`, `api.pose` |
-| `handOpen` | `[left, right]`: уменьшает сгибание пальцев. | Используется обычный сгиб `o.curl`, по умолчанию `0.55`; отсутствие поля не означает полностью открытую кисть. | `vendor.js:4854`, цикл `ready.fingers` |
-| `handFist` | `[left, right]`: усиливает сгиб пальцев к кулаку и отдельно сгибает большую фалангу. | Нулевой вес кулака. При одновременном `handOpen` закрывающая добавка применяется после раскрывающей. | `vendor.js:4857`, `vendor.js:4876` |
-| `handShape` | `{kind:'thumbsUp', side, amount}`: отдельная форма большого пальца; отсутствующий `amount` для этой формы равен `1`. | Обычная кисть. | `vendor.js:4854`, `vendor.js:4865` |
-| `handContact` и `handContactAmount` | Строка `'clap'` либо `'floor'` и общий вес: ориентируют ладони друг к другу либо к полу, раскрывают пальцы и задают положение больших пальцев. | Нет контактной добавки; неизвестная строка также не включает её. | `vendor.js:4808`, `api.pose` |
-| `handTask` | `{kind, amount:[left,right]}`: задачи `'support'`, `'press'`, `'grip'`, `'ledge'` задают ориентацию ладони. Для `'grip'` есть `axis`, для `'ledge'` — `face`. Ветка `'ledge'` также совмещает настоящие суставы с заданной IK-геометрией. | Нет задач для кистей. | `vendor.js:4774`, `vendor.js:4825` |
-
-Эти поля — метаданные, а не новые углы скелета. `mix()` и `copy()`
-переносят только `SC` и `AR`, поэтому необязательные поля следует задавать
-после смешивания позы на каждом нужном кадре. Инерциализация также работает
-по `SC`/`AR`: она не обеспечивает плавность `handOpen`, `handFist` или
-контактного веса. Их вход, удержание и выход задаёт автор действия.
-Пример такого входа — `cometOpenFrom` в `new-abilities.js:524`.
-В `api.pose()` ориентации применяются в порядке `handFacing`, контакт
-позы, `handTask`; при совместном включении более поздняя ветка работает
-с уже изменённой кистью. Их сочетание выбирают для конкретного номера.
-
-Безопасное расширение начинается с выключенного состояния. Например,
-внутри новой функции действия после обычного смешивания позы:
-
-```js
-const p = raw.tools.mix(from, to, progress)
-const amount = Number.isFinite(weight) ? Math.max(0, Math.min(1, weight)) : 0
-if (amount > 0) p.handOpen = [amount, 0]
-return p
-```
-
-Общие константы позы и вложенные буферы другого действия не изменяют.
-Кадровая копия в `frame()` клонирует массивы `AR`, но оставляет остальные
-вложенные метаданные по ссылке. Не следует рассчитывать на глубокое копирование.
-Нулевая добавка должна сохранять прежнюю позу; точность контакта нового номера
-проверяется отдельно по настоящей геометрии, а не только по Wrist.
-
-## Контакт предмета — другой объект
-
-`P.handContact` в параметрах 3D-предмета — объект, отличный от строкового
-`p.handContact` позы. Он не ставит руки в нужную позу: сначала автор задаёт
-положение рук и при необходимости `p.handTask`, затем риг размещает предмет.
-
-`heldContact(it, P)` использует `{kind, amount, side}`. Ветка работает при
-готовом риге, положительном весе и наличии `it.contactMeshes` у builder.
-Без этих условий добавочная контактная посадка не выполняется.
-
-| `kind` | Что происходит |
+| Channel | Meaning |
 |---|---|
-| `'support'` | Выбирается настоящая поверхность ладони `side`; твёрдая геометрия предмета размещается над ней с малым технологическим зазором. |
-| `'press'` | Используются обе ладони; ориентация предмета и его ближняя твёрдая поверхность согласуются с опорной осью. |
-| `'grip'` | Центр между `Middle1` и `Middle2` совмещается с `P.grip`. Необязательный `offset` смещает посадку по нормали ладони и направлению пальцев. Эта ветка завершается раньше записи `contact.out`. |
+| handFacing: [left,right] | Rotate wrists around the forearm axis toward the viewer, accounting for yaw; do not move wrists or elbows |
+| handOpen: [left,right] | Reduce finger curl; absence keeps ordinary curl, default 0.55 |
+| handFist: [left,right] | Add fist curl and thumb bend; applied after opening |
+| handShape: {kind:'thumbsUp',side,amount} | Dedicated thumb gesture; amount defaults to 1 |
+| handContact / handContactAmount | clap or floor contact, orienting palms and opening fingers; unknown values have no effect |
+| handTask: {kind,amount:[left,right]} | support, press, grip or ledge orientation; grip accepts axis, ledge accepts face and aligns actual joints to IK geometry |
 
-`contactMeshes` задаёт builder: в опору включают твёрдую геометрию, а не
-хвост, свечение или контур. Для `'support'`/`'press'` уникальные вершины этих
-мешей кэшируются при первом контакте. `contact.near` помогает выбрать точку
-среди равных экстремумов. Перемещение предмета смешивается с исходным
-положением по `amount`; само поле не является универсальным физическим решателем.
+These fields are metadata, not numeric skeleton channels. mix(), copy() and
+inertialization operate on SC/AR only. Set optional metadata after blending on
+every required frame and explicitly choreograph its entry, hold and exit.
+api.pose applies handFacing, then pose contact, then handTask; later branches see
+the already-modified wrist. New channels should default to no effect and be checked
+against existing actions before broader use.
 
-`contact.out` — изменяемый буфер, выделенный владельцем действия. После
-посадки `'support'`/`'press'` риг записывает:
+## Held-prop contact
 
-| Компонент | Система координат |
+Pose the hands first, including handTask if needed. heldContact(it, P) then places
+the prop using kind, amount and side. It requires a ready rig, positive weight and
+builder-provided contactMeshes.
+
+- support places solid prop geometry above the actual palm with a small clearance.
+- press uses both palms and aligns orientation and the near solid surface to their axis.
+- grip aligns the midpoint between Middle1/Middle2 with P.grip; optional offset
+  shifts along the palm normal and fingers. This branch returns before contact.out.
+
+Include only solid contact geometry in contactMeshes, excluding trails, glow and
+outlines. Unique vertices are cached for support/press. contact.near resolves equal
+extrema. Placement blends by amount; this is not a general physics solver.
+
+The action owns a mutable contact.out buffer. After WebGL support/press placement:
+
+| Entry | Coordinates |
 |---|---|
-| `[0]` | Мировой `x` начала группы предмета, пиксели сцены. |
-| `[1]` | Мировой `y` с направлением вниз, пиксели сцены. |
-| `[2]` | `g.position.x / U`: локальный боковой `side` в единицах скелета. Это не мировой `z`. |
+| 0 | Prop origin world x in stage pixels |
+| 1 | Prop origin world y, downward, in stage pixels |
+| 2 | g.position.x / U: local lateral side in skeleton units, not world z |
 
-Запись происходит при обработке реквизита в WebGL, а не при расчёте позы.
-До неё буфер может быть пустым; после пропуска/удаления контакта в нём может
-остаться последнее значение. В `new-abilities.js` владелец сохраняет этот
-результат как точку отпускания через `releasedAt()`, а при отсутствии записи
-использует расчётную точку. Для нового действия нужен собственный буфер.
+The buffer is written during prop rendering, not pose calculation. It may initially
+be empty or retain a stale value when contact stops. releasedAt() saves the result
+as a launch position and uses an estimated fallback when unavailable. Give every
+action its own buffer.
 
-Дополнительные hooks — `contact.aimAtW` и `contact.placed` — обрабатываются
-в `api.prop()` после контактного размещения. Первый перенаправляет предмет
-на исходную цель сцены после переноса хвата. Второй получает сценические
-`x, y, dx, dy`, только когда цепочка групп видима. Он сообщает transform;
-владение DOM и эффектом остаётся у вызывающего кода.
+api.prop applies contact.aimAtW and contact.placed after contact placement.
+The first re-aims toward a stage target after grip relocation. The second receives
+stage x, y, dx, dy only when the group chain is visible. DOM/effect ownership stays
+with the action.
 
-## Координаты и точки привязки
+## Coordinates and anchors
 
-`solve()` возвращает точки в единицах скелета. Вход `P.at` и `P.to`
-использует эти оси: вперёд, вниз, вбок. Vendor переводит их через `V()`
-в локальные оси 3D-группы и множитель `U`. `P.atW` задаёт сценические
-`[x,y]` в пикселях, а `P.side` — локальную боковую глубину в единицах
-скелета. `P.grip` задаёт точку самого предмета до масштаба и поворота,
-которую нужно совместить с точкой удержания. Масштаб группы — `P.k`;
-отсутствующий `k` равен `1`. Для скрытия возвращают `null`, а не полагаются
-на нулевой масштаб: в `api.prop()` он ограничен снизу.
+solve() returns skeleton points in forward/down/lateral axes. P.at and P.to use
+those axes; vendor V() converts them into local 3D axes with scale U. P.atW is a
+stage [x,y] point in pixels. P.side is local lateral depth in skeleton units.
+P.grip is an unscaled, unrotated point on the prop to align to the holding point.
+P.k defaults to 1; return null to hide, since prop scale is clamped above zero.
 
-В SVG `fig.draw()` вычисляет `handsW` по расчётным кистям; ладони рисуются
-упрощённо. В начале `render()` значения `palmsW` копируются из `handsW`.
-Это запасные точки для эффектов, не поверхность skinned-модели.
+SVG fig.draw computes handsW from solved hands, with simplified palms. render()
+initializes palmsW from handsW as a fallback. In WebGL, renderAnchors() runs after
+pose/place, using Wrist/Index/Pinky bones and actual eye/mouth surface points.
+Surface palmsW is updated with includePalms, currently requested for lightning.
+Anchors refresh before prop callbacks when P3 exists, and before effects/afterRender.
 
-В WebGL после `rig.pose()` и `rig.place()` вызывается `rig.renderAnchors()`.
-Он обновляет `handsW` по костям Wrist/Index/Pinky, глаза и рот — по
-подготовленным точкам настоящей поверхности. `palmsW` по поверхности
-обновляется только при `includePalms`; runtime сейчас включает его для
-`lightning`. При наличии `P3` точки обновляются также до callback реквизита,
-чтобы callback получил текущие привязки. Основной проход повторяет
-обновление перед эффектами и `afterRender`.
+legacyHandPoint() is the Middle1/Middle2 midpoint for older grips. No single anchor
+proves full-palm contact or absence of mesh intersections. hands()/mouth() buffers
+are reused; copy values that must survive a frame.
 
-Не смешивайте эти точки с `legacyHandPoint()`: он возвращает центр между
-`Middle1` и `Middle2` для прежнего хвата. Ни одна из этих привязок сама
-по себе не доказывает контакт всей ладони или отсутствие пересечения мешей.
-Буферы `raw.tools.hands()` и `mouth()` принадлежат экземпляру и переиспользуются;
-для хранения точки за пределами кадра нужна собственная копия.
+Handstand with handContact='floor' requests handContactSupports() before
+groundSolve(). WebGL uses skinned geometry; the fallback uses calculated contacts().
+The physical point sets need not match exactly across renderers.
 
-Стойка на руках имеет отдельную ветку: для действия `handstand` с
-`p.handContact === 'floor'` runtime запрашивает `handContactSupports()`
-до `groundSolve()`. В WebGL опора использует skinned-геометрию;
-без готового рига остаётся расчётная ветка `contacts()`.
-Одинаковый набор физических точек в SVG и WebGL здесь не обещается.
+## Ownership and lifecycle
 
-## Владение и жизненный цикл реквизита
+registerPropBuilders(factory) registers per-rig builders. Invalid or duplicate
+names throw. A builder runs lazily on first api.prop(name,P) and returns {g,upd}
+plus optional contactMeshes. The kit provides units, geometry, materials and
+transparency helpers. SVG registration returns 0; it does not create an SVG equivalent.
 
-`registerPropBuilders(factory)` регистрирует builders в конкретном риге.
-Фабрика возвращает объект функций; неверное или занятое имя вызывает ошибку.
-Builder вызывается лениво при первом `api.prop(name, P)` и возвращает
-`{g, upd}` с необязательными дополнительными полями, например `contactMeshes`.
-Набор `kit` предоставляет единицы, геометрию, материалы и их прозрачность.
-В SVG `raw.tools.registerPropBuilders()` возвращает `0`: 3D-builder там
-не заменяет отдельный SVG-эффект.
+prop3(name,fn) creates a P3 slot with ping=true and miss=0. Names identify slots;
+registering the same name replaces its callback. Set ping=true on each active
+frame. done or miss>0.2 removes the slot and hides the prop. Returning null hides
+only that frame. SVG does not run draw3d(), so SVG effects need their own lifecycle.
 
-`raw.tools.prop3(name, fn)` создаёт состояние `{ping:true, miss:0}` в `P3`.
-Имя — ключ слота: новая регистрация с тем же именем заменяет callback.
-Действие ставит `ping = true` на каждом активном кадре. Пропущенные пинги
-накапливают `miss`; `done` либо `miss > 0.2` удаляют слот и скрывают предмет.
-Возвращённый из callback `null` скрывает предмет на этом кадре, сохраняя слот.
-В SVG этот цикл `draw3d()` не исполняется; SVG-владелец должен отдельно
-вести свой эффект и его очистку.
+Action owners mark props done, remove SVG effects and restore modified DOM on
+completion, interruption, reset and destroy. Runtime disposal walks and deduplicates
+reachable geometries, materials, textures and skeletons, then closes the renderer.
+Resources outside that traversal need explicit hooks. Laptop screen textures use
+material.dispose hooks; the runtime avoids disposing hooked resources twice.
+Create resources in builders and update existing values in upd(P), never per frame.
 
-`api.prop(name, null)` скрывает группу и стропы, а не уничтожает кэш
-геометрии. Builders и созданные предметы переиспользуются внутри рига.
-`clearTransient()`/`propsClear()` снимают слоты и скрывают реквизит.
-Владельцы дополнительных и контекстных номеров отдельно помечают свои
-состояния `done`, удаляют собственные SVG-эффекты и восстанавливают DOM
-при завершении, прерывании, reset и destroy.
+## Source map
 
-Ресурсы освобождаются при уничтожении runtime: `dispose3d()` собирает
-достижимые geometry/material/texture/skeleton с дедупликацией и закрывает
-renderer. Если builder создаёт особый ресурс вне общего набора, он должен
-согласовать его очистку с этим обходом. Пример — экран ноутбука в
-`context-props.js`: обработчик `material.dispose` освобождает свою текстуру,
-а runtime учитывает сработавшие hooks, чтобы не вызвать повторный dispose.
-Создавайте материалы и геометрию в builder, обновляйте их в `upd(P)`;
-не регистрируйте builders и не создавайте ресурсы заново в каждом кадре.
+Use symbol names rather than fixed line numbers as the code evolves:
 
-## Карта исходников
+- runtime.js: SC/AR, mix, frame, chGet, render, legacyHandPoint, prop3, dispose3d.
+- vendor.js: api.pose, heldContact, api.prop, api.renderAnchors, handContactSupports.
+- new-abilities.js: heldCenter, releasedAt, cometOpenFrom.
+- context-props.js and context-story-props.js: source-bound props and texture cleanup.
 
-Номера строк относятся к срезу при написании документа; при изменении файла
-ищите указанный символ. Эта карта описывает код, а не заменяет приёмку номера.
-
-| Тема | Файл, строка и символ |
-|---|---|
-| Числовые поля, поверхностное копирование и интерполяция | `runtime.js:146` — `SC`/`AR`; `runtime.js:154` — `mix`; `runtime.js:3479` — копия в `frame`; `runtime.js:3219` — `chGet` |
-| Кисти и контакт позы | `vendor.js:4794` — `handFacing`; `vendor.js:4808` — `contactAmount`; `vendor.js:4825` — `handTask`; `vendor.js:4854` — `curl`/`shape` |
-| Контакт предмета и выходной буфер | `vendor.js:5203` — `heldContact`; `vendor.js:5262` — `contact.out`; `vendor.js:5267` — `api.prop`; `new-abilities.js:270` — `heldCenter`; `new-abilities.js:288` — `releasedAt` |
-| Привязки обоих рендереров | `runtime.js:435` — SVG `handsW`; `runtime.js:3513` — запасные `palmsW`; `runtime.js:3592` — привязки до prop callback; `vendor.js:4966` — `api.renderAnchors`; `runtime.js:19` — `legacyHandPoint` |
-| Контакт пола | `runtime.js:900` — `contacts`; `runtime.js:3494` — pre-ground hook; `vendor.js:4893` — `api.handContactSupports` |
-| Регистрация и обновление 3D-предмета | `vendor.js:5149` — `api.registerPropBuilders`; `runtime.js:1221` — `prop3`; `runtime.js:3599` — обход `P3`; `runtime.js:3753` — SVG-safe регистрация |
-| Владение эффектами действия | `new-abilities.js:86` — `finish`; `new-abilities.js:271` — `add`; `context-abilities.js:105` — `finish`; `context-abilities.js:401` — `reset`/`destroy` |
-| Очистка и пример private texture | `runtime.js:3736` — `clearTransient`; `runtime.js:3969` — `propsClear`; `runtime.js:3974` — `dispose3d`; `context-props.js:20` — `build`; `context-props.js:89` — `disposeScreen` |
+Geometry tests validate concrete contacts; full visual cycles are still necessary.

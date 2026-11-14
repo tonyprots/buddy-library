@@ -32,13 +32,15 @@ try {
   await browser.navigate(base)
   for (let i = 0; i < 200 && !await ev('!!globalThis.buddy'); i++) await browser.sleep(50)
   assert.equal(await ev('!!globalThis.buddy'), true)
+  assert.equal(await ev('document.documentElement.lang'), 'en')
+  assert.doesNotMatch(await ev('document.body.innerText'), /[А-Яа-яЁё]/u)
   await browser.sleep(300)
   const choose = async (id, value) => { await ev(`document.getElementById(${JSON.stringify(id)}).value=${JSON.stringify(value)};document.getElementById(${JSON.stringify(id)}).dispatchEvent(new Event('change'))`); await browser.sleep(220) }
   const listClick = async id => { await browser.click(`[data-id="${id}"]`); await browser.sleep(100) }
-  await choose('group', 'Яндекс 360')
+  await choose('group', 'Brand')
   assert.deepEqual(await ev(`[...document.querySelectorAll('#list button')].map(x=>x.dataset.id).sort()`), ['calendar','disk','mail','tracker'])
   await browser.screenshot(join(output, 'y360-group.png'))
-  await choose('group', 'Суперхьюман')
+  await choose('group', 'Superhuman')
   assert.equal(await ev(`[...document.querySelectorAll('#list button')].some(x=>['present','salute','spotlight','rain','celebrate','disk','mail'].includes(x.dataset.id))`), false)
   check('Яндекс 360 отдельной группой, в Суперхьюман только способности')
   await choose('group', '')
@@ -64,7 +66,7 @@ try {
   await browser.sleep(250)
   await browser.click('#showTarget')
   assert.equal(await ev(`getComputedStyle(document.getElementById('targetOutline')).display`), 'block')
-  assert.match(await ev(`document.getElementById('analysis').textContent`), /Картинка/)
+  assert.match(await ev(`document.getElementById('analysis').textContent`), /Image/)
   const expectedReaction = await ev('buddy.intelligence.inspect().candidates.find(item=>!item.reason)?.id')
   await browser.click('#reactNow')
   assert.equal(await ev('buddy.state().act'), expectedReaction)
@@ -105,7 +107,7 @@ try {
   await browser.click('#overview')
   await choose('scene', 'image')
   await browser.screenshot(join(output, 'desktop.png'))
-  for (const width of [320,768,1920]) {
+  for (const width of [320,768,1440,1920]) {
     await browser.metrics(width,1100,1);await browser.sleep(250)
     assert.ok(await ev('document.documentElement.scrollWidth <= document.documentElement.clientWidth+1'))
     assert.ok(await ev("document.getElementById('list').scrollWidth <= document.getElementById('list').clientWidth+1"))

@@ -1,42 +1,36 @@
-# Справочник Бадди
+# Buddy API reference
 
-Для подключения одним файлом начните с [README](../README.md).
-Здесь — настройки и API для более точной постановки.
+Start with the [README](../README.md) for one-script integration.
 
-## ES-модули и сборщики
+## ES modules and bundlers
 
-Пакет ещё не опубликован в npm. [Скачайте TGZ или исходники из релиза](https://github.com/tonyprots/buddy-library/releases/latest).
-Для установки из исходников укажите их папку
-(в примере она лежит рядом с вашим приложением):
+The package is not on npm yet. Download the TGZ or sources from the
+[latest release](https://github.com/tonyprots/buddy-library/releases/latest).
+Install a source folder beside your application:
 
 ```bash
 npm install ../buddy-library
 ```
 
-В Vite, webpack или esbuild:
+Or install the release package: `npm install ./tony-prots-buddy-0.9.1.tgz`.
+With Vite, webpack or esbuild:
 
 ```js
 import { createBuddy } from '@tony-prots/buddy'
-
 const buddy = await createBuddy({ stage: document.querySelector('#stage') })
-// При удалении сцены:
+// On unmount:
 buddy.destroy()
 ```
 
-Если у вас готовый TGZ, можно установить его командой
-`npm install ./tony-prots-buddy-0.9.0.tgz`.
-Без сборщика используйте HTTP и относительный импорт `./buddy-library/index.js`
-из папки исходников. ES-модули не работают через `file://`;
-для двойного щелчка используйте классический `dist/buddy.js`.
+Without a bundler, serve the source folder over HTTP and import `./buddy-library/index.js`.
+ES modules do not work through `file://`; use the classic bundle for double-click playback.
+Create instances after the browser DOM mounts, not during SSR. Importing the
+`techniques` catalog is safe without a DOM.
 
-Создавайте экземпляр после монтирования DOM в браузере, не при SSR.
-Импорт каталога `techniques` безопасен без DOM.
+## Markup and scale
 
-## Разметка и масштаб
-
-Сцена — `position: relative; width: 1280px; height: 720px; overflow: hidden`.
-По умолчанию слайды выбираются через `:scope > .slide`, текущий имеет `on`.
-Для иной разметки передайте `slideSelector` и `activeClass`:
+The stage needs `position: relative; width: 1280px; height: 720px; overflow: hidden`.
+Default slides match `:scope > .slide`; `on` marks the active slide.
 
 ```js
 const buddy = await createBuddy({
@@ -46,372 +40,287 @@ const buddy = await createBuddy({
 })
 ```
 
-Селектор должен находить только слайды, в порядке показа, без вложенных
-контейнеров-групп. Активный класс должен быть у одного слайда. Если его нет,
-выбирается первый. Видимость и навигацией управляет сама презентация.
-Добавление или удаление слайдов требует пересоздания экземпляра.
+Select only leaf slides, in presentation order. Exactly one should have the active
+class; otherwise Buddy falls back to the first. The host controls visibility and
+navigation. Recreate Buddy when adding or removing slides.
 
-Для окна другого размера масштабируйте всю сцену: `transform: scale(k)`,
-`transform-origin: 0 0`. Пол находится на высоте 700. Другой логический размер,
-неравномерный масштаб и вращение сцены не поддерживаются.
-Опциональный `attachDeckEffects` рассчитан только на исходную разметку
-`.slide` / `on`; для чужой навигации он не нужен.
+For another viewport size, scale the whole stage with `transform: scale(k)` and
+`transform-origin: 0 0`. The floor is at y=700. Other logical sizes, nonuniform
+scale and stage rotation are unsupported. The optional `attachDeckEffects`
+module only supports `.slide` / `on` markup.
 
-## Классическая сборка
+## Classic bundle
 
-`dist/buddy.js` создаёт глобальный `Buddy` с `createBuddy`,
-`attachDeckEffects`, `techniques`, `abilityPresets`, `autoplayProfiles`,
-`behaviorModes`, `characters`.
+`dist/buddy.js` exposes `Buddy.createBuddy`, `attachDeckEffects`, `techniques`,
+`abilityPresets`, `autoplayProfiles`, `behaviorModes` and `characters`.
+`data-stage="#stage"` mounts automatically; `data-slide-selector` and
+`data-active-class` adapt the markup. After the script loads, `await window.buddy`
+returns the instance. It is initially a Promise, then the instance itself.
 
-С `data-stage="#stage"` экземпляр создаётся автоматически;
-`data-slide-selector` и `data-active-class` задают другую разметку.
-После загрузки скрипта `await window.buddy` возвращает экземпляр.
-До завершения запуска это Promise, после — сам объект.
-Для нескольких сцен или дополнительных настроек не указывайте `data-stage`:
-вызовите `Buddy.createBuddy({ stage, ...options })` для каждой сцены.
+For multiple stages or extra options, omit `data-stage` and call
+`Buddy.createBuddy({ stage, ...options })` once per stage.
 
-## Что он делает сам
+## Default behavior
 
-С настройками по умолчанию (`mode: 'show'`, `character: 'curious'`,
-`profile: 'show'`) бадди живёт своей жизнью:
+Defaults are `mode: 'show'`, `character: 'curious'`, `profile: 'show'`.
+Buddy walks, explores cards, reacts to content and performs powers automatically.
 
-- **Смелеет к концу презентации.** На первом слайде присматривается и держится
-  левой части пола. Дальше лазает на карточки по боковой кромке, ходит по верху,
-  сидит на краю и спрыгивает. Репертуар ограничивают профиль и характер;
-  сверхспособности включены сразу и открываются по мере продвижения. После 15% деки
-  герой начинает показывать номера, а интервал их выбора сокращается примерно
-  с 25–34 до 10–13 секунд к финалу. Длительный номер сначала завершается.
-  На странице с одним слайдом сразу выбирается средний уровень с лазаньем и способностями.
-- **Находит опоры сам.** Опора — любой видимый блок с фоном, рамкой или медиа
-  шириной от 40 px, верх которого свободен от текста. Залезть он может, если
-  нижняя кромка блока не выше 110–175 px над полом (порог растёт со смелостью).
-  Блоки, которые висят выше, остаются препятствиями. Текст и картинки становятся препятствиями: на них он
-  не встаёт и не заслоняет их.
-- **Реагирует на смену слайда.** Спрыгивает с блока, смотрит на новый слайд,
-  подбирает номер к содержимому. Если на слайде есть лестница или финал,
-  проходит их сам (см. «Сцены»).
-- **Реагирует на содержимое.** Число в заголовке или в `<strong>`, ключевое
-  слово, большая картинка, заголовок «Спасибо» вызывают подходящую реакцию:
-  мысль с числом в облачке, подчёркивание, поклон, жест к картинке. Число
-  в обычном абзаце он не заметит; пометьте его `data-buddy-number`. Классификатор локальный, без LLM
-  и сетевых запросов.
+- Confidence grows with deck progress. He starts near the left side of the floor,
+  then climbs, walks along card tops, sits on edges and jumps down. Powers begin
+  after roughly 15% of the deck. Selection intervals shorten from about 25–34 to
+  10–13 seconds toward the finale; the current action finishes first.
+  Single-slide decks start at the middle confidence level.
+- Supports are visible blocks with a background, border or media, at least 40 px
+  wide, with no text on their top edge. Climbable blocks have their bottom edge
+  within roughly 110–175 px of the floor, depending on confidence.
+  Text, images and unreachable blocks remain obstacles.
+- A slide change makes Buddy descend, look at the new slide and choose a reaction.
+  Marked staircases and finales can run automatically.
+- Prominent numbers, known concepts, large images and closing headings can trigger
+  contextual actions. Mark small numbers with `data-buddy-number`.
+  Recognition uses local rules, without an LLM or network requests.
 
-## Режим, характер и внимание
+## Modes, character and focus
 
 ```js
-const buddy = await createBuddy({ stage }) // активное шоу с любопытным характером
-buddy.setMode('show')             // больше движения, профиль show
-buddy.setMode('manual')           // самостоятельные действия и реакции выключены
-buddy.setMode('companion')        // своя жизнь и реакции, профиль live
-buddy.setProfile('calm')          // спокойнее, в том числе при самостоятельной жизни
+const buddy = await createBuddy({ stage })
+buddy.setMode('show')        // Active movement, show profile
+buddy.setMode('manual')      // No autonomous actions or reactions
+buddy.setMode('companion')   // Autonomous movement and reactions, live profile
+buddy.setProfile('calm')
 buddy.setCharacter('business')
 ```
 
-| Характер | Автоматическое поведение |
+| Character | Automatic behavior |
 |---|---|
-| `business` — деловой | Без сна, зевоты, шалостей, акробатики и сверхспособностей; остаются внимание, прогулки и работа с содержимым |
-| `curious` — любопытный, по умолчанию | Чаще смотрит на слайд, читает, записывает и исследует карточки; не засыпает и не начинает бой с тенью |
-| `playful` — озорной | Допускает шалости; в live/show на долгом слайде может зевнуть и заснуть |
+| `business` | Attention, walking and content actions; no sleep, yawning, mischief, acrobatics or powers |
+| `curious` (default) | More reading, note-taking and card exploration; no sleep or shadowboxing |
+| `playful` | Allows mischief; may yawn or nap on a long slide in live/show |
 
-Профиль `calm` ограничивает автоматический репертуар спокойными действиями,
-`live` добавляет лазанье и контекстные истории, `show` — трюки и способности.
-Одна политика действует на самостоятельный выбор и реакции. Ручные команды
-и явно размеченные сцены `data-buddy-stairs` / `data-buddy-fly` сохраняют
-авторский замысел и не фильтруются характером.
-
-Для важного объяснения:
+`calm` limits the repertoire to quiet actions; `live` adds climbing and context
+stories; `show` adds tricks and powers. The same policy governs autonomous choices
+and reactions. Manual commands and explicit `data-buddy-stairs` / `data-buddy-fly`
+scenes preserve the author's intent and are not filtered by character.
 
 ```js
-buddy.focus()       // закончить номер, спуститься при необходимости, встать на свободном полу
-buddy.focus(false)  // вернуть выбранный режим, характер и профиль
+buddy.focus()       // Finish, descend if needed, stand on clear floor
+buddy.focus(false)  // Restore the selected mode, character and profile
 ```
 
-`focus()` не замораживает кадр: дыхание и моргание остаются. Состояние
-`focusing` означает запрос тишины, `focused` — персонаж уже занял свободное
-место на полу. Если свободного участка нет, он ждёт возможности; `focused`
-остаётся false. Смена режима во время focus запоминается до `focus(false)`.
-`pause()` по-прежнему останавливает модельное время полностью.
+Focus preserves breathing and blinking. `focusing` means a request is pending;
+`focused` means Buddy has reached a free floor spot. If none is available, he waits
+and `focused` stays false. Mode changes during focus apply when focus ends.
+`pause()` freezes simulation time completely.
 
-Прежние настройки доступны: `autonomous` включает свою жизнь, `autoplay`
-включает планировщик с интервалами. Любой явный `autoplay` выключает свою
-жизнь; `autoplay: false, reactions: false` оставляет ручное управление.
-`setAutonomous(true)` и `autoplay(true)` выключают друг друга. Новый `mode`
-не смешивается с `autonomous`/`autoplay` в одном вызове `createBuddy`.
-Для старого явного `autoplay` профиль по умолчанию остаётся `calm`.
-`setMode` задаёт согласованные настройки заново; после него можно отдельно
-поменять профиль и включить/выключить реакции.
+Legacy `autonomous` enables self-directed movement; `autoplay` enables a separate
+interval scheduler. Any explicit `autoplay` disables autonomous movement by default.
+`autoplay: false, reactions: false` gives manual control. `setAutonomous(true)` and
+`autoplay(true)` disable each other. Do not combine `mode` with either startup option.
+Legacy explicit `autoplay` still defaults to `calm`. `setMode()` reapplies coherent
+settings; you can then adjust the profile and reactions individually.
 
-## Истории с завершением и отменой
+## Stories, completion and cancellation
 
 ```js
-const run = buddy.story([
-  'lookSlide',
-  { wait: .4 },
-  'present',
-  { wait: .5 },
-  'bow'
-])
-const result = await run.finished   // { status: 'completed', step: 5 }
-```
+const run = buddy.story(['lookSlide', { wait: .4 }, 'present', { wait: .5 }, 'bow'])
+const result = await run.finished // { status: 'completed', step: 5 }
 
-`perform()` запускает один номер с таким же ожиданием:
-
-```js
 const flight = buddy.perform('parachute')
-flight.cancel()                    // завершит текущий номер с посадкой
-await flight.finished              // status: 'cancelled'
+flight.cancel()                   // Finish the current action and land
+await flight.finished            // status: 'cancelled'
 ```
 
-История принимает от 1 до 128 шагов:
+A story accepts 1–128 steps:
 
-- ID приёма или `{ play: 'thinkNumber', contextId: fact.id }`: номер с выбранным
-  источником. Для сна нужна конечная длительность: `{ play: 'nap', duration: 8 }`.
-- `{ lookAt: { x: 640, y: 300 }, duration: 2 }`: взгляд в координатах сцены.
-- `{ wait: 1 }`: пауза в секундах модельного времени, до 300 секунд.
+- An action ID, or `{ play: 'thinkNumber', contextId: fact.id }` to select a source.
+  A nap needs a finite duration: `{ play: 'nap', duration: 8 }` (3–300 seconds).
+- `{ lookAt: { x: 640, y: 300 }, duration: 2 }`: gaze in stage coordinates,
+  with a duration from 0.05 to 60 seconds.
+- `{ wait: 1 }`: a wait in simulation seconds, up to 300.
 
-Постановочные сцены, включая лестницу и парашют, допустимы: следующий шаг
-ждёт весь номер, в том числе подход, внутренние переходы и посадку.
-Выбор источника действует до следующего явного выбора в истории, затем
-восстанавливается прежний источник (или автоматический, если прежний удалён).
-Невыполнимый шаг не пропускается молча: история завершается с `failed` и причиной.
+Staged scenes are allowed. Each step waits for the entire action, including its
+approach, internal transitions and landing. A source selection persists until the
+next explicit selection, then the previous source is restored at story end
+(or automatic selection if it no longer exists). An unavailable step ends with
+`failed` and a reason; it is not silently skipped.
 
-Во время истории самодеятельность и реакции приостановлены. Новые настройки
-режима и характера запоминаются и применяются после неё. `cancel()` и
-`AbortSignal` заканчивают текущий номер, затем отменяют оставшиеся шаги;
-сон плавно завершается досрочно. Во время wait или lookAt отмена немедленна.
-На `pause()` время ожидания и мягкого завершения стоит; нужны `resume()` или `step()`.
+Autonomous actions and reactions pause during a story. Mode and character changes
+apply afterward. `cancel()` and an optional AbortSignal finish the current action
+before cancelling remaining steps; naps wake early. Cancellation during `wait` or
+`lookAt` is immediate. During `pause()`, waits and graceful completion need
+`resume()` or `step()` to advance.
 
-`finished` возвращает `completed`, `cancelled`, `skipped` или `failed`, число
-завершённых шагов `step` и при необходимости `reason`. Неверная форма истории
-вызывает исключение до запуска. Смена слайда, новый ручной номер, reset и destroy
-отменяют прежнюю историю с причиной; reduced motion даёт `skipped`.
-Внешний AbortSignal передаётся вторым аргументом: `buddy.story(steps, { signal })`.
+`finished` resolves to `completed`, `cancelled`, `skipped` or `failed`, with the
+completed step count and optional `reason`. Invalid story shapes throw before
+starting. Slide changes, new manual actions, reset and destroy cancel the previous
+story. Reduced motion returns `skipped`. Pass a signal as
+`buddy.story(steps, { signal })` or `buddy.perform(id, { signal })`.
 
-## Цвет худи
+## Hoodie color
 
-Бадди одевается под презентацию. При запуске он просматривает все слайды,
-включая скрытые, и находит преобладающий насыщенный цвет: акцентные
-заголовки, плашки, рамки, фигуры SVG. В этот цвет он красит худи. В деке
-с оранжевыми акцентами худи будет оранжевым, в синей — синим. Серые, почти
-белые и почти чёрные цвета не учитываются: фон и основной текст о стиле
-ничего не говорят. Если заметного цвета нет, худи остаётся исходным синим.
+With `hoodie: 'auto'`, a brand accent takes priority. Otherwise Buddy scans all
+slides once, including hidden ones, for a prominent saturated color in headings,
+fills, borders or SVG shapes. Gray, near-white and near-black colors are ignored.
+Without a usable accent, the original blue remains. Image pixels are not analyzed;
+`data-buddy-ignore` excludes a block.
 
 ```js
-createBuddy({ stage })                      // auto: цвет по слайдам
-createBuddy({ stage, hoodie: 'default' })   // всегда исходное синее
-createBuddy({ stage, hoodie: '#ff6427' })   // свой цвет: #rgb, #rrggbb, rgb()
+createBuddy({ stage })                    // Detect the deck accent
+createBuddy({ stage, hoodie: 'default' })  // Original blue
+createBuddy({ stage, hoodie: '#ff6427' })  // Explicit color
 ```
 
-Цвет считывается один раз при запуске. Насыщенность и светлота поджимаются,
-чтобы худи читалось на светлом слайде; свет, тень и контур строятся из того же
-оттенка. Картинки не анализируются. Блок с `data-buddy-ignore` в подборе не участвует.
-Что получилось, покажет `buddy.hoodie`.
+Saturation and lightness are adjusted for readable lighting and outlines.
+`buddy.hoodie` exposes `{ color, source }`, where source is `brand`, `deck`,
+`option` or `default`.
 
-## Сцены
+## Scenes
 
-Постановочные сцены запускаются атрибутами разметки или командой `play()`.
+Use markup or `play()` to launch a staged scene.
 
-### Лестница: `data-buddy-stairs`
+- `stairs`: put steps inside `data-buddy-stairs`; Buddy hooks onto the first,
+  climbs in order and finishes with a parachute.
+- `land`: drops onto a block marked `data-buddy-land` and waves.
+- `finale`: flies toward `data-buddy-fly`, optionally likes `data-buddy-like`,
+  and circles the slide. `data-buddy-text` anchors the text target.
+- `parachute`: descends under a canopy.
+- `leap`: approaches the audience and returns to the floor.
+- `flip`: the same entrance, with a somersault on the return path.
 
-```html
-<div data-buddy-stairs>
-  <div class="card">Первая ступень</div>
-  <div class="card">Вторая ступень</div>
-  <div class="card">Третья ступень</div>
-</div>
-```
+Reserve large entrances for the opening or section transitions.
 
-Ступени — дочерние блоки с видимым фоном, свободным верхом и достаточной
-шириной; порядок в разметке — порядок прохода. При переходе на такой слайд
-бадди сам выстреливает крюком к первой ступени, задерживается на каждой,
-проходит до последней и спрыгивает с парашютом. Вручную: `buddy.play('stairs')`.
+## Deck effects
 
-### Посадка: `data-buddy-land`
-
-```html
-<div class="card" data-buddy-land>Сюда он упадёт сверху</div>
-```
-
-`buddy.play('land')` роняет бадди сверху на этот блок, после чего он машет.
-Посадку использует и интро со взрывом обложки (см. «Эффекты для презентации»).
-
-### Финал: `data-buddy-fly`
-
-```html
-<div class="card" data-buddy-fly data-buddy-like>
-  <span data-buddy-text>Спасибо!</span>
-</div>
-```
-
-На слайде с `[data-buddy-fly]` бадди сам летит к цели, если в этот момент стоит на полу.
-`data-buddy-text` уточняет место у текста, `data-buddy-like` добавляет лайк
-и сердечки. Затем он облетает слайд и садится на пол. Вручную: `buddy.play('finale')`.
-
-### Парашют, прыжок к зрителю, сальто
-
-`buddy.play('parachute')` — прыжок вверх и спуск под куполом, `'leap'` —
-приближение к зрителю и возврат на пол, `'flip'` — то же с сальто. Крупные
-появления лучше оставлять для начала или перехода между частями.
-
-## Эффекты для презентации
-
-Необязательный модуль: обложка разбивается, из пробоины вылетает бадди и
-садится на следующий слайд.
+The optional module breaks the cover apart, launches Buddy through the opening
+and lands him on the next slide:
 
 ```js
-import { createBuddy } from '@tony-prots/buddy'
 import { attachDeckEffects } from '@tony-prots/buddy/effects'
-
-const buddy = await createBuddy({ stage })
 const effects = attachDeckEffects({
-  stage,
-  buddy,
-  show(index) { /* синхронно переключить класс on на слайд index */ }
+  stage, buddy,
+  show(index) { /* synchronously move the on class to slide index */ }
 })
-effects.armIntro('line')   // 'line', 'leap' или 'flip'
-// листалка страницы вместо прямой смены on вызывает:
-effects.go(1, 0)           // перейти со слайда 0 на слайд 1
-// при удалении: сначала эффекты, потом персонаж
-effects.destroy(); buddy.destroy()
+effects.armIntro('line') // line | leap | flip
+effects.go(1, 0)        // The host navigation calls this instead of switching directly
+// On unmount, destroy effects first:
+effects.destroy()
+buddy.destroy()
 ```
 
-Обложка — первый `.slide.cover`. Вариант `line`: вылет вверх и посадка на
-`[data-buddy-land]` или на верх строчных букв заголовка следующего слайда.
-Фон осколков берётся из CSS-переменной `--paper` (цвет слайда), цвет ударного
-кольца — из `--flame`; задайте их на сцене. Эффект идёт в реальном времени и не перематывается `step()`.
-При reduced motion переход выполняется без взрыва. В сборке `dist/buddy.js`
-модуль доступен как `Buddy.attachDeckEffects`.
+The first `.slide.cover` is the cover. `line` lands on `[data-buddy-land]` or the
+lowercase letter tops of the next heading. Set stage CSS variables `--paper`
+(slide background) and `--flame` (impact ring). Effects use real time, not `step()`.
+Reduced motion switches slides without an explosion. In the classic bundle use
+`Buddy.attachDeckEffects`.
 
-## Разметка
+## Markup reference
 
-Все атрибуты необязательны.
+All attributes are optional.
 
-| Атрибут | Где | Что делает |
+| Marker | Where | Purpose |
 |---|---|---|
-| `data-buddy-stairs` | контейнер ступеней | Лестница, проходится при входе на слайд |
-| `data-buddy-land` | блок | Цель посадки `land` и интро |
-| `data-buddy-fly` | блок | Цель финала; делает слайд финальным |
-| `data-buddy-like`, `data-buddy-text` | цель финала | Лайк с сердечками; точка у текста |
-| `data-buddy-focus`, `data-buddy-target` | любой элемент | Куда смотреть и показывать (`present`, `spotlight`) |
-| `data-buddy-scene` | `.slide` | Явная роль слайда: `title`, `divider`, `image`, `number`, `finale`, `content`, `off` |
-| `data-buddy-react` | `.slide` | Конкретный приём реакции (`wave`) или `none` |
-| `data-buddy-number` | элемент с числом | Число для реакции даже при мелком шрифте |
-| `data-buddy-ignore` | блок | Исключить медиа и числа внутри из реакций |
-| `data-buddy-context` и др. | данные слайда | Источники контекстных историй, см. [руководство по контексту](slide-context.md) |
-| `.brand` с `[data-perch]` / `[data-perch-text]` | подпись в углу сцены | Место, куда бадди поднимается командой `logo` |
-| `.cover` | первый слайд | Обложка для эффекта взрыва |
+| `data-buddy-stairs` | Step container | Staircase on slide entry |
+| `data-buddy-land` | Block | Landing and intro target |
+| `data-buddy-fly` | Block | Finale target; makes the slide a finale |
+| `data-buddy-like`, `data-buddy-text` | Finale target | Heart reaction and text anchor |
+| `data-buddy-focus`, `data-buddy-target` | Any element | Gaze, presentation and spotlight target |
+| `data-buddy-scene` | Slide | Explicit role: title, divider, image, number, finale, content, off |
+| `data-buddy-react` | Slide | Explicit action such as wave, or none |
+| `data-buddy-number` | Numeric element | Recognize a number even at a small font size |
+| `data-buddy-ignore` | Block | Exclude its media and numbers from reactions |
+| `data-buddy-context` and related attributes | Source content | See the [context guide](slide-context.md) |
+| `.brand` with `[data-perch]` / `[data-perch-text]` | Corner signature | Perch for the logo action |
+| `.cover` | First slide | Breakout intro cover |
 
-Не делайте декоративные контейнеры размером во весь слайд с фоном: такой
-прямоугольник тоже станет опорой. Самостоятельно анимированные элементы
-(бесконечные CSS-анимации) опорами не считаются.
+Avoid decorative full-slide filled containers: they can become supports.
+Continuously animated elements are not treated as supports.
 
-## Клавиши
+## Keyboard and accessibility
 
-С `keyboard: true`: **B** — трюк, **N** — сверхспособность, **C** — лазанье,
-**M** — магнит. Раскладка не важна, в полях ввода клавиши не перехватываются.
-По умолчанию клавиатура выключена.
+`keyboard: true` enables **B** for a trick, **N** for a power, **C** for climbing
+and **M** for the magnet. Keyboard layout does not matter; inputs are excluded.
+Keyboard control is off by default.
 
-## Доступность и уменьшенное движение
+With `prefers-reduced-motion`, Buddy stays still, `play()` returns false and the
+intro has no explosion. `motion: 'reduce'` forces this behavior; `motion: 'full'`
+ignores the system preference and should be used only by explicit user choice.
+The character layer is `aria-hidden` and does not intercept clicks.
 
-При системной настройке `prefers-reduced-motion` бадди стоит в статичной позе,
-`play()` возвращает `false`, интро идёт без взрыва. `motion: 'reduce'`
-включает этот режим принудительно, `motion: 'full'` игнорирует системную
-настройку; используйте его только по явному выбору пользователя. Слой
-персонажа помечен `aria-hidden` и не перехватывает клики.
-
-## API
+## Instance API
 
 ```js
 const buddy = await createBuddy({
-  stage,                  // обязательно: сцена 1280×720
-  slideSelector: ':scope > .slide', // необязательно: селектор слайдов
-  activeClass: 'on',      // необязательно: имя активного класса
-  mode: 'show',           // manual | companion | show
-  character: 'curious',   // business | curious | playful
-  profile: 'show',        // общий репертуар и ритм: calm | live | show
-  reactions: true,        // реакции на содержимое; или { quietMs, cooldownMs }
-  keyboard: false,        // клавиши B N C M
-  motion: 'system',       // system | reduce | full
-  renderer: 'auto',       // auto (WebGL, при неудаче SVG) | svg
-  seed: 1,                // повторяемый выбор номеров
+  stage,                           // Required: 1280×720 HTMLElement
+  slideSelector: ':scope > .slide',
+  activeClass: 'on',
+  mode: 'show',                    // manual | companion | show
+  character: 'curious',            // business | curious | playful
+  profile: 'show',                 // calm | live | show
+  reactions: true,                 // Or reaction timing options
+  keyboard: false,
+  motion: 'system',                // system | reduce | full
+  renderer: 'auto',                // WebGL with SVG fallback, or svg
+  seed: 1,                        // Repeatable action choices
   presets: { superhuman: true },
-  hoodie: 'auto',         // цвет худи: auto | default | '#ff6427'
-  signal                  // AbortSignal: отмена запуска и destroy()
+  hoodie: 'auto',
+  signal                          // Optional AbortSignal
 })
 
-buddy.play('wave')                   // один приём; true — начал, false — отказ планировщика
-buddy.can('climb')                   // null или причина, почему нельзя
+buddy.play('wave')                 // Accepted, not a completion Promise
+buddy.can('climb')                 // null, or an English reason
 buddy.sequence(['wave', 'note', 'clap'])
-buddy.say('heart')                   // пузырь: ! ? … heart bulb z
-buddy.lookAt({ x: 640, y: 300 }, 2)  // взгляд в точку сцены
-buddy.progress(1)                    // уровень смелости 0…1 вручную
-buddy.setAutonomous(false)           // выключить свою жизнь
-buddy.autoplay(true); buddy.setProfile('live'); buddy.setReactions(false)
+buddy.say('heart')                 // ! ? … heart bulb z
+buddy.lookAt({ x: 640, y: 300 }, 2)
+buddy.progress(1)                  // Confidence and pace, 0…1
+buddy.setAutonomous(false)
+buddy.autoplay(true)
+buddy.setProfile('live')
+buddy.setReactions(false)
 buddy.pause(); buddy.step(1 / 60); buddy.resume()
-buddy.reset()                        // убрать эффекты, вернуть на пол
-buddy.rescan()                       // пересчитать опоры после смены вёрстки
-buddy.hoodie                         // { color, source: brand | deck | option | default }
-buddy.brand                          // неизменяемый снимок logo/products/accent/roles
-buddy.state()                        // { x, y, act, surf, grounded, level, autonomous, autoplay, … }
+buddy.reset()                     // Clear effects and return to the floor
+buddy.rescan()                    // Update layout and context
+buddy.state()                    // Position, action, support, level, flags…
 buddy.context(); buddy.selectContext(id)
-buddy.destroy()                      // таймеры, события, WebGL, DOM
+buddy.brand                      // Frozen logo/products/accent/roles snapshot
+buddy.destroy()                   // Dispose timers, listeners, WebGL and DOM
 ```
 
-- `play()` возвращает `true`, если бадди начал номер или пошёл к его месту.
-  Это не Promise завершения. Неизвестный ID — исключение; невыполнимые условия
-  (`can()` вернул причину) — тоже исключение.
-- `sequence()` принимает обычные приёмы. Сцены `land`, `stairs`, `finale`,
-  `parachute`, `leap`, `flip` запускаются через `play()`, `perform()` или `story()`.
-- Состав слайдов фиксируется при подключении. Добавили или убрали слайды —
-  создайте экземпляр заново. Поменялась вёрстка внутри слайда — `rescan()`.
-- `buddy.experimental` — внутренний интерфейс для отладки поз. Его структура
-  может меняться между версиями 0.x.
+`play()` returns true when the action or its approach starts; false when declined.
+Unknown IDs and unavailable conditions throw. `sequence()` accepts ordinary
+actions, not staged scenes (`land`, `stairs`, `finale`, `parachute`, `leap`, `flip`);
+use `play()`, `perform()` or `story()` for those.
 
-Полные типы — в `index.d.ts`. Подробнее о реакциях, профилях и диагностике
-(`buddy.intelligence.inspect()`) — в [руководстве по реакциям](slide-reactions.md).
+Recreate the instance when the slide collection changes; call `rescan()` for
+changes within a slide. `experimental` exposes pose/debug internals that may
+change between 0.x releases. See `index.d.ts` for complete declarations and the
+[reaction guide](slide-reactions.md) for `intelligence.inspect()`.
 
-## Каталог приёмов
+## Action catalog
 
-Каталог экспортируется как `techniques`: у каждой записи есть `id`, `title`,
-`description`, `group`, `requires`, `preset`. Стенд `index.html` в пакете
-показывает все приёмы с запуском по клику (откройте его через HTTP).
+`techniques` is a frozen catalog of `{ id, title, description, group, requires,
+preset }` records. Titles, descriptions, groups and reasons are English as of
+0.9.1; IDs are unchanged. Filter integrations by IDs, presets or context tags,
+not translated labels. Open `index.html` over HTTP for the interactive catalog.
 
-| Группа | Идентификаторы |
+| Group | IDs |
 |---|---|
-| Покой и внимание | `idle`, `lookSlide`, `lookHall`, `yawn`, `sitRest`, `sitLean`, `nap` |
-| Жесты | `wave`, `clap`, `point`, `cheer`, `dance`, `salute`, `bow`, `present`, `thumbsUp`, `sonicPulse`, `celebrate` |
-| Передвижение и акробатика | `stroll`, `jog`, `hop`, `stumble`, `handstand`, `backflip`, `climb`, `pullups`, `logo`, `descend` |
-| Разминка | `stretch`, `squats`, `jacks`, `toeTouch`, `sideBend`, `shadowbox`, `kick` |
-| Реквизит | `popcorn`, `read`, `note`, `spotlight`, `rain` |
-| Сверхспособности (`superhuman`) | `levitate`, `shield`, `laser`, `shrink`, `smoke`, `lightning`, `fire`, `ice`, `portal`, `speed`, `clone`, `fly`, `hulk`, `web`, `magnet`, `grapple`, `construct`, `energyOrb`, `forcePush`, `energyBow`, `orbit`, `comet`, `snow`, `starcatch`, `forceWall`, `timeBubble` |
-| Сцены | `land`, `stairs`, `parachute`, `finale`, `leap`, `flip` |
-| Контекст слайда | `laptopNotes`, `thinkNumber`, `hologramObject`, `hologramKeyword`, `traceFocus`, `peekCard`, `perchRead`, `thinkKeyword`, `compareValues`, `followChart`, `chartClimb`, `cardRoute`, `traceFlow`, `inspectDetail`, `assembleList`, `showBeforeAfter`, `quoteIdea` |
-| Бренд (`brand`, включается с набором изображений) | `tracker`, `disk`, `mail`, `calendar` |
+| Rest and attention | idle, lookSlide, lookHall, yawn, sitRest, sitLean, nap |
+| Gestures | wave, clap, point, cheer, dance, salute, bow, present, thumbsUp, sonicPulse, celebrate |
+| Movement and acrobatics | stroll, jog, hop, stumble, handstand, backflip, climb, pullups, logo, descend |
+| Warm-up | stretch, squats, jacks, toeTouch, sideBend, shadowbox, kick |
+| Props | popcorn, read, note, spotlight, rain |
+| Superhuman | levitate, shield, laser, shrink, smoke, lightning, fire, ice, portal, speed, clone, fly, hulk, web, magnet, grapple, construct, energyOrb, forcePush, energyBow, orbit, comet, snow, starcatch, forceWall, timeBubble |
+| Staged scenes | land, stairs, parachute, finale, leap, flip |
+| Slide context | laptopNotes, thinkNumber, hologramObject, hologramKeyword, traceFocus, peekCard, perchRead, thinkKeyword, compareValues, followChart, chartClimb, cardRoute, traceFlow, inspectDetail, assembleList, showBeforeAfter, quoteIdea |
+| Brand | tracker, disk, mail, calendar |
 
-Условия запуска проверяет планировщик: свободный пол, доступная кромка, место
-для эффекта. Если персонажу тесно, номер не начнётся, а `can()` объяснит почему.
-Объёмный реквизит, пальцы и голограммы видны только в WebGL; в SVG-режиме
-сохраняются позы и облачка.
+Actions require enough space, accessible edges and compatible context.
+`can()` explains unavailable conditions. Volumetric props, fingers and holograms
+require WebGL; SVG retains poses and bubbles. Context actions preserve the source
+language, exact numbers, signs and units. Charts, pairs, diagrams, lists and routes
+require explicit structure; Buddy does not infer them from pixels.
 
-Контекстные истории берут данные со слайда: точное число со знаком и единицей,
-короткий тезис, понятие из словаря, картинку, карточки. Для графиков, пар
-значений, схем, списков и маршрутов автор размечает структуру атрибутами;
-по пикселям бадди данные не угадывает.
-
-```html
-<strong data-buddy-context="number" data-buddy-context-id="result">−18%</strong>
-<div data-buddy-context="values" data-buddy-text="Доля ошибок">
-  <strong data-buddy-item="before" data-buddy-label="Было">42%</strong>
-  <strong data-buddy-item="after" data-buddy-label="Стало">27%</strong>
-</div>
-```
-
-Все восемь видов структур, лимиты и `context()` описаны в
-[руководстве по контексту](slide-context.md).
-
-## Пресеты
-
-### Бренд презентации
+## Presentation brand
 
 ```js
 const buddy = await createBuddy({
@@ -424,36 +333,28 @@ const buddy = await createBuddy({
 })
 ```
 
-При наличии изображений `presets.brand` включается сам. Главный знак используется
-в энергетическом шаре, финале и как доска для полёта; продукты — на орбите
-силового поля и финала. Число продуктов произвольное, в том числе ноль.
-Номера `disk`, `mail`, `calendar`, `tracker` берут продукты по кругу,
-а при их отсутствии — главный знак или нейтральный реквизит.
+Images automatically enable `presets.brand`. The main logo appears in the energy
+ball and finale and acts as a flight board. Product images orbit the shield and
+finale. Any product count is supported, including zero. The four brand actions
+cycle through product images, falling back to the main logo or neutral props.
 
-`accent` — непрозрачный цвет `#rgb`, `#rrggbb` или `rgb()`.
-Он задаёт акцент силового поля, ауры, портала и обычных искр; физические
-цвета огня, льда и смысловые цвета отметок сохраняются. При `hoodie: 'auto'`
-этот цвет задаёт палитру худи с поправкой на читаемость света и тени,
-а `buddy.hoodie.source` равен `brand`. Явный `hoodie` имеет приоритет.
+`accent` accepts opaque `#rgb`, `#rrggbb` or `rgb()`. It colors the shield, aura,
+portal and ordinary sparks. Fire, ice and semantic check-mark colors are preserved.
+With `hoodie: 'auto'`, it also drives the hoodie palette and sets its source to
+`brand`. An explicit hoodie option takes priority.
 
-`brand: null`, пустой объект или отсутствующий набор оставляют обычного героя
-без предупреждений. Один акцент без изображений меняет цвета, но не включает
-фирменные номера. Неверные явные значения вызывают TypeError до подключения.
-Набор копируется при создании; менять его на ходу следует пересозданием экземпляра.
-`buddy.brand` возвращает неизменяемый снимок.
+Missing, null or empty brand configurations keep normal behavior without warnings.
+An accent alone changes colors without enabling brand actions. Invalid explicit
+values throw TypeError before mounting. The configuration is copied and frozen;
+recreate the instance to change it. `buddy.brand` returns the frozen snapshot.
 
-Для точного назначения изображений есть необязательные `roles`:
-`disc` — диск, `message` — письмо, `reminder` — встреча,
-`mark` — отметка, `board` — доска для полёта. Значение `null` в роли
-выбирает нейтральный реквизит (для доски — обычный полёт без доски).
-Пример: `brand: { logo, products, roles: { board: './board.svg' } }`.
+Optional `roles` override images: `disc`, `message`, `reminder`, `mark`, `board`.
+A null role uses neutral props (or flight without a board).
+For example: `brand: { logo, products, roles: { board: './board.svg' } }`.
+`presets: { brand: false }` disables brand actions and images but keeps the accent;
+it cannot be combined with explicit `y360: true`.
 
-`presets: { brand: false }` отключает фирменные номера и изображения;
-акцент сохраняется. Этот флаг несовместим с явным `y360: true`.
-В каталогах начиная с 0.9.0 группа четырёх фирменных номеров называется
-«Бренд», их `preset` — `brand`; ID номеров не менялись.
-
-Для классической сборки передайте тот же объект как JSON:
+For the classic bundle:
 
 ```html
 <script type="application/json" id="deck-brand">
@@ -462,80 +363,54 @@ const buddy = await createBuddy({
 <script defer src="./buddy.js" data-stage="#stage" data-brand="#deck-brand"></script>
 ```
 
-`data-brand` — CSS-селектор JSON-блока на этой странице, а не адрес загрузки.
-Библиотека не определяет компанию и не ищет изображения в сети.
-URL изображений разрешаются относительно HTML-страницы; явно переданный
-сетевой URL потребует загрузки браузером. Для file:// и автономной поставки
-используйте локальные файлы или data:image URI. Сырые SVG-строки не принимаются:
-преобразуйте SVG в data-URI. Пример без внешних файлов — examples/brand.html.
+`data-brand` selects a JSON script on the page; it is not a URL. Buddy does not
+identify companies or search the web. Image URLs resolve relative to the HTML
+page; remote URLs require browser downloads. Use local files or data:image URIs
+for offline playback. Raw SVG strings must first be encoded as data URIs.
+See [Leaf Lab](../examples/brand.html).
 
-### Способности и прежний пример
+## Powers and the legacy example
 
-`superhuman` включён по умолчанию: сверхспособности и световые контекстные
-номера. Выключить: `presets: { superhuman: false }`, тогда остаются жесты,
-реквизит, лазанье и сцены.
+`superhuman` is enabled by default, including light-based context actions.
+Disable it with `presets: { superhuman: false }`; gestures, props, climbing and
+staged scenes remain available.
 
-`y360` — необязательный пример, выключен по умолчанию. Начиная с 0.8.3,
-включение пресета само не загружает изображения: передайте их явно.
-С 0.9.0 он также экспортирует общий `brand`:
+`y360` is an optional example, off by default. Since 0.8.3 its images must be
+supplied explicitly; since 0.9.0 it also exports a general brand configuration:
 
 ```js
 import { brand } from '@tony-prots/buddy/presets/y360'
 const buddy = await createBuddy({ stage, brand })
 ```
 
-В классическом скрипте доступен `BuddyY360.brand`.
-Прежний вызов с `presets.y360` и `logos` продолжает работать:
+The classic optional bundle exposes `BuddyY360.brand`. The legacy form remains:
 
 ```js
-import { createBuddy } from '@tony-prots/buddy'
 import { logos } from '@tony-prots/buddy/presets/y360'
-
 const buddy = await createBuddy({ stage, presets: { y360: true }, logos })
 ```
 
-Для классической сборки подключите два файла из исходников:
+For plain HTML, load `buddy.js` and `buddy-y360.js` from the source distribution,
+then create Buddy after the stage mounts, passing `brand: BuddyY360.brand`.
+The Yandex 360 example (`examples/y360.html`) and its image bundle are not in the
+web ZIP. Missing legacy images use neutral props with one warning per mount;
+partial sets are allowed. Legacy keys are `y360`, `mail`, `calendar`, `disk`,
+`docs`, `telemost`, `tracker`. Trademark images are not covered by MIT.
 
-```html
-<script src="./buddy.js"></script>
-<script src="./buddy-y360.js"></script>
-<script>
-  // Выполнять после появления сцены в DOM.
-  window.buddy = Buddy.createBuddy({
-    stage: document.getElementById('stage'),
-    presets: { y360: true }, logos: window.BuddyY360?.logos
-  })
-</script>
-```
+## Performance and browser support
 
-Рабочая демонстрация — `examples/y360.html` в исходниках.
-В web-архив файл знаков и этот пример не входят.
-Без изображений номера используют собственный нейтральный реквизит;
-один запуск сообщает об этом одним предупреждением. Остальные способности
-работают как обычно. Частичный набор тоже допустим.
+The WebGL canvas follows the character instead of covering the whole slide.
+Pixel density is budgeted and shaders compile before the first frame.
+Do not call `rescan()` every frame; geometry updates on events. Always destroy
+instances on unmount. Hidden tabs do not start new reactions.
 
-Свои изображения передаются через `logos` (data-URI или URL) с ключами
-`y360`, `mail`, `calendar`, `disk`, `docs`, `telemost`, `tracker`.
-Фирменные изображения остаются товарными знаками правообладателей;
-лицензия MIT на них не распространяется.
+The runtime targets modern ES2022 browsers with WebGL and Web Animations.
+Without WebGL it uses SVG. Release 0.9.1 is checked in Chromium; Safari and Firefox
+are not verified for this release.
 
-## Производительность
+## Licenses
 
-Холст WebGL движется вместе с фигурой, а не занимает весь слайд; плотность
-пикселей ограничена бюджетом, шейдеры компилируются до первого кадра. Не
-вызывайте `rescan()` каждый кадр: геометрия обновляется по событиям. После
-удаления сцены обязательно `destroy()`. На скрытой вкладке реакции не запускаются.
-
-Браузеры: современные Chromium, Safari и Firefox с ES2022, WebGL и Web
-Animations. Без WebGL автоматически включается SVG-режим.
-
-## Лицензии
-
-- Код библиотеки — [MIT](../LICENSE).
-- Three.js и GLTFLoader внутри `vendor.js` — MIT, уведомление в
-  [THIRD_PARTY_NOTICES.md](../THIRD_PARTY_NOTICES.md).
-- 3D-модель — [Quaternius](https://quaternius.com), CC0 1.0 (общественное достояние).
-- Знаки сервисов в `presets/y360.js` — товарные знаки правообладателей,
-  не покрываются MIT.
-
-История изменений — в [CHANGELOG.md](../CHANGELOG.md).
+Code: [MIT](../LICENSE). Bundled Three.js and GLTFLoader: MIT.
+The [Quaternius](https://quaternius.com) model is CC0 1.0.
+See [third-party notices](../THIRD_PARTY_NOTICES.md) for attribution and trademark
+limitations, and the [changelog](../CHANGELOG.md) for release history.

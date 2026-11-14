@@ -1,51 +1,29 @@
-# Качество рисовки
+# Rendering quality
 
-Изменения версии 0.1.0 не меняют модель, число полигонов, количество проходов
-и способ скиннинга. Основной выигрыш — устойчивое лицо на разных GPU и
-разделение состояния двух одновременно подключённых персонажей.
+The initial renderer fixes preserve the model, polygon count, render passes and
+skinning method. They improve stable facial rendering across GPUs and isolate
+multiple instances.
 
-## Что улучшено
+- Rig state is per instance: density, outline width, transparency, giant tint and
+  occlusion capsules. Resizing one canvas must not alter another's outline.
+- vendor.js exports THREE and Buddy3D as ESM without replacing window.THREE or
+  application globals.
+- Eye and mouth masks avoid reversed smoothstep edges, whose results are undefined
+  by GLSL. Use the complement of a smoothstep with correctly ordered edges.
+- Iris highlights fade at subpixel size while remaining visible in close-ups.
+- Skin contact shadows use 76% of the former strength, retaining readable tones
+  around hands, faces and white shoes.
 
-- **Риги изолированы.** Плотность пикселей, толщина контура, прозрачность,
-  оттенок «великана» и капсулы окклюзии принадлежат каждому экземпляру.
-  Раньше это был общий объект: изменение размера второго холста могло
-  повлиять на контур первого.
-- **Three.js не попадает в глобальное пространство.** Локальная сборка
-  экспортирует `THREE` и `Buddy3D` как ESM. Подключение не перезаписывает
-  `window.THREE`, модель и риг приложения.
-- **У глаз и рта определённая маска.** Устранены вызовы GLSL `smoothstep`
-  с обратным порядком границ. Такой порядок не определён спецификацией
-  и способен давать разные результаты на разных драйверах. Формула заменена
-  эквивалентным дополнением плавной ступени с правильными границами.
-- **Субпиксельный блик приглушён.** Когда глаз занимает мало пикселей,
-  белая точка радужки плавно ослабевает. Крупный план сохраняет блик,
-  маленькая фигура меньше зависит от попадания точки на пиксельную сетку.
-- **Чище контакт кожи и одежды.** Для кожи коэффициент контактной тени
-  уменьшен до 76% от прежнего. Свет снизу немного светлее; кисти у лица
-  и белая обувь сохраняют больше различимых полутонов.
+Only scalar shader operations were added. No new textures, lights, shadow maps or
+screen-space filters; the same eleven occlusion capsules use the existing pass.
 
-В шейдер добавлены только скалярные операции. Новых текстур, источников
-света, теневых карт и экранных фильтров нет. Прежние 11 капсул используются
-в том же проходе материала.
+Check full-slide and close-up views, front and both facings, blinking, smiling,
+yawning, hands near the mouth, held props and enlarged bodies. Check two instances
+with different scales and canvas sizes. render-quality.test.mjs checks real
+Three.js state isolation and model loading, not every GPU's shader output.
 
-## Как проверять
-
-Нужны две сцены: обычный размер фигуры на слайде и крупный план. Проверять
-анфас и обе стороны, открытые глаза, моргание, улыбку, зевок, руки у рта,
-книгу, блокнот, бинокль и увеличенную фигуру. Отдельно — два экземпляра
-с разными размерами холста и масштабом: изменение второго не должно менять
-контур первого.
-
-Тест `tests/render-quality.test.mjs` проверяет независимость состояния
-на настоящем локальном Three.js и загрузку двух встроенных моделей.
-Он не подменяет визуальный прогон шейдеров в WebGL. В общем браузерном
-прогоне отсмотрены кадры до и после изменения материала, а также книга,
-блокнот, бинокль и попкорн с обеих сторон. Силуэт и контакт с реквизитом
-сохранены; кожа и кисти читаются светлее. Различия направления взгляда между
-двумя кадрами не трактуются как изменение шейдера: взгляд задаёт планировщик.
-Эти кадры проверяют конкретные позы и не доказывают отсутствие артефактов
-на всех драйверах и во всех промежуточных кадрах.
-
-Резервный SVG-рендер не изменён: улучшения относятся к 3D-ригу в `vendor.js`.
-При очень маленькой фигуре детали ограничены физическими пикселями;
-прибавление полигонов этого ограничения не снимает.
+Historical before/after frames showed preserved silhouettes and prop contacts with
+lighter skin readability. Differences in gaze are scheduler state, not necessarily
+shader differences. Those frames do not prove freedom from artifacts on all drivers
+or at every intermediate pose. SVG was unchanged by these fixes; very small figures
+remain limited by physical pixel count, not polygon count.

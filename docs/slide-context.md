@@ -1,223 +1,178 @@
-# Контекст слайда
+# Slide context
 
-Бадди использует конкретный источник: число, короткий текст, слово из словаря,
-изображение, карточку или явно размеченную структуру. Анализатор читает видимый DOM и сохраняет исходный
-факт с координатами. Он не читает надписи внутри картинок, не распознаёт
-произвольные фотографии и не выводит оценку результата из числа.
+Buddy uses a specific source: a number, short text, known concept, image, card or
+explicitly marked structure. The analyzer reads visible DOM content and stores
+its exact wording and coordinates. It does not read text inside images, recognize
+arbitrary photographs or infer success from a number. Source text stays in its
+original language; the surrounding API and diagnostics are English.
 
-## Подключение и выбор
+## Reading and selecting context
 
-Контекст подключается вместе с `createBuddy()`. Его можно читать при выключенных
-автопилоте и реакциях. Отдельный контроллер создавать не требуется.
+Context is included with `createBuddy()`, even when autoplay and reactions are off.
+Do not create a second controller.
 
 ```js
-const buddy = await createBuddy({ stage, autoplay: false, reactions: false })
-const context = buddy.context()
-const number = context.facts.find(fact => fact.kind === 'number')
-
+const buddy = await createBuddy({ stage, mode: 'manual' })
+const number = buddy.context().facts.find(fact => fact.kind === 'number')
 if (number) {
   buddy.selectContext(number.id)
   if (!buddy.can('thinkNumber')) buddy.play('thinkNumber')
 }
-
-buddy.selectContext(null) // вернуть автоматический выбор
+buddy.selectContext(null) // Return to automatic selection
 ```
 
-`context()` возвращает глубоко замороженный снимок:
+`context()` returns a deeply frozen snapshot, without DOM references:
 
 ```js
 {
   available: true,
   selectedId: null,
-  reason: 'Автовыбор по маркерам, выделению и заголовку',
+  reason: 'Automatic selection by markers, emphasis and heading',
   measures: 1,
   issues: [],
   facts: [{
-    id: 'demo-value:number:1',
-    kind: 'number',
-    text: '−18%',
+    id: 'demo-value:number:1', kind: 'number', text: '−18%',
     target: { x: 640, y: 300, width: 220, height: 90 },
-    priority: 430,
-    reason: 'Авторский маркер контекста'
+    priority: 430, reason: 'Explicit context marker'
   }]
 }
 ```
 
-`selectedId` обозначает ручной выбор, `null` — автоматический. Неизвестный ID
-вызывает ошибку и не меняет выбор. Источник сбрасывается при переходе на другой
-DOM-слайд; при обновлении того же элемента его ID сохраняется. `measures`
-меняется при пересчёте, а не при чтении снимка. DOM-ссылок в снимке нет.
+`selectedId: null` means automatic selection. An unknown ID throws without changing
+the selection. Moving to another DOM slide clears selection; rescanning the same
+element preserves its ID. `measures` increments on analysis, not snapshot reads.
 
-`issues` содержит ошибки явно размеченных структур. Каждый элемент хранит
-`id` контейнера, `kind`, конкретную `reason` и его `target`. Например, пара
-`42%` и `27 ₽` получает причину несовместимых единиц вместо исчезнувшего
-источника без объяснения. Некорректная структура не попадает в `facts`;
-сами ошибки тоже глубоко заморожены.
+`issues` contains invalid explicit structures with their container `id`, `kind`,
+`reason` and `target`. Invalid structures are absent from `facts`; they do not
+silently disappear without an explanation. For example, comparing `42%` and `$27`
+reports incompatible units.
 
-Ручной источник обязателен для выбранного номера: если выбрано число,
-голограмма картинки не подставит другую картинку сама. `can()` сначала
-проверяет совместимость источника, затем пол и геометрию. Площадка должна
-позволять безопасный подход и возвращение; прямоугольник карточки сам по себе
-не гарантирует доступность `peekCard` или `perchRead`.
-При отсутствии подходящего факта `can()` возвращает причину из `issues`
-нужного вида; ручной несовместимый выбор сохраняет собственную причину отказа.
+Manual selection is binding: an image action will not substitute another image
+when you selected a number. `can()` checks compatibility before floor geometry.
+A card rectangle alone does not guarantee a safe route for `peekCard` or `perchRead`.
+Without a compatible fact, `can()` can return a relevant structure issue.
 
-## Разметка автора
+## Author markup
 
 ```html
-<strong data-buddy-context="number" data-buddy-context-id="demo-value">−18%</strong>
-<h2 data-buddy-context="keyword" data-buddy-concept="memory">Контекст</h2>
-<p data-buddy-context="text" data-buddy-focus>Короткий тезис со слайда</p>
-<img data-buddy-context="object" src="diagram.svg" alt="Схема связи">
-<article data-buddy-context="card" data-buddy-text="Пример">…</article>
+<strong data-buddy-context="number" data-buddy-context-id="result">−18%</strong>
+<h2 data-buddy-context="keyword" data-buddy-concept="memory">Context</h2>
+<p data-buddy-context="text" data-buddy-focus>A short statement from the slide</p>
+<img data-buddy-context="object" src="diagram.svg" alt="Connection diagram">
+<article data-buddy-context="card" data-buddy-text="Example">…</article>
 ```
 
-| Атрибут | Значение |
+| Attribute | Meaning |
 |---|---|
-| `data-buddy-context` | `number`, `text`, `keyword`, `object`, `card` или [структурированный вид](#структурированный-факт) |
-| `data-buddy-context-id` | Стабильная основа ID; к ней добавляются вид и номер факта |
-| `data-buddy-concept` | Один из восьми подготовленных образов; не произвольный запрос |
-| `data-buddy-text` | Короткий текст, явно выбранный автором вместо длинного содержимого |
-| `data-buddy-focus`, `data-buddy-target` | Повышают приоритет источника без назначения его вида |
-| `data-buddy-ignore` | Исключает элемент и его потомков из контекста |
+| `data-buddy-context` | number, text, keyword, object, card or a [structured kind](#structured-facts) |
+| `data-buddy-context-id` | Stable ID base; the analyzer appends kind and fact number |
+| `data-buddy-concept` | One of eight prepared visuals, not a free-form prompt |
+| `data-buddy-text` | Author-selected short text instead of longer content |
+| `data-buddy-focus`, `data-buddy-target` | Raise priority without assigning a kind |
+| `data-buddy-ignore` | Exclude this element and its descendants |
 
-Явный вид ограничивает факты этого элемента. Например, карточка с маркером
-`card` не становится одновременно текстом и числом. Вложенные отдельные
-источники могут иметь свои маркеры. При ручном выборе используйте полный
-`fact.id` из снимка, а не исходное значение атрибута.
+An explicit kind limits facts from that element. A marked card does not also
+become a number or text fact. Nested sources can have separate markers.
+Use the full `fact.id` from the snapshot when selecting manually.
 
-## Автоматическое распознавание
+## Automatic recognition
 
-Порядок приоритетов: авторский маркер → выделенный источник → заголовок →
-остальное видимое выделенное содержимое. В одной позиции число приоритетнее
-понятия, понятие — короткого текста. При равных подходящих фактах автоматический
-выбор пропускает номер и предлагает выбрать источник. Случайность автопилота
-не разрешает эту неоднозначность.
+Priority is explicit marker → highlighted source → heading → other visible
+emphasized content. Within one location, a number outranks a concept, which
+outranks text. Equal compatible top-priority sources are ambiguous: Buddy skips
+the action and asks for a source selection. Random scheduling does not break ties.
 
-Рассматриваются первые 200 подходящих элементов и не более 80 фактов.
-Заголовки, `strong`, `em`, `pre`, `code` и явные маркеры дают короткие тексты
-до 180 символов. Цифры учитываются в заголовках, выделенных источниках,
-`data-buddy-number` и элементах со шрифтом от 40 px. В числовом факте остаются
-знак, десятичная запятая или точка, пробелы разрядов и известная единица:
-`−18%`, `4,2×`, `1 000 ₽`, `1,2 млн ₽`, `250 тыс. руб.`, `12 мс`, `5 с`.
-Составные даты и время не разбиваются на отдельные числа.
-Набор единиц ограничен; произвольные единицы и графики требуют разметки.
+The analyzer considers up to 200 candidate elements and 80 facts. Headings,
+`strong`, `em`, `pre`, `code` and explicit markers provide text up to 180 characters.
+Numbers come from headings, highlighted sources, `data-buddy-number` and elements
+with font size at least 40 px. Signs, decimal separators, grouping spaces and known
+units are preserved: `−18%`, `4.2×`, `$1 000`, `12 ms`, `5 s`. Russian words and
+units are supported too. Dates and times are not split into unrelated numbers.
+The unit vocabulary is limited; unfamiliar units and charts need explicit markup.
 
-`42% ошибок` даёт нейтральный факт `42%`, а не повод для одобрения или салюта.
-Семантическая реакция на числовой слайд больше не выбирает `thumbsUp` по одному
-наличию цифры. Бадди может обдумать значение, выделить его или записать.
+An error rate of `42%` is a neutral fact, not a reason to celebrate. Numerical
+reactions can think about, underline or record the value.
 
-Изображениями считаются видимые `img` и корневые `svg`; их содержимое не
-интерпретируется. Подпись берётся из `alt` / `aria-label`. Проекция повторяет
-сам источник, а подготовленный объёмный образ задаётся через `concept`.
-Карточки ищутся по `.card`, `.tile`, `data-buddy-card` либо явному виду `card`.
-Их минимальный размер — 80×45 в координатах сцены; решатель пути проверяет
-достижимость отдельно.
+Visible `img` and root `svg` elements are image sources; their content is not
+interpreted. Captions come from `alt` / `aria-label`. Projections copy the actual
+source; prepared 3D visuals use `concept`. Cards match `.card`, `.tile`,
+`data-buddy-card` or explicit kind `card`, with minimum dimensions 80×45 in stage
+coordinates. Reachability is checked separately.
 
-Скрытые элементы и потомки, `.brand`, `data-perch`, `data-perch-text`, навигация
-и собственный слой `.buddy` исключаются. Тексты блоков и переносы строк
-разделяются пробелами; единица в соседнем строчном элементе остаётся слитной:
-`42<span>%</span>` → `42%`. Числа копируются без потери внутренних пробелов.
+Hidden elements, `.brand`, perch markers, navigation and `.buddy` are excluded.
+Block boundaries become spaces, while inline units stay attached:
+`42<span>%</span>` becomes `42%`. Internal numeric spacing is preserved.
 
-## Словарь образов
+## Concept vocabulary
 
-| `concept` | Примеры слов и форм |
+| Concept | English examples |
 |---|---|
-| `memory` | память, контекст, memory, context |
-| `target` | цель, target, goal |
-| `team` | команда, агенты, рой, team, agents, swarm |
-| `chain` | цепочка, этапы, workflow, pipeline |
-| `link` | связь, интеграция, API, connection, link |
-| `cloud` | облако, cloud |
-| `rules` | правила, инструкция, checklist, rules |
-| `search` | поиск, найти, искать, search |
+| memory | memory, context |
+| target | target, goal |
+| team | team, agents, swarm |
+| chain | workflow, pipeline |
+| link | integration, API, connection, link |
+| cloud | cloud |
+| rules | checklist, rules, instruction |
+| search | search |
 
-Точный контролируемый список форм экспортируется в `contextConcepts`.
-Поиск учитывает границы слов: `APIary` и `memoryless` не совпадают. Близкие
-отрицания до или после понятия подавляют совпадение: «без памяти», «память
-не нужна», `cloud is not needed`. Это ограниченное правило, не полноценный
-разбор русского или английского предложения. Сомнительный источник лучше
-разметить явно. Цитаты и код не дают понятия автоматически; явный маркер
-разрешает автору выбрать такой источник.
+`contextConcepts` exports the exact controlled English and Russian word forms.
+Matching respects word boundaries: APIary and memoryless do not match.
+Nearby negation suppresses a match, for example `cloud is not needed`.
+This is a limited rule, not a full language parser. Mark uncertain sources explicitly.
+Quotes and code do not automatically produce concepts; an explicit marker can opt in.
 
-## Первая серия: семь приёмов
+## Context actions
 
-Первые семь приёмов входят в группу «Контекст слайда». У существующих указания,
-фонарика, магнита, световой копии, подъёмов и размеченных постановок есть
-`tags:['context']`; их прежние группы и ID сохранены.
+All 17 actions belong to **Slide context**. Existing pointing, spotlight, magnet,
+climbing and staged actions also carry `tags: ['context']` without changing IDs.
 
-| Приём | Совместимый источник |
-|---|---|
-| `laptopNotes` | Короткий текст, число, понятие |
-| `thinkNumber` | Число |
-| `hologramObject` | Изображение или авторский объект |
-| `hologramKeyword` | Понятие из словаря |
-| `traceFocus` | Любой из пяти видов |
-| `peekCard`, `perchRead` | Карточка и безопасная доступная кромка |
-
-Голограммы требуют `superhuman`; остальные новые номера доступны без него.
-Профиль `calm` выбирает короткие `thinkNumber` и `traceFocus`. Длинные истории
-доступны в `live` и `show`, а также вручную. Автопилот показывает не более
-одной контекстной истории за посещение слайда. Ручной запуск по-прежнему
-подчиняется общим паузе, reduced motion и условиям сцены.
-
-`intelligence.state().context` содержит тот же снимок, `last.context` — факт,
-связанный с последней контекстной реакцией. Анализ обновляется по событиям
-DOM, загрузки медиа и изменения размера; `buddy.rescan()` обновляет его
-синхронно. Вызовы `context()` и повторные проверки доступности используют кэш,
-без сканирования DOM на каждом кадре.
-
-После обновления кэша действующий номер проверяет свой источник. Удаление,
-изменение текста, понятия, изображения, содержимого SVG или рамки прекращает старую проекцию и возвращает
-бадди в безопасное ожидание. Перенос или масштабирование всей сцены камерой
-не меняет логические координаты источника и не вызывает пересчёт на каждом кадре.
-
-Для независимого анализа экспортирован `analyzeSlideContext(slide, stage)`.
-Он возвращает такой же неизменяемый снимок без ручного выбора и DOM-ссылок.
-
-## Вторая серия: десять историй
-
-К первой серии добавлены десять историй. Первые семь ID и их группы сохранены;
-в общем реестре теперь 17 контекстных номеров. Визуальная приёмка второй серии
-проводится отдельно от проверки первой поставки.
-
-| Приём | Источник | Что связывает номер со слайдом |
+| Action | Source | Behavior |
 |---|---|---|
-| `thinkKeyword` | `keyword` или короткий `text` | Точная мысль в облачке и взгляд на её источник |
-| `compareValues` | `values` | Два исходных значения с подписями, без оценки результата |
-| `followChart` | `chart` | Курсор проходит по размеченной линии графика |
-| `chartClimb` | `bars` | Подъём по доступным контейнерам столбцов в порядке автора |
-| `cardRoute` | `route` | Последовательное посещение доступных карточек и возвращение |
-| `traceFlow` | `flow` | Импульс следует только по явно заданным связям |
-| `inspectDetail` | `detail` | Копия именно той области изображения, которую указал автор |
-| `assembleList` | `list` | Исходные строки в прежнем порядке и с настоящим состоянием галочек |
-| `showBeforeAfter` | `images` | Две исходные картинки с раздельными подписями |
-| `quoteIdea` | короткий `text` | Точная формулировка на временной карточке |
+| laptopNotes | text, number, keyword | Record the selected fact on a laptop |
+| thinkNumber | number | Show the exact value and unit in a thought bubble |
+| hologramObject | object | Project the source image or SVG |
+| hologramKeyword | keyword | Show a prepared concept visual and source wording |
+| traceFocus | Any of the five basic kinds | Underline the source |
+| peekCard, perchRead | card | Use a safe edge to peek or climb and read |
+| thinkKeyword | keyword or short text | Hold the exact thought and look at its source |
+| compareValues | values | Present both labeled values without judging them |
+| followChart | chart | Follow the marked chart line |
+| chartClimb | bars | Climb accessible bars in author order |
+| cardRoute | route | Visit accessible cards and return |
+| traceFlow | flow | Follow only explicit links |
+| inspectDetail | detail | Magnify the author-selected crop |
+| assembleList | list | Preserve item order and actual check states |
+| showBeforeAfter | images | Present both images with separate captions |
+| quoteIdea | short text | Show the exact wording on a temporary card |
 
-В `calm` добавлен короткий `thinkKeyword`. Остальные истории доступны в
-`live` и `show`, кроме многоэтапных `chartClimb` и `cardRoute`: они оставлены
-для `show` и ручного запуска. Общий предел одной автоматической контекстной
-истории за посещение распространяется на обе серии.
+Holograms, compareValues, followChart, traceFlow, assembleList and showBeforeAfter
+require `superhuman`; the other context actions are base actions.
+`calm` uses short thoughts and underlining. Longer stories run in live/show;
+automatic chartClimb and cardRoute require show. At most one automatic context
+story runs per slide visit across both action sets. Manual actions still respect
+pause, reduced motion and scene conditions.
 
-`compareValues`, `followChart`, `traceFlow`, `assembleList`, `showBeforeAfter`
-требуют пресета `superhuman`. Остальные пять историй второй серии — базовые.
-Пресет не отменяет проверку источника, свободной опоры и доступного маршрута.
+`intelligence.state().context` exposes the same snapshot; `last.context` records
+the last contextual reaction's source. Analysis updates on DOM changes, media
+loads and resize; `buddy.rescan()` updates synchronously. Reads use the cache,
+not per-frame DOM scans.
 
-## Структурированный факт
+If the source is removed or its text, concept, image, SVG content or bounds change,
+the old projection is cancelled and Buddy returns safely to waiting. Camera
+movement and whole-stage scaling do not change logical source coordinates.
+`analyzeSlideContext(slide, stage)` provides standalone immutable analysis without
+selection state or DOM references.
 
-Новые виды не угадываются по произвольной картинке или соседству элементов.
-Нужен контейнер с `data-buddy-context="values|images|chart|bars|route|flow|list|detail"`.
-У его факта есть дополнительное поле `structure`:
+## Structured facts
+
+Use `data-buddy-context="values|images|chart|bars|route|flow|list|detail"` on a container.
+Structure is never inferred from arbitrary images or neighboring elements.
 
 ```js
 {
   items: [{
-    id: 'before',
-    text: '42%',
-    label: 'Было',
-    kind: 'number',
-    value: '42%',
-    unit: '%',
+    id: 'before', text: '42%', label: 'Before', kind: 'number', value: '42%', unit: '%',
     target: { x: 250, y: 300, width: 100, height: 70 }
   }],
   points: [{ x: 100, y: 300 }, { x: 300, y: 180 }],
@@ -226,56 +181,48 @@ DOM, загрузки медиа и изменения размера; `buddy.re
 }
 ```
 
-Поля `points`, `edges` и `crop` присутствуют только у соответствующих видов.
-Все координаты логические, в сцене 1280×720; `target.x/y` обозначают центр,
-а `crop.x/y` — верхний левый угол. `value` хранит точную строку со знаком
-и единицей. `label` берётся отдельно из `data-buddy-label` или `aria-label`
-и не подменяет значение. Подпись ограничена 80 символами, текст части — 180.
-`checked` присутствует только при известном состоянии исходного пункта.
+Only applicable fields appear. Coordinates use the logical 1280×720 stage;
+`target.x/y` is the center, `crop.x/y` the top-left. Values retain exact signs and
+units. Labels come separately from `data-buddy-label` or `aria-label` and never
+replace values. Labels allow 80 characters, part text 180, IDs 100. `checked`
+is present only when the source state is known.
 
-Снимок глубоко заморожен. Внутри проигрывателя resolver дополнительно отдаёт
-`parts:[{id,element,bounds}]`, где ID совпадают с `items`, а `bounds` имеют вид
-`[x1,y1,x2,y2]`. Это точные исходные контейнеры для копирования и проверки
-геометрии; в публичный `buddy.context()` DOM-ссылки не попадают.
-У SVG-частей внутреннее поле `media` хранит исходные размеры viewport и
-результат проверки копирования. Положительное масштабирование и перенос
-корневого SVG разрешены; корневой поворот, наклон и отражение дают отказ
-`can()`. Такие преобразования можно перенести во внутреннюю группу SVG.
-Проверка выполняется при анализе или обновлении источника, поле не входит
-в публичный факт.
-Общий маршрутизатор обслуживает оба модуля постановок: команды `can`, `play`,
-`sequence`, `reset`, `rescan` и `destroy` работают с обеими сериями.
+The private resolver adds `parts: [{ id, element, bounds }]`, with bounds
+`[x1,y1,x2,y2]`, for copying and geometry checks. DOM references never enter the
+public snapshot. SVG media records viewport dimensions and copyability internally.
+Positive root scaling and translation are supported; root rotation, skew or
+reflection are rejected. Move those transforms to an inner SVG group.
 
-### Два значения
+The shared router handles both context modules through can, play, sequence,
+reset, rescan and destroy.
+
+### Value pairs
 
 ```html
 <div data-buddy-context="values" data-buddy-context-id="comparison">
-  <strong data-buddy-item="before" aria-label="Было">42%</strong>
-  <strong data-buddy-item="after" data-buddy-label="Стало">27%</strong>
+  <strong data-buddy-item="before" aria-label="Before">42%</strong>
+  <strong data-buddy-item="after" data-buddy-label="After">27%</strong>
 </div>
 ```
 
-Нужны ровно две части, в каждой одно значение. Допустим явный
-`data-buddy-value="42%"`; тогда вся строка атрибута должна быть числовым фактом.
-Единицы должны совпадать; пустая единица разрешена только у обеих частей.
-Регистр, пробелы и точки сокращений нормализуются, перевод единиц не выполняется:
-`тыс. ₽` и `млн ₽`, `%` и `₽` не считаются одинаковыми. Направление изменения
-не превращается в утверждение об успехе или провале.
+Exactly two parts, with one exact value each. An optional `data-buddy-value`
+must contain only the numeric fact. Units and scale must match; both may be
+unitless. Case, spaces and abbreviation periods are normalized, but units are
+not converted. A change is not interpreted as success or failure.
 
-### Два изображения
+### Image pairs
 
 ```html
-<div data-buddy-context="images" data-buddy-context-id="pictures">
-  <img data-buddy-item="before" src="before.png" alt="Было">
-  <img data-buddy-item="after" src="after.png" alt="Стало">
+<div data-buddy-context="images">
+  <img data-buddy-item="before" src="before.png" alt="Before">
+  <img data-buddy-item="after" src="after.png" alt="After">
 </div>
 ```
 
-Нужны ровно два видимых `img` или корневых `svg` с собственными ID частей.
-Проекция копирует источники; условные рисунки вместо картинок не подставляются.
-Градиенты и локальные SVG-ссылки сохраняются в отдельном пространстве ID.
+Exactly two visible IMG or root SVG elements with unique part IDs. The projection
+copies the source, including gradients and local SVG references in isolated ID namespaces.
 
-### График
+### Charts
 
 ```html
 <svg data-buddy-context="chart" viewBox="0 0 600 300">
@@ -283,21 +230,19 @@ DOM, загрузки медиа и изменения размера; `buddy.re
 </svg>
 ```
 
-В контейнере должна быть ровно одна помеченная линия: `polyline`, `line` либо
-один открытый непрерывный `path`. SVG-координаты переводятся через настоящую
-матрицу `getScreenCTM()` в координаты сцены. `path` измеряется в 64 точках;
-закрытые и разорванные пути отклоняются. Направление берётся из порядка точек,
-а не из предположения о росте показателя.
-Матрица сверяется с внешним SVG viewport: это исправляет пропущенный CSS-масштаб
-предков в WebKit и сохраняет `viewBox`, letterbox и внутренние преобразования.
-Корневой CSS-поворот, наклон или отражение не восстанавливаются по прямоугольнику
-и дают явный отказ; такие преобразования размещайте во внутренней SVG-группе.
+Exactly one marked polyline, line or open continuous path. SVG points are converted
+to stage coordinates using `getScreenCTM()`. Paths are sampled at 64 points;
+closed and disconnected paths are rejected. Direction follows point order.
+The matrix is checked against the outer viewport to account for ancestor CSS scale
+in WebKit, while preserving viewBox, letterboxing and inner transforms.
+Root CSS rotation, skew and reflection cannot be reconstructed from a rectangle;
+put them on an inner group instead.
 
-Вместо чтения SVG допустим явный `data-buddy-points='[[100,300],[300,180]]'`
-на помеченной линии. Эти точки уже заданы в координатах сцены. Нужно от 2
-до 64 конечных точек внутри сцены; нулевая траектория не принимается.
+Alternatively set `data-buddy-points='[[100,300],[300,180]]'` on the marked line.
+These are already stage coordinates: 2–64 finite points inside the stage,
+with a nonzero path.
 
-### Столбцы и маршрут карточек
+### Bars and card routes
 
 ```html
 <div data-buddy-context="bars">
@@ -305,73 +250,66 @@ DOM, загрузки медиа и изменения размера; `buddy.re
   <div data-buddy-bar="b" data-buddy-step="2" data-buddy-value="40%">40%</div>
 </div>
 <div data-buddy-context="route">
-  <article data-buddy-item="first" data-buddy-step="1">Первый этап</article>
-  <article data-buddy-item="second" data-buddy-step="2">Второй этап</article>
+  <article data-buddy-item="first" data-buddy-step="1">First stage</article>
+  <article data-buddy-item="second" data-buddy-step="2">Second stage</article>
 </div>
 ```
 
-Сами `div` столбцов и `article` карточек должны совпадать с реальными
-площадками `world.plats`. Постановка не добавляет опоры к исходному слайду.
-`data-buddy-step` — уникальный положительный целый порядок. Анализатор сохраняет
-от 2 до 8 частей без обрезания; текущие телесные истории проходят две или три
-опоры. Более длинный источник получает отказ `can()`.
-Дополнительно проверяются достижимая кромка, свободный путь по полу, расстояние
-и возвращение. Разметка порядка сама по себе не делает маршрут безопасным.
+Containers must match actual supports in `world.plats`; the action does not invent
+platforms. Steps are unique positive integers. The analyzer preserves 2–8 parts,
+but current physical stories use two or three supports; longer routes receive a
+`can()` rejection. Safe edges, a clear floor route, distances and return paths are
+checked independently of the markup order.
 
-### Схема связей
+### Diagrams
 
 ```html
 <div data-buddy-context="flow">
-  <div data-buddy-node="a">Источник</div>
-  <div data-buddy-node="b">Результат</div>
+  <div data-buddy-node="a">Source</div>
+  <div data-buddy-node="b">Result</div>
   <svg>
     <polyline data-buddy-from="a" data-buddy-to="b" points="100,100 300,100"/>
   </svg>
 </div>
 ```
 
-Нужны 2–12 узлов с уникальными непустыми ID и 1–16 явных связей.
-У каждой связи есть `data-buddy-from`, `data-buddy-to` и настоящая SVG-линия
-либо `data-buddy-points` в координатах сцены. Связи по близости узлов не строятся.
-Ссылки на отсутствующий или скрытый узел, повтор одной связи и петля в тот же
-узел отклоняются. Точки связи должны лежать в сцене.
-Анализатор сохраняет до 16 связей, но одна постановка `traceFlow` принимает
-до трёх: между рёбрами нужны погашение луча и плавное перенаведение указки.
-Для более сложной схемы `can()` объяснит, что нужно выделить меньший источник.
+Provide 2–12 nodes with unique nonempty IDs and 1–16 explicit links. Every link
+needs from/to IDs and a real SVG line or explicit stage-coordinate points.
+No links are inferred from proximity. Missing or hidden endpoints, duplicate links,
+self-loops and out-of-stage points are rejected. A traceFlow story uses at most
+three links so it can turn the beam off and re-aim between edges. Larger diagrams
+need a smaller selected source.
 
-### Список
+### Lists
 
 ```html
 <ul data-buddy-context="list">
-  <li data-buddy-item="a"><input type="checkbox" checked>Готово</li>
-  <li data-buddy-item="b"><input type="checkbox">В работе</li>
+  <li data-buddy-item="a"><input type="checkbox" checked>Done</li>
+  <li data-buddy-item="b"><input type="checkbox">In progress</li>
 </ul>
 ```
 
-Разрешено 1–8 строк. `checked` копируется из настоящего checkbox; при его
-отсутствии допустим явный `data-buddy-checked="true|false"` на части. Текст
-«Готово» сам по себе не создаёт галочку. Живые `input` / `change` обновляют
-кэш по событию; после программного изменения свойства без события вызовите
-`buddy.rescan()`. Порядок строк сохраняется.
+Use 1–8 items. `checked` comes from the actual checkbox, or explicit
+`data-buddy-checked="true|false"` when no checkbox exists. The word Done alone
+does not create a check mark. Input/change events update the cache; after changing
+a property programmatically without an event, call `rescan()`. Item order is preserved.
 
-### Область картинки
+### Image details
 
 ```html
 <div data-buddy-context="detail" data-buddy-crop='[930,300,80,60]'>
-  <img data-buddy-item="image" src="detail.png" alt="Деталь">
+  <img data-buddy-item="image" src="detail.png" alt="Detail">
 </div>
 ```
 
-Нужна ровно одна видимая картинка и явная область `[x,y,width,height]`
-в координатах сцены. Область положительного размера должна целиком помещаться
-в исходную картинку и сцену. `fact.target` указывает на область, а исходная
-часть хранит рамку полной картинки. Области не выбираются по содержимому пикселей.
-Проекция увеличивает фрагмент минимум в 1,5 раза; её внутренняя сторона
-ограничена 244 px сцены. Слишком крупный фрагмент получает объяснимый отказ
-`can()` — для него нужно выбрать меньшую область. Проекция размещается с учётом
-перекрытия исходной картинки.
+Exactly one visible image and an explicit positive `[x,y,width,height]` crop
+entirely within both image and stage. The fact target points to the crop; the part
+retains the full image bounds. No crop is inferred from pixels. Magnification is
+at least 1.5×, with an inner projection size capped at 244 stage pixels.
+Oversized crops receive a `can()` rejection; choose a smaller crop. Placement
+accounts for overlap with the source image.
 
-Неполная структура не дополняется догадками, а превышение лимитов не отрезает
-часть данных молча. Источники внутри вложенной отдельной структуры не становятся
-частями её родителя. Изменения частей, подписей, точек, связей и crop запускают
-событийный пересчёт и проверку действующего номера.
+Incomplete structures are not guessed, and excessive data is never silently
+truncated. Parts of a nested separate structure do not become parent parts.
+Changes to parts, captions, points, edges and crop trigger event-based analysis
+and validation of the running action.

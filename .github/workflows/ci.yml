@@ -1,4 +1,4 @@
-name: Проверки библиотеки
+name: Library checks
 
 on:
   push:

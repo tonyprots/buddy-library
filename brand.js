@@ -6,7 +6,7 @@ const roleNames = ['disc', 'message', 'reminder', 'mark', 'board'],
     if (value == null) return null
     if (typeof value !== 'string' || !value.trim() || /^(?:javascript|vbscript):/i.test(value.trim())
       || /^data:/i.test(value.trim()) && !/^data:image\//i.test(value.trim()))
-      throw new TypeError('Изображение бренда — непустой URL или data:image URI')
+      throw new TypeError('A brand image must be a nonempty URL or data:image URI')
     return value.trim()
   }
 
@@ -18,17 +18,17 @@ export function resolveBrand(input, logos = {}) {
     products: ['mail', 'calendar', 'disk', 'docs', 'telemost', 'tracker'].map(id => logos[id]).filter(Boolean),
     roles: Object.fromEntries(Object.entries(legacyRoles).map(([role, id]) => [role, logos[id]]))
   }
-  if (typeof input !== 'object' || Array.isArray(input)) throw new TypeError('brand — объект с logo, products и accent')
-  if (input.products != null && !Array.isArray(input.products)) throw new TypeError('brand.products — массив изображений')
-  if (input.roles != null && (typeof input.roles !== 'object' || Array.isArray(input.roles))) throw new TypeError('brand.roles — объект')
+  if (typeof input !== 'object' || Array.isArray(input)) throw new TypeError('brand must be an object with logo, products and accent')
+  if (input.products != null && !Array.isArray(input.products)) throw new TypeError('brand.products must be an array of images')
+  if (input.roles != null && (typeof input.roles !== 'object' || Array.isArray(input.roles))) throw new TypeError('brand.roles must be an object')
   const logo = image(input.logo), products = Object.freeze((input.products || []).map(value => {
     const url = image(value)
-    if (!url) throw new TypeError('В brand.products не должно быть пустых изображений')
+    if (!url) throw new TypeError('brand.products must not contain empty images')
     return url
   })), rgb = input.accent == null ? null : parseColor(input.accent)
   if (input.accent != null && (!rgb || rgb.some(value => !Number.isFinite(value))
     || rgb.slice(0, 3).some(value => value < 0 || value > 255) || rgb[3] !== 1))
-    throw new TypeError('brand.accent — непрозрачный цвет #rgb, #rrggbb или rgb()')
+    throw new TypeError('brand.accent must be an opaque #rgb, #rrggbb or rgb() color')
   const accent = rgb ? '#' + rgb.slice(0, 3).map(value => Math.round(value).toString(16).padStart(2, '0')).join('').toUpperCase() : null,
     roles = Object.freeze(Object.fromEntries(roleNames.map((role, index) => [
       role, Object.hasOwn(input.roles || {}, role) ? image(input.roles[role])

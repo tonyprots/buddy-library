@@ -65,7 +65,7 @@ try {
   report.browser = await ev('navigator.userAgent')
   const icon = await ev(`new DOMParser().parseFromString(decodeURIComponent(document.querySelector('link[rel=icon]').href.split(',')[1]),'image/svg+xml').documentElement.localName`)
   assert.equal(icon, 'svg')
-  await choose('group', 'Контекст слайда'); await choose('scene', 'context-keywords')
+  await choose('group', 'Slide context'); await choose('scene', 'context-keywords')
   for (const concept of concepts) for (const face of [-1, 1]) {
     const row = { concept, face, frames: [] }
     report.cycles.push(row)

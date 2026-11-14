@@ -1,9 +1,9 @@
 <!doctype html>
-<html lang="ru">
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Бадди — необязательный пример Яндекс 360</title>
+<title>Buddy · optional Yandex 360 example</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='9' r='7' fill='%232a5350'/%3E%3Cpath d='M7 31v-9q0-9 9-9t9 9v9' fill='%232a5350'/%3E%3C/svg%3E">
 <style>
 * { box-sizing: border-box }
@@ -36,31 +36,31 @@ output { min-width: 48px; text-align: center; font-variant-numeric: tabular-nums
     <div id="deck">
       <div class="pages">
         <article class="is-active">
-          <div class="copy"><h1>Пример Яндекс 360</h1><p>Знаки подключены отдельным файлом. Выберите номер под слайдом, чтобы увидеть их в действии.</p></div>
-          <div class="props"><div class="prop">Место для идеи</div><div class="prop">И для героя</div></div>
+          <div class="copy"><h1>Yandex 360 example</h1><p>Images load from a separate file. Choose an action below the slide to see them in use.</p></div>
+          <div class="props"><div class="prop">Room for an idea</div><div class="prop">And for Buddy</div></div>
         </article>
         <article>
-          <div class="copy"><h2>От идеи к действию</h2><p>Бадди замечает содержание и сам выбирает подходящие жесты и трюки.</p></div>
-          <div class="props"><div class="prop">Идея</div><div class="prop" style="height:180px">Прототип</div></div>
+          <div class="copy"><h2>From idea to action</h2><p>Buddy notices the content and chooses gestures and tricks to match.</p></div>
+          <div class="props"><div class="prop">Idea</div><div class="prop" style="height:180px">Prototype</div></div>
         </article>
         <article>
-          <div class="copy"><h2>Спасибо!</h2><p>К финалу — больше движения и способностей. Останьтесь здесь немного и посмотрите.</p></div>
-          <div class="props"><div class="prop">Вопросы?</div></div>
+          <div class="copy"><h2>Thank you!</h2><p>More movement and powers toward the finale. Stay a little longer and watch.</p></div>
+          <div class="props"><div class="prop">Questions?</div></div>
         </article>
       </div>
     </div>
   </div>
-  <nav aria-label="Управление презентацией">
-    <button id="previous" type="button" disabled>Назад</button>
+  <nav aria-label="Presentation controls">
+    <button id="previous" type="button" disabled>Back</button>
     <output id="counter" aria-live="polite">1 / 3</output>
-    <button id="next" type="button">Дальше</button>
-    <button id="pause" type="button" aria-pressed="false" disabled>Пауза героя</button>
-    <button type="button" data-technique="disk" disabled>Диск</button>
-    <button type="button" data-technique="mail" disabled>Письмо</button>
-    <button type="button" data-technique="calendar" disabled>Встреча</button>
-    <button type="button" data-technique="tracker" disabled>Готово</button>
+    <button id="next" type="button">Next</button>
+    <button id="pause" type="button" aria-pressed="false" disabled>Pause Buddy</button>
+    <button type="button" data-technique="disk" disabled>Disc</button>
+    <button type="button" data-technique="mail" disabled>Message</button>
+    <button type="button" data-technique="calendar" disabled>Meeting</button>
+    <button type="button" data-technique="tracker" disabled>Done</button>
   </nav>
-  <p class="hint" role="status">Необязательный пример: знаки принадлежат правообладателям и не входят в основной buddy.js.</p>
+  <p class="hint" role="status">Optional example: trademarks belong to their owners and are not included in the main buddy.js.</p>
 </main>
 <script>
 addEventListener('DOMContentLoaded', () => {
@@ -105,7 +105,7 @@ addEventListener('DOMContentLoaded', async () => {
       button.disabled = buddy.state().reducedMotion
       button.addEventListener('click', () => {
         const id = button.dataset.technique, reason = buddy.can(id)
-        document.querySelector('.hint').textContent = reason || ('Номер: ' + button.textContent)
+        document.querySelector('.hint').textContent = reason || ('Action: ' + button.textContent)
         if (!reason) buddy.perform(id)
       })
     }
@@ -114,7 +114,7 @@ addEventListener('DOMContentLoaded', async () => {
       const paused = !buddy.paused
       paused ? buddy.pause() : buddy.resume()
       pause.setAttribute('aria-pressed', String(paused))
-      pause.textContent = paused ? 'Продолжить' : 'Пауза героя'
+      pause.textContent = paused ? 'Resume' : 'Pause Buddy'
     })
   } catch { pause.disabled = true }
 }, { once: true })

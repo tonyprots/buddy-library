@@ -1,9 +1,8 @@
-# Реакции на содержание слайда
+# Reactions to slide content
 
-Актуальный контракт единого автопилота, профили `calm` / `live` / `show`,
-разметка, опоры, подпись и диагностика описаны в
-[руководстве по автопилоту и реакциям](slide-reactions.md).
+The unified controller, calm/live/show profiles, markup, supports, signature and
+diagnostics are described in the [reaction guide](slide-reactions.md).
 
-`createBuddy()` всегда создаёт один контроллер. Переключайте его через
-`autoplay()`, `setReactions()` и `setProfile()`; читайте состояние через
-`intelligence.state()` и `intelligence.inspect()`.
+`createBuddy()` always creates one controller. Switch it through `autoplay()`,
+`setReactions()` and `setProfile()`. Read its state through `intelligence.state()`
+and `intelligence.inspect()`.

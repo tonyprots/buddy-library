@@ -38,7 +38,7 @@ export interface SlideAnalysis extends SlideClassification {
   brand: { text: string; perch: boolean; perchText: boolean; surface: 'text' | 'avatar' | 'fallback'; techniques: TechniqueId[] } | null
 }
 export interface ReactionTimingOptions {
-  /** Все интервалы задаются в миллисекундах. */
+  /** All intervals are in milliseconds. */
   quietMs?: number
   cooldownMs?: number
   revisitMs?: number
@@ -106,7 +106,7 @@ export interface SlideIntelligence {
   setProfile(id: AutoplayProfileId): void
   setAutoplay(on: boolean): void
   setReactions(on: boolean): void
-  /** Сообщает о ручном действии: пропускает текущую реакцию и начинает паузу. */
+  /** Notifies the controller of a manual action: skips this visit's reaction and starts a cooldown. */
   activity(id?: TechniqueId): void
   destroy(): void
 }
@@ -116,7 +116,7 @@ export interface SlideIntelligenceOptions extends ReactionOptions {
   autoplay?: boolean
   reactions?: boolean
   world?(): SceneWorld
-  /** Общая политика автоматических действий; ручные команды не ограничивает. */
+  /** Shared policy for automatic actions; does not constrain manual commands. */
   allowAutomatic?(id: TechniqueId): boolean
   slideContext?: SlideContextController
   contextTechniques?: readonly { id: TechniqueId; contextKinds: readonly ContextKind[] }[]

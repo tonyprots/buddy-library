@@ -11,14 +11,14 @@ const sceneTypes = new Set(['finale', 'divider', 'image', 'number', 'title', 'co
   }, defaults = Object.freeze({ quietMs: 4000, cooldownMs: 20000, revisitMs: 90000, staleMs: 16000, debounceMs: 140 })
 
 export const autoplayProfiles = Object.freeze(Object.fromEntries(Object.entries({
-  calm: { title: 'Спокойный', quietMs: 6000, cooldownMs: 45000, ambientMs: [30000, 50000],
+  calm: { title: 'Calm', quietMs: 6000, cooldownMs: 45000, ambientMs: [30000, 50000],
     actions: ['lookSlide', 'lookHall', 'wave', 'salute', 'bow', 'point', 'present', 'thumbsUp', 'note', 'read', 'stretch', 'sideBend', 'stroll', 'thinkNumber', 'thinkKeyword', 'traceFocus'] },
-  live: { title: 'Живой', quietMs: 4000, cooldownMs: 24000, ambientMs: [18000, 30000],
+  live: { title: 'Live', quietMs: 4000, cooldownMs: 24000, ambientMs: [18000, 30000],
     actions: ['wave', 'clap', 'salute', 'bow', 'point', 'present', 'thumbsUp', 'sonicPulse', 'note', 'read', 'rain', 'spotlight',
       'stretch', 'squats', 'toeTouch', 'sideBend', 'stroll', 'jog', 'hop', 'logo', 'climb', 'descend', 'popcorn',
       'thinkNumber', 'traceFocus', 'laptopNotes', 'hologramObject', 'hologramKeyword', 'peekCard', 'perchRead',
       'thinkKeyword', 'compareValues', 'followChart', 'traceFlow', 'inspectDetail', 'assembleList', 'showBeforeAfter', 'quoteIdea'] },
-  show: { title: 'Шоу', quietMs: 2500, cooldownMs: 14000, ambientMs: [10000, 18000],
+  show: { title: 'Show', quietMs: 2500, cooldownMs: 14000, ambientMs: [10000, 18000],
     actions: ['wave', 'clap', 'cheer', 'dance', 'celebrate', 'salute', 'bow', 'point', 'present', 'thumbsUp', 'sonicPulse',
       'note', 'read', 'rain', 'spotlight', 'stretch', 'squats', 'jacks', 'shadowbox', 'kick', 'stroll', 'jog', 'hop',
       'stumble', 'handstand', 'backflip', 'logo', 'climb', 'pullups', 'descend', 'popcorn', 'levitate', 'shield',
@@ -30,7 +30,7 @@ export const autoplayProfiles = Object.freeze(Object.fromEntries(Object.entries(
 }).map(([id, value]) => [id, Object.freeze({ ...value, ambientMs: Object.freeze(value.ambientMs), actions: Object.freeze(value.actions) })])))
 
 export function resolveAutoplayProfile(id = 'calm') {
-  if (!Object.hasOwn(autoplayProfiles, id)) throw new RangeError(`Неизвестный профиль автопилота: ${id}`)
+  if (!Object.hasOwn(autoplayProfiles, id)) throw new RangeError(`Unknown autoplay profile: ${id}`)
   return autoplayProfiles[id]
 }
 
@@ -38,15 +38,15 @@ export function resolveAutoplayProfile(id = 'calm') {
 export function classifySlideEvidence(evidence = {}) {
   const { declared, disabled = false, heading = '', cover = false, divider = false,
     finale = false, imageCoverage = 0, largeNumber = false } = evidence
-  if (disabled || declared === 'off') return { kind: 'off', reason: 'Отключено разметкой', confidence: 1 }
-  if (sceneTypes.has(declared)) return { kind: declared, reason: 'Явная роль слайда', confidence: 1 }
+  if (disabled || declared === 'off') return { kind: 'off', reason: 'Disabled by markup', confidence: 1 }
+  if (sceneTypes.has(declared)) return { kind: declared, reason: 'Explicit slide role', confidence: 1 }
   if (finale || /^(?:спасибо(?:\s+за\s+внимание)?|вопросы\??|thank\s+you|questions\??)[.!\s]*$/iu.test(heading.trim()))
-    return { kind: 'finale', reason: finale ? 'Отмечена цель финального полёта' : 'Финальный заголовок', confidence: .95 }
-  if (divider) return { kind: 'divider', reason: 'Перебивка размечена классом или ролью', confidence: .95 }
-  if (cover) return { kind: 'title', reason: 'Обложка', confidence: .95 }
-  if (imageCoverage >= .3) return { kind: 'image', reason: 'Изображение занимает не менее 30% слайда', confidence: .85 }
-  if (largeNumber) return { kind: 'number', reason: 'Выделено крупное число', confidence: .8 }
-  return { kind: 'content', reason: 'Обычный содержательный слайд', confidence: .6 }
+    return { kind: 'finale', reason: finale ? 'Final flight target marked' : 'Closing heading', confidence: .95 }
+  if (divider) return { kind: 'divider', reason: 'Divider marked by class or role', confidence: .95 }
+  if (cover) return { kind: 'title', reason: 'Cover', confidence: .95 }
+  if (imageCoverage >= .3) return { kind: 'image', reason: 'Image occupies at least 30% of the slide', confidence: .85 }
+  if (largeNumber) return { kind: 'number', reason: 'Prominent number', confidence: .8 }
+  return { kind: 'content', reason: 'Regular content slide', confidence: .6 }
 }
 
 /** Политика реакций: одно событие на посещение, тишина после смены, глобальная и повторная паузы. */
@@ -56,7 +56,7 @@ export function createReactionPolicy(options = {}) {
   const configure = (input = {}) => {
     const next = { ...config, ...input }
     for (const name of ['quietMs', 'cooldownMs', 'revisitMs', 'staleMs', 'debounceMs'])
-      if (!Number.isFinite(next[name]) || next[name] < 0) throw new RangeError(`Некорректный интервал ${name}`)
+      if (!Number.isFinite(next[name]) || next[name] < 0) throw new RangeError(`Invalid interval ${name}`)
     Object.assign(config, next)
   }
   configure()
@@ -64,16 +64,16 @@ export function createReactionPolicy(options = {}) {
     configure,
     begin(key, now) { visit = { key, at: now, consumed: false } },
     verdict(now, { paused = false, hidden = false, reduced = false, busy = false } = {}) {
-      if (!visit) return { ready: false, reason: 'Нет активного слайда' }
-      if (visit.consumed) return { ready: false, reason: 'Реакция этого посещения завершена' }
-      if (paused || hidden || reduced) return { ready: false, reason: paused ? 'Пауза' : hidden ? 'Вкладка скрыта' : 'Уменьшенное движение' }
+      if (!visit) return { ready: false, reason: 'No active slide' }
+      if (visit.consumed) return { ready: false, reason: 'This visit\'s reaction is complete' }
+      if (paused || hidden || reduced) return { ready: false, reason: paused ? 'Paused' : hidden ? 'Tab hidden' : 'Reduced motion' }
       const quietLeft = config.quietMs - (now - visit.at)
-      if (quietLeft > 0) return { ready: false, reason: 'Тихое окно', wait: quietLeft }
-      if (now - visit.at > config.quietMs + config.staleMs) return { ready: false, reason: 'Момент реакции прошёл', expired: true }
+      if (quietLeft > 0) return { ready: false, reason: 'Quiet window', wait: quietLeft }
+      if (now - visit.at > config.quietMs + config.staleMs) return { ready: false, reason: 'Reaction window has passed', expired: true }
       const remaining = Math.max(config.cooldownMs - (now - lastReaction), config.revisitMs - (now - (history.get(visit.key) ?? -Infinity)))
-      if (remaining > 0) return { ready: false, reason: 'Пауза между реакциями', wait: remaining }
-      if (busy) return { ready: false, reason: 'Персонаж занят', wait: 750 }
-      return { ready: true, reason: 'Можно реагировать' }
+      if (remaining > 0) return { ready: false, reason: 'Reaction cooldown', wait: remaining }
+      if (busy) return { ready: false, reason: 'Character busy', wait: 750 }
+      return { ready: true, reason: 'Ready to react' }
     },
     consume(now) {
       if (!visit || visit.consumed) return
@@ -152,8 +152,8 @@ const layoutStyle = element => (element.getAttribute('style') || element.style?.
 /** Единый режиссёр: реакции на слайд и редкие самостоятельные действия без прерывания пользователя. */
 export function attachSlideIntelligence({ stage, buddy, presentation, profile = 'calm', seed = 1, autoplay = false,
   reactions = true, world, slideContext, contextTechniques = [], allowAutomatic = () => true, ...options }) {
-  if (!Number.isInteger(seed) || seed < 0 || seed > 0xffffffff) throw new RangeError('seed — целое 0…4294967295')
-  if (typeof autoplay !== 'boolean' || typeof reactions !== 'boolean') throw new TypeError('autoplay и reactions — логические значения')
+  if (!Number.isInteger(seed) || seed < 0 || seed > 0xffffffff) throw new RangeError('seed must be an integer from 0 to 4294967295')
+  if (typeof autoplay !== 'boolean' || typeof reactions !== 'boolean') throw new TypeError('autoplay and reactions must be booleans')
   const contextIds = new Set(contextTechniques.map(item => item.id)),
     timing = () => ({ ...defaults, ...resolveAutoplayProfile(profile), ...options }),
     config = timing(), policy = createReactionPolicy(config), now = () => performance.now(), observers = [],
@@ -165,7 +165,7 @@ export function attachSlideIntelligence({ stage, buddy, presentation, profile = 
       return result
     }
   let current = null, analysis = null, timer = 0, debounce = 0, paused = false, destroyed = false, directing = false,
-    last = { reason: 'Подключение', action: null, source: null }, measures = 0, candidates = [], candidateKey = '', ambientBag = [],
+    last = { reason: 'Mounted', action: null, source: null }, measures = 0, candidates = [], candidateKey = '', ambientBag = [],
     lastAction = null, lastActivity = -Infinity, nextAmbientAt = Infinity, contextVisitUsed = false,
     stageLayoutStyle = layoutStyle(stage)
   const clear = () => { clearTimeout(timer); timer = 0 },
@@ -195,8 +195,8 @@ export function attachSlideIntelligence({ stage, buddy, presentation, profile = 
       clear()
       if (!destroyed && !paused && (autoplay || reactions)) timer = setTimeout(react, Math.max(20, Math.min(wait, 60000)))
     },
-    blocked = ctx => ctx.paused ? 'Пауза' : ctx.hidden ? 'Вкладка скрыта' : ctx.reduced ? 'Уменьшенное движение'
-      : ctx.invisible ? 'Сцена вне экрана' : !analysis?.available ? 'Сцена скрыта или не имеет размеров' : null,
+    blocked = ctx => ctx.paused ? 'Paused' : ctx.hidden ? 'Tab hidden' : ctx.reduced ? 'Reduced motion'
+      : ctx.invisible ? 'Stage outside viewport' : !analysis?.available ? 'Stage hidden or has no dimensions' : null,
     schedule = () => {
       if (destroyed || paused || !analysis || (!autoplay && !reactions)) return
       const ctx = context(), reason = blocked(ctx)
@@ -214,25 +214,25 @@ export function attachSlideIntelligence({ stage, buddy, presentation, profile = 
       directing = true
       try {
         for (const id of ids) {
-          if (!allowAutomatic(id)) { rejected.push(`${id}: не подходит профилю или характеру`); continue }
-          if (contextIds.has(id) && contextVisitUsed) { rejected.push(`${id}: контекстная история этого посещения уже показана`); continue }
+          if (!allowAutomatic(id)) { rejected.push(`${id}: excluded by profile or character`); continue }
+          if (contextIds.has(id) && contextVisitUsed) { rejected.push(`${id}: a context story has already played on this visit`); continue }
           if (contextIds.has(id) && !automaticContext.has(id) && !(source === 'semantic' && analysis.explicitAction === id)) {
-            rejected.push(`${id}: источник неоднозначен или ниже приоритета выбранного контекста`); continue
+            rejected.push(`${id}: source is ambiguous or has lower priority than the selected context`); continue
           }
-          if (id === lastAction) { rejected.push(`${id}: повтор предыдущего действия`); continue }
+          if (id === lastAction) { rejected.push(`${id}: repeats the previous action`); continue }
           try {
             const reason = buddy.can(id)
             if (reason) { rejected.push(`${id}: ${reason}`); continue }
             if (buddy.play(id) !== false) { selected = id; break }
-            rejected.push(`${id}: планировщик отказал в запуске`)
+            rejected.push(`${id}: scheduler declined to start`)
           } catch (error) { rejected.push(`${id}: ${error.message}`) }
         }
       } finally { directing = false }
       if (selected) { lastAction = selected; if (contextIds.has(selected)) contextVisitUsed = true }
       lastActivity = now(); resetAmbient()
       const fact = selected && contextIds.has(selected) ? slideContext?.resolve(selected)?.fact : null
-      last = { reason: fact ? fact.reason : selected ? source === 'semantic' ? analysis.reason : 'Самостоятельное действие профиля'
-        : ids.length ? 'Доступен только взгляд' : 'Сдержанный взгляд на содержание', action: selected, source, rejected,
+      last = { reason: fact ? fact.reason : selected ? source === 'semantic' ? analysis.reason : 'Autonomous profile action'
+        : ids.length ? 'Only a glance is available' : 'A restrained glance at the content', action: selected, source, rejected,
         ...(fact ? { context: { id: fact.id, kind: fact.kind, text: fact.text, ...(fact.concept ? { concept: fact.concept } : {}) } } : {}) }
       options.onReaction?.(snapshot({ ...last, kind: analysis.kind, target: analysis.target }))
     },
@@ -268,7 +268,7 @@ export function attachSlideIntelligence({ stage, buddy, presentation, profile = 
       analysis = analyzeSlide(slide, stage, presentation?.slides); measures++
       if (changed) candidateKey = ''
       chooseCandidates()
-      if (changed) last = { reason: 'Новый слайд, тихое окно', action: null, source: null }
+      if (changed) last = { reason: 'New slide, quiet window', action: null, source: null }
       schedule()
     },
     requestRefresh = () => {
@@ -287,13 +287,13 @@ export function attachSlideIntelligence({ stage, buddy, presentation, profile = 
       context: slideContext?.snapshot() ?? null,
       nextAmbientAt: Number.isFinite(nextAmbientAt) ? nextAmbientAt : null, scheduled: !!timer }),
     inspect = () => {
-      if (destroyed) return snapshot({ ...state(), verdict: { ready: false, reason: 'Контроллер отключён' }, candidates: [], world: null })
+      if (destroyed) return snapshot({ ...state(), verdict: { ready: false, reason: 'Controller has been destroyed' }, candidates: [], world: null })
       const ctx = context(), reason = blocked(ctx),
-        verdict = reason ? { ready: false, reason } : !reactions ? { ready: false, reason: 'Реакции выключены' }
+        verdict = reason ? { ready: false, reason } : !reactions ? { ready: false, reason: 'Reactions disabled' }
           : analysis?.kind === 'off' ? { ready: false, reason: analysis.reason } : policy.verdict(now(), ctx)
       return snapshot({ ...state(), verdict, candidates: candidates.map(id => {
-        try { return { id, reason: contextIds.has(id) && contextVisitUsed ? 'Контекстная история этого посещения уже показана'
-          : id === lastAction ? 'Повтор предыдущего действия' : buddy.can(id) } }
+        try { return { id, reason: contextIds.has(id) && contextVisitUsed ? 'A context story has already played on this visit'
+          : id === lastAction ? 'Repeats the previous action' : buddy.can(id) } }
         catch (error) { return { id, reason: error.message } }
       }), world: world?.() ?? null, rhythm: { quietMs: config.quietMs, cooldownMs: config.cooldownMs, ambientMs: config.ambientMs } })
     }
@@ -348,11 +348,11 @@ export function attachSlideIntelligence({ stage, buddy, presentation, profile = 
       ambientBag = []; chooseCandidates(); resetAmbient(); schedule()
     },
     setAutoplay(on) {
-      if (typeof on !== 'boolean') throw new TypeError('Ожидается логическое значение')
+      if (typeof on !== 'boolean') throw new TypeError('Expected a boolean')
       autoplay = on; clear(); resetAmbient(); schedule()
     },
     setReactions(on) {
-      if (typeof on !== 'boolean') throw new TypeError('Ожидается логическое значение')
+      if (typeof on !== 'boolean') throw new TypeError('Expected a boolean')
       reactions = on; clear(); schedule()
     },
     activity(id) {

@@ -1,7 +1,7 @@
 {
   "name": "@tony-prots/buddy",
-  "version": "0.9.0",
-  "description": "Анимированный 3D-человечек для HTML-презентаций: сам ходит по слайдам, лазает по блокам и реагирует на содержание",
+  "version": "0.9.1",
+  "description": "An animated 3D companion for HTML presentations: autonomous movement, slide reactions and brand-aware tricks in one local script",
   "keywords": [
     "presentation",
     "slides",

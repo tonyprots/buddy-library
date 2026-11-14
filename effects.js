@@ -2,8 +2,8 @@
 const EFFECTS_CSS = '\n/* ================= fx: интро со взрывом и графические переходы (drafts/fx) ================= */\n.fx-layer{position:absolute;inset:0;pointer-events:none}\n.fx-canvas{position:absolute;left:0;top:0;width:1280px;height:720px;z-index:7;pointer-events:none}\n\n/* ---------- интро: трещины по обложке ---------- */\n/* смятие в точке удара: белая крошка и мелкие сколы */\n.fx-crush{position:absolute;z-index:6;width:46px;height:46px;margin:-23px 0 0 -23px;border-radius:50%;pointer-events:none;opacity:0;\n  background:radial-gradient(circle,rgba(255,255,255,1) 0 3px,rgba(235,230,225,.9) 5px,rgba(210,204,198,.45) 9px,rgba(255,255,255,0) 23px)}\n[data-buddy-effects][data-fx=clean] .slide.on{animation:none}\n\n/* осколки: блок размером со свой кусок, внутри — копия обложки, сдвинутая на место */\n.fx-shards{position:absolute;inset:0;z-index:5;pointer-events:none;perspective:900px}\n.fx-shard{position:absolute;overflow:hidden;contain:strict;will-change:transform,opacity;backface-visibility:hidden}\n.fx-shard > .slide.fx-clone{position:absolute;inset:auto;width:1280px;height:720px;background:var(--paper)}\n.fx-shade{position:absolute;inset:0;background:#1A1817;opacity:0;pointer-events:none}\n.fx-clone,.fx-clone *{animation:none!important;transition:none!important}\n/* пока обложка — это осколки, оригинал прячем; осколки уже стоят на его месте */\n[data-buddy-effects].fx-armed > .slide.cover{visibility:hidden}\n.fx-crackcv{position:absolute;left:0;top:0;width:1280px;height:720px;z-index:6;pointer-events:none}\n\n.fx-flash{position:absolute;inset:0;z-index:6;pointer-events:none;\n  background:radial-gradient(circle at var(--x) var(--y),rgba(236,241,255,.95) 0%,rgba(19,64,224,.2) 14%,rgba(19,64,224,0) 38%)}\n.fx-ring{position:absolute;z-index:6;width:1800px;height:1800px;border-radius:50%;border:1.5px solid var(--flame);pointer-events:none;\n  transform:translate(-50%,-50%) scale(.02);opacity:0;will-change:transform,opacity}\n\n/* до взрыва человечка на обложке нет — он внутри */\n[data-buddy-effects].fx-intro .buddy{opacity:0}\n\n/* ---------- переход «диафрагма» ---------- */\n.fx-iris{position:absolute;inset:0;z-index:3;pointer-events:none;background:var(--paper)}\n.fx-iris-ring{position:absolute;z-index:3;width:0;height:0;border:14px solid var(--flame);border-radius:50%;transform:translate(-50%,-50%);pointer-events:none;box-sizing:border-box}\nhtml[data-vt=push]::view-transition-old(fx-stage){animation:fx-out .62s cubic-bezier(.6,0,.2,1) both;transform-origin:30% 50%}\nhtml[data-vt=push]::view-transition-new(fx-stage){animation:fx-in .62s cubic-bezier(.6,0,.2,1) both;box-shadow:-30px 0 60px -20px rgba(40,25,15,.35)}\nhtml[data-vt=push][data-dir=back]::view-transition-old(fx-stage){animation-name:fx-out-b;transform-origin:70% 50%}\nhtml[data-vt=push][data-dir=back]::view-transition-new(fx-stage){animation-name:fx-in-b}\n@keyframes fx-out{to{transform:translateX(-14%) scale(.86) rotate(-1.5deg);opacity:.0;filter:brightness(.85)}}\n@keyframes fx-in{from{transform:translateX(100%) rotate(2deg)}to{transform:none}}\n@keyframes fx-out-b{to{transform:translateX(14%) scale(.86) rotate(1.5deg);opacity:0;filter:brightness(.85)}}\n@keyframes fx-in-b{from{transform:translateX(-100%) rotate(-2deg)}to{transform:none}}\n\n/* ---------- подсказка о выбранном переходе ---------- */\n.fx-toast{position:absolute;left:50%;top:22px;z-index:8;transform:translate(-50%,-8px);opacity:0;pointer-events:none;\n  padding:9px 16px;border-radius:999px;background:var(--ink);color:#fff;font-size:14px;white-space:nowrap;\n  transition:opacity .2s,transform .2s}\n.fx-toast.on{opacity:1;transform:translate(-50%,0)}\n.fx-toast span{color:var(--peach)}\nhtml.export .fx-toast{display:none}\n'
 
 export function attachDeckEffects({ stage: deck, buddy, show, keyboard = false }) {
-  if (!deck || !buddy?.experimental || typeof show !== 'function') throw new TypeError('Нужны stage, buddy и show(index)')
-  if (deck.hasAttribute('data-buddy-effects')) throw new Error('Эффекты уже подключены')
+  if (!deck || !buddy?.experimental || typeof show !== 'function') throw new TypeError('Expected stage, buddy and show(index)')
+  if (deck.hasAttribute('data-buddy-effects')) throw new Error('Effects already attached')
   const html = deck, window = { __buddy: buddy.experimental, go: show },
     nodes = new Set(), timers = new Set(), intervals = new Set(), framesPending = new Set(), cleanups = [],
     previousAnimations = new Set(deck.getAnimations({ subtree: true })),
@@ -25,12 +25,12 @@ export function attachDeckEffects({ stage: deck, buddy, show, keyboard = false }
   const W = 1280, H = 720, PI = Math.PI;
 
   const MODES = ['none', 'push', 'clean', 'iris'];
-  const NAMES = { none: 'без перехода', push: 'колода', clean: 'склейка + хореография', iris: 'диафрагма от человечка' };
+  const NAMES = { none: 'none', push: 'card stack', clean: 'cut + choreography', iris: 'iris from Buddy' };
   let mode = MODES.includes(localStorage.getItem('fx-mode3')) ? localStorage.getItem('fx-mode3') : 'none';
   html.dataset.fx = mode;
   const EASE = 'cubic-bezier(.16,1,.3,1)';
   // основной вариант: вылет из пробоины вверх и приземление на строку заголовка следующего слайда
-  const JUMPS = ['line', 'leap', 'flip'], JNAMES = { line: 'вылет на заголовок', leap: 'прыжок на зрителя', flip: 'на зрителя и сальто назад' };
+  const JUMPS = ['line', 'leap', 'flip'], JNAMES = { line: 'fly onto the heading', leap: 'leap toward the audience', flip: 'leap with a backflip' };
   let jump = JUMPS.includes(localStorage.getItem('fx-jump2')) ? localStorage.getItem('fx-jump2') : 'line';
 
   const el = (cls, parent, tag) => { const e = document.createElement(tag || 'div'); e.className = cls; (parent || deck).appendChild(e); nodes.add(e); return e; };
@@ -567,9 +567,9 @@ export function attachDeckEffects({ stage: deck, buddy, show, keyboard = false }
     if (e.metaKey || e.ctrlKey || e.altKey || e.repeat) return;
     if (e.code === 'KeyT') {
       mode = MODES[(MODES.indexOf(mode) + 1) % MODES.length]; localStorage.setItem('fx-mode3', mode); html.dataset.fx = mode;
-      say('Переход: <span>' + NAMES[mode] + '</span>');
+      say('Transition: <span>' + NAMES[mode] + '</span>');
     }
-    if (e.code === 'KeyJ') { jump = JUMPS[(JUMPS.indexOf(jump) + 1) % JUMPS.length]; localStorage.setItem('fx-jump2', jump); say('Человечек: <span>' + JNAMES[jump] + '</span> · I — разбить заново'); }
+    if (e.code === 'KeyJ') { jump = JUMPS[(JUMPS.indexOf(jump) + 1) % JUMPS.length]; localStorage.setItem('fx-jump2', jump); say('Buddy: <span>' + JNAMES[jump] + '</span> · I to break through again'); }
     if (e.code === 'KeyI') startIntro();
   }, true);
 
@@ -583,14 +583,14 @@ export function attachDeckEffects({ stage: deck, buddy, show, keyboard = false }
 
   return Object.freeze({
     armIntro(variant = 'line') {
-      if (dead) throw new Error('Эффекты отключены')
-      if (!JUMPS.includes(variant)) throw new RangeError('Вариант: line, leap или flip')
+      if (dead) throw new Error('Effects have been destroyed')
+      if (!JUMPS.includes(variant)) throw new RangeError('Variant must be line, leap or flip')
       if (reduced()) { stopMotion(); show(0); return false }
       jump = variant; startIntro(); return true
     },
     go(index, currentIndex) {
-      if (dead) throw new Error('Эффекты отключены')
-      if (!Number.isInteger(index) || index < 0 || index >= slides.length) throw new RangeError('Нет такого слайда')
+      if (dead) throw new Error('Effects have been destroyed')
+      if (!Number.isInteger(index) || index < 0 || index >= slides.length) throw new RangeError('Slide does not exist')
       window.__fxGo(index, currentIndex, () => show(index))
     },
     get glass() { return window.__fx.glass },

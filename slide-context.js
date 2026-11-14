@@ -9,7 +9,7 @@ const structuredKinds = new Set(['values', 'images', 'chart', 'bars', 'route', '
     cloud: ['облако', 'облака', 'облаке', 'облаком', 'облаков', 'cloud', 'clouds'],
     rules: ['правило', 'правила', 'правил', 'правилами', 'инструкция', 'инструкции', 'инструкцию', 'инструкций', 'checklist', 'rules', 'instruction', 'instructions'],
     search: ['поиск', 'поиска', 'поиске', 'поиском', 'найти', 'искать', 'search']
-  }, labels = { memory: 'Память и контекст', target: 'Цель', team: 'Команда', chain: 'Цепочка', link: 'Связь', cloud: 'Облако', rules: 'Правила', search: 'Поиск' },
+  }, labels = { memory: 'Memory and context', target: 'Goal', team: 'Team', chain: 'Chain', link: 'Connection', cloud: 'Cloud', rules: 'Rules', search: 'Search' },
   ignored = '.buddy, .brand, .nav, .dv-nav, [data-perch], [data-perch-text], [data-buddy-ignore], script, style, nav',
   blockTags = new Set(['P', 'DIV', 'SECTION', 'ARTICLE', 'ASIDE', 'H1', 'H2', 'H3', 'H4', 'H5', 'H6', 'PRE', 'BLOCKQUOTE', 'LI', 'UL', 'OL', 'TABLE', 'TR']),
   selectors = '[data-buddy-context], [data-buddy-focus], [data-buddy-target], [data-buddy-number], h1, h2, h3, strong, em, pre, code, img, svg, .card, .tile, [data-buddy-card]',
@@ -87,22 +87,22 @@ function svgMedia(element, target) {
     height = element.clientHeight || element.height?.baseVal?.value || target.height,
     result = reason => Object.freeze({ width, height, copyable: !reason, reason })
   if (![width, height].every(value => Number.isFinite(value) && value > 0))
-    return result('Не удалось измерить исходный viewport SVG')
+    return result('Could not measure the source SVG viewport')
   try {
     if (typeof element.getScreenCTM === 'function') {
       const matrix = element.getScreenCTM()
       if (!matrix || ![matrix.a, matrix.b, matrix.c, matrix.d, matrix.e, matrix.f].every(Number.isFinite))
-        return result('Не удалось определить преобразование исходного SVG')
+        return result('Could not determine the source SVG transform')
       const tolerance = 1e-7 * Math.max(Math.abs(matrix.a), Math.abs(matrix.d), Number.EPSILON)
       if (matrix.a <= 0 || matrix.d <= 0 || Math.abs(matrix.b) > tolerance || Math.abs(matrix.c) > tolerance || matrix.is2D === false)
-        return result('Корневой поворот, наклон или отражение SVG не поддерживается; перенесите преобразование во внутреннюю группу')
+        return result('Root SVG rotation, skew or reflection is not supported; move the transform to an inner group')
     } else {
       const css = getComputedStyle(element)
       if (css.transform && css.transform !== 'none' || element.hasAttribute('transform'))
-        return result('Не удалось проверить корневое преобразование SVG без матрицы')
+        return result('Could not validate the root SVG transform without a matrix')
     }
     return result(null)
-  } catch { return result('Не удалось определить преобразование исходного SVG') }
+  } catch { return result('Could not determine the source SVG transform') }
 }
 
 const finiteMatrix = matrix => matrix && [matrix.a, matrix.b, matrix.c, matrix.d, matrix.e, matrix.f].every(Number.isFinite),
@@ -118,11 +118,11 @@ function svgCalibration(svg, stage) {
         tolerance = values ? 1e-7 * Math.max(Math.abs(values[0]), Math.abs(values[3]), Number.EPSILON) : 0
       if (!values || values.length !== 6 || !values.every(Number.isFinite) || values[0] <= 0 || values[3] <= 0
         || Math.abs(values[1]) > tolerance || Math.abs(values[2]) > tolerance)
-        return { error: 'Корневой CSS-поворот, наклон или отражение SVG-линии не поддерживается; используйте внутреннюю SVG-группу' }
+        return { error: 'Root CSS rotation, skew or reflection of an SVG line is not supported; use an inner SVG group' }
     }
     if (style.rotate && style.rotate !== 'none' && !/^(?:[xyz]\s+)?0(?:deg|grad|rad|turn)?$/u.test(style.rotate)
       || style.scale && style.scale !== 'none' && !style.scale.split(/\s+/u).every(value => Number.isFinite(Number(value)) && Number(value) > 0))
-      return { error: 'Корневой CSS-поворот или отражение SVG-линии не поддерживается; используйте внутреннюю SVG-группу' }
+      return { error: 'Root CSS rotation or reflection of an SVG line is not supported; use an inner SVG group' }
     if (node === stage) break
   }
   const matrix = svg.getScreenCTM?.(), box = svg.getBoundingClientRect(),
@@ -130,7 +130,7 @@ function svgCalibration(svg, stage) {
     width = (parseFloat(css.width) || svg.clientWidth) - (css.boxSizing === 'border-box' ? borders[0] + borders[2] : 0),
     height = (parseFloat(css.height) || svg.clientHeight) - (css.boxSizing === 'border-box' ? borders[1] + borders[3] : 0)
   if (!finiteMatrix(matrix) || ![width, height, box.width, box.height].every(value => Number.isFinite(value) && value > 0))
-    return { error: 'Не удалось измерить viewport и матрицу SVG-линии' }
+    return { error: 'Could not measure the SVG line viewport and matrix' }
   const view = svg.viewBox?.baseVal, ratio = svg.preserveAspectRatio?.baseVal
   let sx = 1, sy = 1, tx = 0, ty = 0
   if (view?.width > 0 && view.height > 0) {
@@ -149,7 +149,7 @@ function svgCalibration(svg, stage) {
     left = Math.min(...corners.map(point => point.x)), top = Math.min(...corners.map(point => point.y)),
     projectedWidth = Math.max(...corners.map(point => point.x)) - left,
     projectedHeight = Math.max(...corners.map(point => point.y)) - top
-  if (!(projectedWidth > 0 && projectedHeight > 0)) return { error: 'Вырожденный viewport SVG-линии' }
+  if (!(projectedWidth > 0 && projectedHeight > 0)) return { error: 'Degenerate SVG line viewport' }
   // WebKit может сохранить экранный перенос, пропустив CSS scale предков
   // в линейной части CTM. Калибруем весь viewport, включая letterbox.
   return { x: box.width / projectedWidth, y: box.height / projectedHeight,
@@ -207,11 +207,11 @@ function structuredSource(container, kind, measure, stageBox, scale, stage, matr
     limits = { values: [2, 2], images: [2, 2], bars: [2, 8], route: [2, 8], flow: [2, 12], list: [1, 8], detail: [1, 1] },
     parts = [], items = [], seen = new Set(), structure = { items }
   if (kind !== 'chart' && (nodes.length < limits[kind][0] || nodes.length > limits[kind][1]))
-    return reject(`Для ${kind} нужны ${limits[kind][0] === limits[kind][1] ? `ровно ${limits[kind][0]}` : `от ${limits[kind][0]} до ${limits[kind][1]}`} видимых частей`)
+    return reject(`Structure ${kind} requires ${limits[kind][0] === limits[kind][1] ? `exactly ${limits[kind][0]}` : `between ${limits[kind][0]} and ${limits[kind][1]}`} visible parts`)
   if (kind === 'route' || kind === 'bars') {
     const steps = nodes.map(node => node.getAttribute('data-buddy-step'))
     if (steps.some(value => !/^[1-9]\d*$/u.test(value || '')) || new Set(steps.map(Number)).size !== steps.length)
-      return reject('Порядок data-buddy-step должен содержать уникальные положительные целые числа')
+      return reject('data-buddy-step order must use unique positive integers')
     nodes.sort((a, b) => Number(a.getAttribute('data-buddy-step')) - Number(b.getAttribute('data-buddy-step')))
   }
   for (const [index, node] of nodes.entries()) {
@@ -221,51 +221,51 @@ function structuredSource(container, kind, measure, stageBox, scale, stage, matr
       text = rawText.replace(/\s+/gu, ' ').trim() || node.getAttribute('alt') || node.getAttribute('aria-label') || '',
       label = (node.getAttribute('data-buddy-label') || node.getAttribute('aria-label') || '').trim(),
       image = /^(?:IMG|SVG)$/u.test(node.tagName.toUpperCase()) && !node.parentElement?.closest?.('svg')
-    if (!target) return reject('У части нет видимой измеримой области в сцене')
+    if (!target) return reject('A part has no visible, measurable area on the stage')
     if (seen.has(id) || id.length > 100 || kind === 'flow' && !node.getAttribute('data-buddy-node')?.trim())
-      return reject('У частей должны быть уникальные непустые ID длиной до 100 символов')
-    if (text.length > 180 || label.length > 80) return reject('Текст части ограничен 180 символами, подпись — 80')
-    if ((kind === 'images' || kind === 'detail') && !image) return reject('Частью изображения должен быть IMG или корневой SVG')
+      return reject('Parts must have unique nonempty IDs up to 100 characters')
+    if (text.length > 180 || label.length > 80) return reject('Part text is limited to 180 characters and labels to 80')
+    if ((kind === 'images' || kind === 'detail') && !image) return reject('An image part must be an IMG or root SVG')
     seen.add(id)
     const item = { id, text, target, kind: image ? 'object' : kind === 'route' || kind === 'bars' ? 'card' : 'text' }
     if (label) item.label = label
     if (kind === 'values' || kind === 'bars') {
       const declared = node.getAttribute('data-buddy-value'), values = extractContextNumbers(declared ?? rawText)
       if (kind === 'values' && values.length !== 1 || declared !== null && (values.length !== 1 || values[0] !== declared.trim()))
-        return reject('В каждой числовой части нужно одно точное значение со знаком и единицей')
+        return reject('Each numeric part must contain one exact value with its sign and unit')
       if (values.length === 1) { item.value = values[0]; item.unit = numericUnit(values[0]) }
       if (kind === 'values') item.kind = 'number'
     }
     if (kind === 'list') {
       const checkbox = node.matches?.('input[type="checkbox"]') ? node : node.querySelector('input[type="checkbox"]'),
         checked = node.getAttribute('data-buddy-checked')
-      if (checked !== null && checked !== 'true' && checked !== 'false') return reject('data-buddy-checked принимает только true или false')
-      if (checkbox && (!owned(checkbox) || !visible(checkbox))) return reject('Исходный checkbox скрыт или исключён из контекста')
+      if (checked !== null && checked !== 'true' && checked !== 'false') return reject('data-buddy-checked accepts only true or false')
+      if (checkbox && (!owned(checkbox) || !visible(checkbox))) return reject('The source checkbox is hidden or excluded from context')
       if (checkbox) item.checked = !!checkbox.checked
       else if (checked !== null) item.checked = checked === 'true'
     }
     items.push(item); parts.push({ id, element: node, bounds: targetBounds(target),
       ...((kind === 'images' || kind === 'detail') && node.tagName.toUpperCase() === 'SVG' ? { media: svgMedia(node, target) } : {}) })
   }
-  if (kind === 'values' && items[0].unit !== items[1].unit) return reject('Для сравнения нужны одинаковые единицы и масштаб у обоих значений')
+  if (kind === 'values' && items[0].unit !== items[1].unit) return reject('Both values must have matching units and scale for comparison')
   if (kind === 'chart') {
     const lines = container.hasAttribute('data-buddy-chart-line') ? [container] : descendants('[data-buddy-chart-line]')
-    if (lines.length !== 1) return reject('Графику нужна ровно одна явно помеченная линия data-buddy-chart-line')
+    if (lines.length !== 1) return reject('A chart requires exactly one explicitly marked data-buddy-chart-line')
     structure.points = linePoints(lines[0], stageBox, scale, stage, matrices)
     if (structure.points?.error) return reject(structure.points.error)
-    if (!structure.points) return reject('Линия графика должна быть открытой, непрерывной и содержать от 2 до 64 точек внутри сцены')
+    if (!structure.points) return reject('The chart line must be open, continuous and contain 2 to 64 points inside the stage')
   }
   if (kind === 'flow') {
     const edges = descendants('[data-buddy-from], [data-buddy-to]'), seenEdges = new Set()
-    if (!edges.length || edges.length > 16) return reject('Схеме нужны от 1 до 16 явно размеченных связей')
+    if (!edges.length || edges.length > 16) return reject('A diagram requires 1 to 16 explicitly marked links')
     structure.edges = []
     for (const edge of edges) {
       const from = edge.getAttribute('data-buddy-from'), to = edge.getAttribute('data-buddy-to'), key = `${from}\u0000${to}`,
         points = linePoints(edge, stageBox, scale, stage, matrices)
-      if (!seen.has(from) || !seen.has(to)) return reject('Связь ссылается на отсутствующий или скрытый узел')
-      if (from === to || seenEdges.has(key)) return reject('Повторяющаяся связь или петля в тот же узел не поддерживается')
+      if (!seen.has(from) || !seen.has(to)) return reject('A link references a missing or hidden node')
+      if (from === to || seenEdges.has(key)) return reject('Duplicate links and self-loops are not supported')
       if (points?.error) return reject(points.error)
-      if (!points) return reject('У связи нужны от 2 до 64 конечных точек настоящего пути внутри сцены')
+      if (!points) return reject('A link requires 2 to 64 finite points along its actual path inside the stage')
       seenEdges.add(key); structure.edges.push({ from, to, points })
     }
   }
@@ -275,9 +275,9 @@ function structuredSource(container, kind, measure, stageBox, scale, stage, matr
       if (!Array.isArray(crop) || crop.length !== 4 || !crop.every(Number.isFinite) || crop[2] <= 0 || crop[3] <= 0
         || !stagePoint({ x: crop[0], y: crop[1] }) || !stagePoint({ x: crop[0] + crop[2], y: crop[1] + crop[3] })
         || crop[0] < bounds[0] || crop[1] < bounds[1] || crop[0] + crop[2] > bounds[2] || crop[1] + crop[3] > bounds[3])
-        return reject('Область crop должна иметь положительный размер и целиком лежать в картинке и сцене')
+        return reject('The crop must have positive dimensions and lie entirely within the image and stage')
       structure.crop = { x: crop[0], y: crop[1], width: crop[2], height: crop[3] }
-    } catch { return reject('data-buddy-crop должен содержать JSON [x,y,width,height]') }
+    } catch { return reject('data-buddy-crop must contain JSON [x,y,width,height]') }
   }
   return { structure, parts }
 }
@@ -312,7 +312,7 @@ function scan(slide, stage, identify = (_, index) => `source-${index + 1}`) {
         const crop = result.structure.crop, focus = crop ? { x: crop.x + crop.width / 2, y: crop.y + crop.height / 2,
           width: crop.width, height: crop.height } : target,
           text = sourceText(element) || element.getAttribute('aria-label') || structured
-        add(element, index, structured, text.slice(0, 180), focus, 440, 'Авторская структура слайда', null, '', result.structure, result.parts)
+        add(element, index, structured, text.slice(0, 180), focus, 440, 'Explicit slide structure', null, '', result.structure, result.parts)
       } else issues.push({ id: element.getAttribute('data-buddy-context-id') || element.id || identify(element, index),
         kind: structured, reason: result.error, target })
       continue
@@ -321,7 +321,7 @@ function scan(slide, stage, identify = (_, index) => `source-${index + 1}`) {
       focused = element.hasAttribute('data-buddy-focus') || element.hasAttribute('data-buddy-target'),
       heading = /^H[123]$/u.test(element.tagName.toUpperCase()), quote = !!element.closest?.('blockquote, pre, code, [data-buddy-example]'),
       priority = (explicit ? 400 : focused ? 300 : heading ? 200 : 100) - (quote && !explicit ? 80 : 0),
-      reason = explicit ? 'Авторский маркер контекста' : focused ? 'Выделенный источник' : heading ? 'Заголовок слайда' : 'Видимое выделенное содержимое',
+      reason = explicit ? 'Explicit context marker' : focused ? 'Highlighted source' : heading ? 'Slide heading' : 'Visible highlighted content',
       raw = element.getAttribute('data-buddy-text') || readText(element), text = raw.replace(/\s+/gu, ' ').trim(),
       concept = element.getAttribute('data-buddy-concept'), isConcept = Object.hasOwn(dictionary, concept),
       matches = quote && !explicit ? [] : matchContextConcepts(raw),
@@ -339,15 +339,15 @@ function scan(slide, stage, identify = (_, index) => `source-${index + 1}`) {
     const media = /^(?:IMG|SVG)$/u.test(element.tagName.toUpperCase()) && !element.parentElement?.closest?.('svg'),
       card = element.matches?.('.card, .tile, [data-buddy-card]') || marker === 'card'
     if ((marker === 'object' || media && !explicit) && (media || isConcept))
-      add(element, index, 'object', element.getAttribute('alt') || element.getAttribute('aria-label') || text || 'Изображение',
+      add(element, index, 'object', element.getAttribute('alt') || element.getAttribute('aria-label') || text || 'Image',
         target, priority, reason, isConcept ? concept : null)
     if (card && (!explicit || marker === 'card') && target.width >= 80 && target.height >= 45)
-      add(element, index, 'card', text.slice(0, 180) || 'Карточка', target, priority, reason)
+      add(element, index, 'card', text.slice(0, 180) || 'Card', target, priority, reason)
   }
   facts.sort((a, b) => b.priority - a.priority)
   return { records, snapshot: freeze({ available: stageBox.width > 0 && stageBox.height > 0 && visible(slide),
     facts, issues, selectedId: null, measures: 1,
-    reason: issues[0]?.reason || (facts.length ? 'Автовыбор по маркерам, выделению и заголовку' : 'Подходящий источник не найден') }) }
+    reason: issues[0]?.reason || (facts.length ? 'Automatic selection by markers, emphasis and heading' : 'No suitable source found') }) }
 }
 
 /** Измеряет видимые источники в координатах 1280×720; DOM-ссылки в результат не попадают. */
@@ -357,7 +357,7 @@ export function analyzeSlideContext(slide, stage) { return scan(slide, stage).sn
 export function createSlideContext({ stage, presentation, techniques = [], onRefresh }) {
   const ids = new WeakMap(), requirements = new Map(techniques.map(item => [item.id, new Set(item.contextKinds)]))
   let current = null, selectedId = null, dirty = true, dead = false, records = new Map(), serial = 0, revision = 0,
-    data = freeze({ available: false, facts: [], issues: [], selectedId: null, reason: 'Нет активного слайда', measures: revision })
+    data = freeze({ available: false, facts: [], issues: [], selectedId: null, reason: 'No active slide', measures: revision })
   const activeSlide = presentation?.current || (() => stage.querySelector(':scope > .slide.on') || stage.querySelector(':scope > .slide')),
     refresh = () => {
       if (dead) return
@@ -365,7 +365,7 @@ export function createSlideContext({ stage, presentation, techniques = [], onRef
       if (current !== slide) selectedId = null
       current = slide; dirty = false; revision++
       if (!slide) {
-        records.clear(); data = freeze({ available: false, facts: [], issues: [], selectedId: null, reason: 'Нет активного слайда', measures: revision })
+        records.clear(); data = freeze({ available: false, facts: [], issues: [], selectedId: null, reason: 'No active slide', measures: revision })
         onRefresh?.(); return
       }
       const result = scan(slide, stage, element => {
@@ -374,7 +374,7 @@ export function createSlideContext({ stage, presentation, techniques = [], onRef
       })
       records = result.records
       if (!records.has(selectedId)) selectedId = null
-      data = freeze({ ...result.snapshot, selectedId, reason: selectedId ? 'Источник выбран вручную' : result.snapshot.reason, measures: revision })
+      data = freeze({ ...result.snapshot, selectedId, reason: selectedId ? 'Source selected manually' : result.snapshot.reason, measures: revision })
       onRefresh?.()
     },
     ensure = () => { if (!dead && (dirty || current !== activeSlide())) refresh() }
@@ -382,11 +382,11 @@ export function createSlideContext({ stage, presentation, techniques = [], onRef
     refresh, invalidate() { dirty = true },
     snapshot() { ensure(); return data },
     select(id) {
-      if (dead) throw new Error('Контекст отключён')
+      if (dead) throw new Error('Context disabled')
       ensure()
-      if (id !== null && (typeof id !== 'string' || !records.has(id))) throw new RangeError('Неизвестный источник контекста')
-      selectedId = id; data = freeze({ ...data, selectedId, reason: id ? 'Источник выбран вручную'
-        : data.issues[0]?.reason || 'Автовыбор по маркерам, выделению и заголовку' })
+      if (id !== null && (typeof id !== 'string' || !records.has(id))) throw new RangeError('Unknown context source')
+      selectedId = id; data = freeze({ ...data, selectedId, reason: id ? 'Source selected manually'
+        : data.issues[0]?.reason || 'Automatic selection by markers, emphasis and heading' })
     },
     resolve(id) {
       ensure()
@@ -400,6 +400,6 @@ export function createSlideContext({ stage, presentation, techniques = [], onRef
       return record && current?.contains(record.element) && visible(record.element) && !excluded(record.element)
         && (!record.parts || record.parts.every(part => current.contains(part.element) && visible(part.element) && !excluded(part.element))) ? record : null
     },
-    destroy() { dead = true; records.clear(); current = null; dirty = false; data = freeze({ available: false, facts: [], issues: [], selectedId: null, reason: 'Контекст отключён', measures: revision }) }
+    destroy() { dead = true; records.clear(); current = null; dirty = false; data = freeze({ available: false, facts: [], issues: [], selectedId: null, reason: 'Context disabled', measures: revision }) }
   })
 }

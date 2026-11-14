@@ -1,10 +1,10 @@
-# Сторонние материалы
+# Third-party notices
 
-## Three.js и GLTFLoader
+## Three.js and GLTFLoader
 
-В `vendor.js` включены Three.js r186 и GLTFLoader из той же локальной сборки,
-что использовалась в исходной деке. Уведомления сборки сохранены.
-Проект: [github.com/mrdoob/three.js](https://github.com/mrdoob/three.js).
+`vendor.js` includes Three.js r186 and GLTFLoader from the original local build.
+Bundled license notices are preserved.
+Project: [github.com/mrdoob/three.js](https://github.com/mrdoob/three.js).
 
 MIT License
 
@@ -28,21 +28,21 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
-## Модель Quaternius
+## Quaternius model
 
 CC0 1.0 Universal, public domain.
-Исходное уведомление: «Quaternius — CC0 1.0 Universal (public domain).
-https://quaternius.com».
+Original notice: “Quaternius — CC0 1.0 Universal (public domain).
+https://quaternius.com”.
 
-- Автор: [Quaternius](https://quaternius.com).
-- Условия: [CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/).
+- Author: [Quaternius](https://quaternius.com).
+- Terms: [CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/).
 
-## Пример со знаками Яндекс 360
+## Yandex 360 trademark example
 
-`presets/y360.js` и отдельная сборка `dist/buddy-y360.js` содержат изображения
-сервисов для необязательного примера `examples/y360.html`. В основной
-`dist/buddy.js` и в лёгкий web-архив эти изображения не входят.
-Они остаются товарными знаками своих правообладателей. Лицензия MIT
-на собственный код библиотеки не предоставляет права на товарные знаки и не
-означает одобрения библиотеки компанией Яндекс. Пресет выключен по умолчанию;
-для использования изображений их нужно отдельно передать через `logos`.
+`presets/y360.js` and the separate `dist/buddy-y360.js` bundle contain service
+images for the optional `examples/y360.html` demonstration. These images are not
+included in the main `dist/buddy.js` bundle or the lightweight web ZIP.
+They remain trademarks of their respective owners. The MIT license for the
+library code grants no trademark rights and does not imply endorsement by Yandex.
+The example is off by default; pass its images explicitly through `brand` or
+the legacy `logos` option to use them.

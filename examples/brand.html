@@ -1,9 +1,9 @@
 <!doctype html>
-<html lang="ru">
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Бадди — бренд презентации</title>
+<title>Buddy · presentation branding</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='9' r='7' fill='%232a5350'/%3E%3Cpath d='M7 31v-9q0-9 9-9t9 9v9' fill='%232a5350'/%3E%3C/svg%3E">
 <style>
 * { box-sizing: border-box }
@@ -45,32 +45,32 @@ output { min-width: 48px; text-align: center; font-variant-numeric: tabular-nums
     <div id="deck">
       <div class="pages">
         <article class="is-active">
-          <div class="copy"><h1>Лаборатория «Лист»</h1><p>Вымышленный бренд: один главный знак, два продукта и свой цвет. Герой уже использует этот набор.</p></div>
-          <div class="props"><div class="prop">Лист · Идеи</div><div class="prop">Лист · Дела</div></div>
+          <div class="copy"><h1>Leaf Lab</h1><p>A fictional brand: one main logo, two products and an accent color. Buddy is already using them.</p></div>
+          <div class="props"><div class="prop">Leaf · Ideas</div><div class="prop">Leaf · Tasks</div></div>
         </article>
         <article>
-          <div class="copy"><h2>От идеи к действию</h2><p>Бадди замечает содержание и сам выбирает подходящие жесты и трюки.</p></div>
-          <div class="props"><div class="prop">Идея</div><div class="prop" style="height:180px">Прототип</div></div>
+          <div class="copy"><h2>From idea to action</h2><p>Buddy notices the content and chooses gestures and tricks to match.</p></div>
+          <div class="props"><div class="prop">Idea</div><div class="prop" style="height:180px">Prototype</div></div>
         </article>
         <article>
-          <div class="copy"><h2>Спасибо!</h2><p>К финалу — больше движения и способностей. Останьтесь здесь немного и посмотрите.</p></div>
-          <div class="props"><div class="prop" data-buddy-fly>Вопросы?</div></div>
+          <div class="copy"><h2>Thank you!</h2><p>More movement and powers toward the finale. Stay a little longer and watch.</p></div>
+          <div class="props"><div class="prop" data-buddy-fly>Questions?</div></div>
         </article>
       </div>
     </div>
   </div>
-  <nav aria-label="Управление презентацией">
-    <button id="previous" type="button" disabled>Назад</button>
+  <nav aria-label="Presentation controls">
+    <button id="previous" type="button" disabled>Back</button>
     <output id="counter" aria-live="polite">1 / 3</output>
-    <button id="next" type="button">Дальше</button>
-    <button id="pause" type="button" aria-pressed="false" disabled>Пауза героя</button>
-    <button type="button" data-technique="disk" disabled>Диск</button>
-    <button type="button" data-technique="mail" disabled>Письмо</button>
-    <button type="button" data-technique="calendar" disabled>Встреча</button>
-    <button type="button" data-technique="tracker" disabled>Готово</button>
-    <button type="button" data-technique="shield" disabled>Продукты на орбите</button>
+    <button id="next" type="button">Next</button>
+    <button id="pause" type="button" aria-pressed="false" disabled>Pause Buddy</button>
+    <button type="button" data-technique="disk" disabled>Disc</button>
+    <button type="button" data-technique="mail" disabled>Message</button>
+    <button type="button" data-technique="calendar" disabled>Meeting</button>
+    <button type="button" data-technique="tracker" disabled>Done</button>
+    <button type="button" data-technique="shield" disabled>Products in orbit</button>
   </nav>
-  <p class="hint" role="status">Набор находится в этой HTML-странице. Никаких изменений в коде библиотеки и внешних загрузок.</p>
+  <p class="hint" role="status">The brand lives in this HTML page. No library changes or external downloads.</p>
 </main>
 <script>
 const stage = document.getElementById('deck'), viewport = document.getElementById('viewport'),
@@ -109,7 +109,7 @@ addEventListener('DOMContentLoaded', async () => {
       button.disabled = buddy.state().reducedMotion
       button.addEventListener('click', () => {
         const id = button.dataset.technique, reason = buddy.can(id)
-        document.querySelector('.hint').textContent = reason || ('Номер: ' + button.textContent)
+        document.querySelector('.hint').textContent = reason || ('Action: ' + button.textContent)
         if (!reason) buddy.perform(id)
       })
     }
@@ -118,7 +118,7 @@ addEventListener('DOMContentLoaded', async () => {
       const paused = !buddy.paused
       paused ? buddy.pause() : buddy.resume()
       pause.setAttribute('aria-pressed', String(paused))
-      pause.textContent = paused ? 'Продолжить' : 'Пауза героя'
+      pause.textContent = paused ? 'Resume' : 'Pause Buddy'
     })
   } catch { pause.disabled = true }
 }, { once: true })

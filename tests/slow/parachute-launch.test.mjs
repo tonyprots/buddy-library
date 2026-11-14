@@ -36,9 +36,9 @@ test('публичный play запускает парашют с пола бе
     block.getBoundingClientRect = () => ({ left: 0, top: 300, right: 1280, bottom: 560, width: 1280, height: 260 })
     f.slide.querySelectorAll = selector => selector === '*' ? [block] : []
     buddy.rescan()
-    assert.match(buddy.can('parachute'), /коридор/u)
+    assert.match(buddy.can('parachute'), /corridor/u)
     const refusedY = buddy.experimental.B.y
-    assert.throws(() => buddy.play('parachute'), /коридор/u)
+    assert.throws(() => buddy.play('parachute'), /corridor/u)
     assert.equal(buddy.experimental.B.y, refusedY)
   } finally {
     buddy?.destroy(); f.close()
@@ -112,7 +112,7 @@ test('парашют идёт к свободному коридору, а не�
     assert.equal(b.mode, 'free'); assert.ok(b.x < 410 || b.x > 870, 'Тело и купол находятся сбоку от преграды')
     raw.reset(); raw.W.ob = [{ x1: 0, x2: 1280, y1: 300, y2: 560 }]
     const before = { x: b.x, y: b.y, action: b.act, queue: b.queue }
-    assert.match(raw.availability('parachute'), /коридор/u)
+    assert.match(raw.availability('parachute'), /corridor/u)
     assert.equal(launch(raw), false)
     assert.deepEqual({ x: b.x, y: b.y, action: b.act, queue: b.queue }, before)
   } finally { f.close() }

@@ -1,56 +1,55 @@
-# Бадди
+# Buddy
 
-Анимированный 3D-герой для авторов HTML-презентаций. Сам гуляет, читает слайды,
-лазает по блокам и показывает трюки. По мере продвижения становится смелее
-и активнее. Всё включено сразу: настройка характера и режима не нужна.
+An animated 3D companion for HTML presentations. Buddy walks around, reads your
+slides, climbs onto cards and performs tricks. He grows bolder as your talk
+progresses. Movement, reactions and powers are on by default.
 
-<img src="docs/buddy-preview.png" width="320" height="240" alt="Бадди в синем худи">
+<img src="docs/buddy-preview.png" width="320" height="240" alt="Buddy wearing a blue hoodie">
 
-## Подключить к презентации
+## Add Buddy to a presentation
 
-Готовый [web-архив и пакет для сборщика — в релизах](https://github.com/tonyprots/buddy-library/releases/latest).
-Web-архив содержит скрипт, примеры и инструкции; установка не нужна.
+Download the [web ZIP from the latest release](https://github.com/tonyprots/buddy-library/releases/latest).
+It includes the ready-to-use script, examples and documentation.
 
-1. Скачайте [dist/buddy.js](dist/buddy.js) кнопкой Download raw и положите
-   рядом с HTML. Если у вас web-архив, готовый `buddy.js` лежит в его корне.
-2. Добавьте одну строку:
+1. Put `buddy.js` next to your HTML file. You can also download
+   [dist/buddy.js](dist/buddy.js) directly using **Download raw**.
+2. Add one line:
 
    ```html
    <script defer src="./buddy.js" data-stage="#stage"></script>
    ```
 
-3. Откройте презентацию. Работает даже двойным щелчком, без сервера, npm и сети.
-   Готовая мини-дека — [examples/quick-start.html](examples/quick-start.html).
+3. Open your presentation. No server, npm, build step or network connection
+   required. Try the [quick-start deck](examples/quick-start.html) by double-clicking it.
 
-Сцена `#stage` должна иметь `position: relative`, логический размер
-**1280×720** и скрывать переполнение. По умолчанию слайды — её прямые дочерние
-`.slide`, текущий имеет класс `on`, остальные скрыты вашей страницей.
-Навигация остаётся у презентации; бадди наблюдает за сменой активного класса.
+Your stage needs `position: relative`, a logical size of **1280×720**, and
+`overflow: hidden`. By default, its direct `.slide` children are slides and
+`on` marks the active one. Your presentation controls navigation and visibility;
+Buddy watches the active class.
 
-Если классы другие, укажите их без переделки разметки:
+Different markup? Point Buddy at your existing slides:
 
 ```html
 <script defer src="./buddy.js" data-stage="#deck"
   data-slide-selector=".pages > article" data-active-class="is-active"></script>
 ```
 
-Сцена может масштабироваться целиком через `transform: scale(k)`.
-Произвольные размеры слайда, непрерывная прокрутка и вращение сцены пока
-не поддерживаются. Для reveal.js и других движков сначала согласуйте
-размер 1280×720 и выбор только конечных слайдов — это не универсальный плагин.
+Scale the entire stage with `transform: scale(k)` to fit the viewport.
+Arbitrary slide dimensions, scrolling pages and rotated stages are not supported.
+For reveal.js and similar engines, configure a 1280×720 stage and select only
+leaf slides. Buddy is not a universal presentation-engine plugin.
 
-## Передать своему агенту
+## Ask your coding agent
 
-> Прочитай [инструкцию интеграции](docs/agent-integration.md) и подключи библиотеку
-> к моей HTML-презентации. Сохрани её навигацию, оформление и активные дефолты.
+> Read the [integration guide](docs/agent-integration.md) and add Buddy to my
+> HTML presentation. Keep its navigation, design and Buddy's active defaults.
 
-Агенту достаточно этих инструкций и справочника. Устанавливать инструменты
-разработки или прогонять тесты библиотеки для встраивания не требуется.
+The guide and API reference are enough. Consumers do not need to install
+development tools or run the library's test suite.
 
-## Герой под бренд презентации
+## Match your presentation's brand
 
-Главный знак, изображения продуктов и акцент берутся из самой презентации.
-Добавьте JSON-блок и укажите его в подключении:
+Use the logo, product images and accent color from your presentation:
 
 ```html
 <script type="application/json" id="deck-brand">
@@ -59,42 +58,43 @@ Web-архив содержит скрипт, примеры и инструкц
 <script defer src="./buddy.js" data-stage="#stage" data-brand="#deck-brand"></script>
 ```
 
-Фирменные номера включаются вместе с набором. Один главный знак тоже подходит;
-если бренд неизвестен, подключайте Бадди как обычно.
-[Рабочий пример с вымышленным брендом](examples/brand.html) не требует сервера.
-Для работы полностью офлайн храните изображения рядом или внутри data-URI.
+Brand actions turn on automatically when images are supplied. A single logo
+works too. Without a brand, Buddy keeps his usual behavior.
+Try [Leaf Lab, a fictional brand](examples/brand.html).
+Use local images or data URIs for offline presentations.
 
-## Что доступно
+## What you get
 
-- 93 приёма: жесты, акробатика, реквизит, способности и истории по содержимому.
-- Активный режим `show`, характер `curious`, реакции и способности по умолчанию.
-- Three.js и модель внутри файла; внешних запросов нет.
-- Упрощённый SVG без WebGL; неподвижный герой при системном reduced motion.
-- Пауза, ручные номера, сценарии и TypeScript — через публичный API.
+- 93 actions: gestures, acrobatics, props, powers and stories based on slide content.
+- Active `show` mode, a `curious` personality and increasing confidence toward the finale.
+- Bundled Three.js and character model, with no external dependencies to load.
+- An SVG fallback without WebGL and a still character when reduced motion is enabled.
+- Pause controls, manual actions, scripted sequences and TypeScript declarations.
+- English UI and documentation; English and Russian slide-content recognition.
 
-При автоподключении экземпляр доступен как `await window.buddy` после
-загрузки скрипта. Например, кнопка паузы вызывает `buddy.pause()` /
-`buddy.resume()`. При удалении сцены вызовите `buddy.destroy()`.
+After the script loads, `await window.buddy` gives you the instance. Add an
+accessible pause button using `pause()` / `resume()`. Call `destroy()` when
+removing the stage.
 
-## Документация и другие способы установки
+## Documentation
 
-- [Справочник API](docs/api.md) — ESM, сборщики, режимы, сцены, ограничения.
-- [Инструкция агенту](docs/agent-integration.md).
-- [Контекст слайда](docs/slide-context.md) и [реакции](docs/slide-reactions.md).
-- [Разработка библиотеки](CONTRIBUTING.md) — только для изменения исходников.
-- [Изменения](CHANGELOG.md).
+- [API reference](docs/api.md): ESM, bundlers, modes, scenes and limitations.
+- [Integration guide for coding agents](docs/agent-integration.md).
+- [Slide context](docs/slide-context.md) and [automatic reactions](docs/slide-reactions.md).
+- [Contributing](CONTRIBUTING.md): only needed when changing the library itself.
+- [Changelog](CHANGELOG.md).
 
-Публикации в npm пока нет. Для проекта со сборщиком установите папку
-скачанных исходников:
+The package is not on npm yet. For a project with a bundler, install the TGZ
+from the release or a downloaded source folder:
 
 ```bash
 npm install ../buddy-library
 ```
 
-## Лицензии
+## Licenses
 
-Код — [MIT](LICENSE), Three.js — MIT, модель Quaternius — CC0.
-Сохраняйте [уведомления об источниках](THIRD_PARTY_NOTICES.md) рядом с файлом.
-Яндекс 360 — необязательный пример в исходниках. Его изображения находятся
-в отдельном файле `dist/buddy-y360.js`, отсутствуют в основном `buddy.js`
-и web-архиве. Права на знаки остаются у правообладателей.
+Library code: [MIT](LICENSE). Three.js: MIT. Quaternius model: CC0.
+Keep [third-party notices](THIRD_PARTY_NOTICES.md) alongside the script.
+Yandex 360 is an optional example in the source distribution. Its images live
+in `dist/buddy-y360.js`, separate from the main bundle and the web ZIP.
+Trademark rights remain with their respective owners.

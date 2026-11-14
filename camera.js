@@ -29,7 +29,7 @@ export function createPreviewCamera({ mode = 'auto' } = {}) {
   let current = null, selectedMode = mode
   const velocity = { x: 0, y: 0, scale: 0 }
   const setMode = next => {
-    if (!['auto', 'closeup', 'overview'].includes(next)) throw new RangeError('Неизвестный режим кадрирования')
+    if (!['auto', 'closeup', 'overview'].includes(next)) throw new RangeError('Unknown framing mode')
     selectedMode = next
   }
   setMode(mode)

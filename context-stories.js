@@ -3,16 +3,16 @@ import { createStoryPropBuilders } from './context-story-props.js'
 import { contextSource, sameContextSource } from './context-source.js'
 
 const entries = [
-  ['thinkKeyword', 'Обдумать мысль', 'Перечитывает слово или короткий тезис, касается виска, удерживает точную мысль и возвращает руки.', 7.6, ['keyword', 'text']],
-  ['compareValues', 'Сопоставить значения', 'Поднимает две карточки, раскрывает над ними точные световые проекции значений и сворачивает их без оценки результата.', 9.4, ['values']],
-  ['followChart', 'Проследить график', 'Достаёт световую указку и ведёт курсор по настоящим точкам графика, затем убирает её.', 10, ['chart']],
-  ['chartClimb', 'Подняться по столбцам', 'По очереди забирается на две или три доступные опоры столбцов, читает значения, спускается и возвращается.', 24, ['bars']],
-  ['cardRoute', 'Пройти маршрут карточек', 'Последовательно взбирается на две или три доступные карточки, читает каждую и возвращается на исходный пол.', 25, ['route']],
-  ['traceFlow', 'Провести по схеме', 'Прослеживает до трёх заданных связей схемы; между ними гасит луч, опускает руку и плавно перенаводит указку.', 10.8, ['flow']],
-  ['inspectDetail', 'Рассмотреть деталь', 'Поднимает лупу, выводит через неё увеличенную оптическую проекцию авторского фрагмента и опускает её.', 9.6, ['detail']],
-  ['assembleList', 'Собрать список', 'Достаёт по одной карточке со строками исходного списка, укладывает их в порядке автора и убирает стопку.', 11.6, ['list']],
-  ['showBeforeAfter', 'Показать пару изображений', 'Разворачивает две исходные картинки рядом, смотрит по очереди на обе и закрывает рамки.', 10.4, ['images']],
-  ['quoteIdea', 'Прочитать цитату', 'Достаёт карточку, расправляет над ней световую проекцию точной формулировки, читает и сворачивает её.', 8.8, ['text']]
+  ['thinkKeyword', 'Think about an idea', 'Rereads a word or short statement, touches the temple, holds the exact thought and lowers the hands.', 7.6, ['keyword', 'text']],
+  ['compareValues', 'Compare values', 'Raises two cards, projects their exact values and folds them away without judging the result.', 9.4, ['values']],
+  ['followChart', 'Follow a chart', 'Takes out a light pointer, follows the actual chart points and puts it away.', 10, ['chart']],
+  ['chartClimb', 'Climb the bars', 'Climbs two or three accessible bar tops in order, reads their values, descends and returns.', 24, ['bars']],
+  ['cardRoute', 'Follow a card route', 'Climbs two or three accessible cards in order, reads each one and returns to the starting point on the floor.', 25, ['route']],
+  ['traceFlow', 'Trace a diagram', 'Follows up to three marked links, turning off the beam and smoothly repositioning the pointer between them.', 10.8, ['flow']],
+  ['inspectDetail', 'Inspect a detail', 'Raises a magnifying glass, shows an enlarged optical projection of the marked crop and lowers it.', 9.6, ['detail']],
+  ['assembleList', 'Assemble a list', 'Takes out cards with the original list items, stacks them in the author\'s order and puts them away.', 11.6, ['list']],
+  ['showBeforeAfter', 'Show an image pair', 'Opens the two source images side by side, looks at each and closes the frames.', 10.4, ['images']],
+  ['quoteIdea', 'Read a quote', 'Takes out a card, projects the exact wording above it, reads it and folds it away.', 8.8, ['text']]
 ], clamp = (x, a = 0, b = 1) => Math.max(a, Math.min(b, x)),
   smooth = x => (x = clamp(x), x * x * (3 - 2 * x)),
   phase = (t, a, b) => smooth((t - a) / (b - a)),
@@ -27,7 +27,7 @@ const entries = [
 
 export const storyTechniques = Object.freeze(entries.map(([id, title, description, duration, kinds]) =>
   Object.freeze({ id, title, description, duration, contextKinds: Object.freeze(kinds), requires: 'floor',
-    group: 'Контекст слайда', tags: Object.freeze(['context']),
+    group: 'Slide context', tags: Object.freeze(['context']),
     preset: ['compareValues', 'followChart', 'traceFlow', 'assembleList', 'showBeforeAfter'].includes(id) ? 'superhuman' : 'base' })))
 const registry = new Map(storyTechniques.map(entry => [entry.id, entry]))
 const thoughtSymbols = {
@@ -143,54 +143,54 @@ export function createStoryPlayer(raw, { host, context = () => null } = {}) {
     valid = selection => selection?.fact && isBounds(selection.bounds),
     can = id => {
       const entry = registry.get(id)
-      if (!entry) return 'Неизвестная контекстная история'
-      if (dead) return 'Проигрыватель отключён'
-      if (raw.reduced) return 'Движение сокращено'
-      if (B.mode !== 'ground' || B.surf?.kind !== 'floor') return 'Нужна стойка на полу'
+      if (!entry) return 'Unknown context story'
+      if (dead) return 'Player has been destroyed'
+      if (raw.reduced) return 'Reduced motion'
+      if (B.mode !== 'ground' || B.surf?.kind !== 'floor') return 'Requires a standing pose on the floor'
       const source = context(id)
-      if (!valid(source) || !entry.contextKinds.includes(source.fact.kind)) return 'Нет совместимого источника истории'
+      if (!valid(source) || !entry.contextKinds.includes(source.fact.kind)) return 'No compatible story source'
       const structure = source.fact.structure, items = structure?.items
       if (['thinkKeyword', 'quoteIdea'].includes(id)) return source.fact.text?.length > 0 && source.fact.text.length <= 180
-        ? null : 'Нужна точная короткая формулировка'
+        ? null : 'Requires an exact short statement'
       if (id === 'followChart') return structure?.points?.length >= 2 && structure.points.length <= 64 && structure.points.every(isPoint)
-        ? null : 'Нужна явно размеченная линия графика'
+        ? null : 'Requires an explicitly marked chart line'
       if (!Array.isArray(items) || !items.length || items.some(item => typeof item.text !== 'string' || !isBounds(targetBounds(item.target || {}))))
-        return 'Источник не содержит измеренных частей'
+        return 'Source has no measured parts'
       if (id === 'compareValues') return items.length === 2 && items.every(item => typeof item.value === 'string') && items[0].unit === items[1].unit
-        ? null : 'Нужны два значения с одинаковой единицей'
+        ? null : 'Requires two values with the same unit'
       if (id === 'chartClimb' || id === 'cardRoute') {
         const journey = route(source)
-        if (!journey) return 'Нужны две или три доступные опоры с безопасным путём по полу'
+        if (!journey) return 'Requires two or three accessible supports with a safe floor route'
         if (id === 'chartClimb' && journey.slice(1).some((part, i) => {
           const previous = journey[i], gap = Math.max(part.plat.x1 - previous.plat.x2, previous.plat.x1 - part.plat.x2, 0)
           return gap > 140 || Math.abs(part.plat.y - previous.plat.y) > 120
-        })) return 'Между столбцами слишком большой промежуток или перепад высот'
+        })) return 'The gap or height difference between bars is too large'
         return null
       }
       if (id === 'traceFlow') {
         const ids = new Set(items.map(item => item.id)), edges = structure.edges
-        if (edges?.length > 3) return 'Для одной истории используйте не больше трёх связей схемы'
+        if (edges?.length > 3) return 'Use no more than three diagram links per story'
         return items.length <= 12 && edges?.length > 0
           && edges.every(edge => ids.has(edge.from) && ids.has(edge.to) && edge.points?.length >= 2 && edge.points.every(isPoint))
-          ? null : 'Нужны узлы и явные связи схемы'
+          ? null : 'Requires nodes and explicit diagram links'
       }
       if (id === 'assembleList') {
-        if (items.length > 8) return 'В одной истории помещается до восьми строк'
+        if (items.length > 8) return 'A story can contain up to eight lines'
         const height = items.reduce((sum, item) => sum + Math.max(34, layoutText(item.text, 245, 18).height + 14), 0) + (items.length - 1) * 8
-        return height <= Math.min(500, W.floor.y - 160) ? null : 'Список не помещается целиком; сократите строки или число пунктов'
+        return height <= Math.min(500, W.floor.y - 160) ? null : 'The list does not fit; shorten its lines or reduce the number of items'
       }
       const parts = source.parts || [], media = part => /^(img|svg)$/i.test(part?.element?.tagName || '') && isBounds(part.bounds)
       if (id === 'showBeforeAfter' || id === 'inspectDetail') {
         const unsupported = parts.find(part => part.media?.copyable === false)
-        if (unsupported) return unsupported.media.reason || 'Изображение нельзя точно скопировать в эту постановку'
+        if (unsupported) return unsupported.media.reason || 'The image cannot be copied accurately into this scene'
       }
       if (id === 'showBeforeAfter') return items.length === 2 && items.every(item => media(parts.find(part => part.id === item.id)))
-        ? null : 'Нужна явно заданная пара изображений'
+        ? null : 'Requires an explicitly marked image pair'
       const crop = structure.crop
       if (!(items.length === 1 && media(parts.find(part => part.id === items[0].id)) && isPoint(crop)
-        && Number.isFinite(crop.width) && Number.isFinite(crop.height) && crop.width > 0 && crop.height > 0)) return 'Нужен авторский фрагмент изображения'
+        && Number.isFinite(crop.width) && Number.isFinite(crop.height) && crop.width > 0 && crop.height > 0)) return 'Requires a marked image crop'
       return Math.min(244, Math.max(160, Math.max(crop.width, crop.height) * 1.7)) / Math.max(crop.width, crop.height) >= 1.5
-        ? null : 'Для увеличения выберите меньший фрагмент изображения'
+        ? null : 'Choose a smaller image crop to magnify'
     }
 
   function finish(drop = false) {

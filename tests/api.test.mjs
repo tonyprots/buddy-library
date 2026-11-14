@@ -8,6 +8,7 @@ test('Каталог доступен при импорте без браузе�
   assert.ok(techniques.length > 60)
   for (const item of techniques) {
     assert.ok(item.title && item.description && item.group && item.requires)
+    assert.doesNotMatch([item.title, item.description, item.group, item.requires].join(' '), /[А-Яа-яЁё]/u)
     assert.ok(item.preset === 'base' || item.preset in abilityPresets)
   }
 })
@@ -22,14 +23,14 @@ test('Фирменный пресет выключен, суперхьюман �
 test('фирменные номера отделены от способностей, обычные жесты и реквизит не требуют superhuman', () => {
   const branded = techniques.filter(item => item.preset === 'brand')
   assert.deepEqual(new Set(branded.map(item => item.id)), new Set(['disk', 'mail', 'tracker', 'calendar']))
-  assert.ok(branded.every(item => item.group === 'Бренд'))
+  assert.ok(branded.every(item => item.group === 'Brand'))
   for (const id of ['salute', 'bow', 'present', 'thumbsUp', 'sonicPulse', 'celebrate', 'spotlight', 'rain']) {
     const item = techniques.find(item => item.id === id)
     assert.equal(item.preset, 'base')
-    assert.equal(item.group, id === 'spotlight' || id === 'rain' ? 'Реквизит' : 'Жесты')
+    assert.equal(item.group, id === 'spotlight' || id === 'rain' ? 'Props' : 'Gestures')
   }
-  assert.ok(techniques.filter(item => item.preset === 'superhuman' && !item.contextKinds).every(item => item.group === 'Суперхьюман'))
-  assert.ok(techniques.filter(item => item.contextKinds).every(item => item.group === 'Контекст слайда' && item.tags.includes('context')))
+  assert.ok(techniques.filter(item => item.preset === 'superhuman' && !item.contextKinds).every(item => item.group === 'Superhuman'))
+  assert.ok(techniques.filter(item => item.contextKinds).every(item => item.group === 'Slide context' && item.tags.includes('context')))
 })
 
 test('единый контроллер доступен при обоих выключенных режимах, настройки не перебивают ручной номер', async () => {
@@ -80,7 +81,7 @@ test('контекстный API сохраняет число, проверяе
   try {
     buddy = await createBuddy({ stage: f.stage, renderer: 'svg', autoplay: false, reactions: false })
     buddy.experimental.B.surf = { kind: 'plat' }
-    assert.match(buddy.can('thinkNumber'), /источник/u, 'Нет источника, а не ошибочное предложение сначала спуститься')
+    assert.match(buddy.can('thinkNumber'), /source/u, 'Нет источника, а не ошибочное предложение сначала спуститься')
     const source = new f.stage.constructor('strong')
     source.setAttribute('data-buddy-context', 'number'); source.setAttribute('data-buddy-context-id', 'demo-value')
     source.textContent = '−18%'
@@ -94,7 +95,7 @@ test('контекстный API сохраняет число, проверяе
     const measures = buddy.context().measures
     for (let i = 0; i < 10; i++) buddy.context()
     assert.equal(buddy.context().measures, measures)
-    assert.match(buddy.can('thinkNumber'), /пол/u)
+    assert.match(buddy.can('thinkNumber'), /floor/u)
     buddy.reset()
     const fact = buddy.context().facts.find(item => item.kind === 'number')
     buddy.selectContext(fact.id)
@@ -248,7 +249,7 @@ test('своя жизнь: autonomous не стоит час после reset и
   globalThis.HTMLElement = f.stage.constructor
   let buddy
   try {
-    await assert.rejects(createBuddy({ stage: f.stage, renderer: 'svg', autonomous: true, autoplay: true }), /взаимоисключающие/u)
+    await assert.rejects(createBuddy({ stage: f.stage, renderer: 'svg', autonomous: true, autoplay: true }), /mutually exclusive/u)
     buddy = await createBuddy({ stage: f.stage, renderer: 'svg', autonomous: true, reactions: false })
     assert.equal(buddy.reactionState()?.autoplay ?? false, false, 'autoplay по умолчанию выключается')
     buddy.reset(); let wait = buddy.experimental.B.act; buddy.step(3, 30)

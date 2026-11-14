@@ -1,116 +1,73 @@
-# Рендерер: зум, пауза и границы кадра
+# Renderer: zoom, pause and framing
 
-## Почему крупный план был мутнее и темнее
+## Paused zoom bug
 
-Баг воспроизведён на неподвижной позе при CSS-масштабе сцены 1 → 3 → 1.
-На паузе буфер оставался 320×320, хотя его отображаемый размер увеличивался
-с 80×80 до 240×240 CSS-пикселей. Даже одиночный шаг не исправлял разрешение;
-обновление происходило только после события `resize`.
+A frozen pose became blurry and darker when CSS scale changed 1 → 3 → 1.
+The backing buffer stayed 320×320 while displayed size grew from 80×80 to 240×240.
+A simulation step did not fix it; a resize event did.
 
-Причина: кэш масштаба истекал по модельному времени, которое на паузе не идёт.
-`ResizeObserver` отслеживает логический размер элемента и не сообщает об обычном
-изменении `transform:scale(...)`.
+Scale-cache expiry used simulation time, which stops while paused. ResizeObserver
+tracks logical dimensions, not ordinary transform scale. Separately, a constant
+2.5 backing-pixel outline became 2.5 instead of 1.25 screen pixels when supersampling
+was capped. Lighting and AO were unchanged; brightness compensation would hide the bug.
 
-Отдельная причина потемнения — постоянная толщина контура 2,5 пикселя буфера.
-При ограничении supersampling она превращалась из 1,25 в 2,5 экранного пикселя.
-Освещение и капсулы AO от CSS-масштаба не менялись; компенсация яркости здесь
-была бы маскировкой ошибки.
+## Fix and verification limits
 
-## Что исправлено
+Observe scale-affecting changes on stage and ancestors: transform, individual scale,
+zoom, classes and CSS variables. Translation alone does not reallocate. Paused
+updates redraw only, without frame(), time advancement or resumed autonomous actions.
+Outline width is `1.25 * bufferRatio / screenRatio`. Resize, DPR and CSS transition
+completion are tracked separately; the fallback cache uses real time.
 
-- Изменение масштаба сцены или её наблюдаемых родителей обновляет плотность
-  буфера. Учитываются `transform`, отдельный CSS `scale`, `zoom`, классы
-  и CSS-переменные. Чистое перемещение `translate` не вызывает перерасчёт.
-- На паузе выполняется только перерисовка представления: без `frame()`,
-  продвижения модельного времени и возобновления автономного поведения.
-- Толщина контура вычисляется как `1.25 × bufferRatio / screenRatio`.
-  Поэтому ограничение supersampling не делает контур толще в крупном плане.
-- Отдельно отслеживаются оконный `resize`, смена DPR и завершение CSS-перехода.
-  Запасной кэш активного рендера использует реальные часы, не модельные.
+In the historical check the buffer changed 320² → 480² → 320² and shader uPx
+2.5 → 1.25 → 2.5, preserving 1.25 screen pixels. Pause, parent scale, individual
+scale and translation-only cases passed. Headless CDP DPR changes did not emit
+the expected native resize signal, so the helper explicitly reproduced it.
+This does not claim a real window move between monitors was tested.
+With that signal, DPR2 → DPR1 reduced the buffer from 320² to 160² and density
+from 4 to 2, preserving outline width and frozen simulation time.
 
-В проверенном случае буфер автоматически меняется 320×320 → 480×480 → 320×320.
-Прочитанные через WebGL значения `uPx` — 2,5 → 1,25 → 2,5; после пересчёта
-плотности это постоянные **1,25 экранного пикселя**. Проверены пауза,
-масштаб родителя, отдельный CSS `scale` и перемещение без смены масштаба.
+## Framing API
 
-Headless CDP меняет `deviceScaleFactor` без обычного оконного `resize`.
-В первоначальном расширенном тесте такой изолированный переход не прислал
-ожидаемое уведомление, и DPR-проверка не прошла. Хелпер воспроизводит
-сопровождающий нативный сигнал `resize` явно; это не утверждение о проверке
-реального переноса окна между двумя мониторами.
-Финальный расширенный прогон с этим сигналом завершился без ошибок:
-DPR 2 → 1 уменьшил буфер 320×320 → 160×160 и плотность 4 → 2,
-сохранив 1,25 экранного пикселя контура и неподвижное модельное время.
-
-Финальный прогон исправленного хелпера завершился успешно. При DPR 2 → 1
-буфер меняется 320×320 → 160×160, ratio 4 → 2, экранный контур остаётся
-1,25 px, модельное время не меняется. Ошибок JavaScript и консоли нет.
-Отчёт: `drafts/renderer-final-verified/report.json`.
-
-## Границы для камеры
-
-`buddy.framing()` возвращает неизменяемый снимок в координатах сцены 1280×720:
+framing() returns frozen cached bounds in 1280×720 stage coordinates:
 
 ```js
 {
-  actor: [x1, y1, x2, y2],
-  props: [x1, y1, x2, y2] || null,
-  planned: [x1, y1, x2, y2] || null
+  actor: [x1,y1,x2,y2],
+  props: [x1,y1,x2,y2] || null,
+  detail: [x1,y1,x2,y2] || null,
+  planned: [x1,y1,x2,y2] || null
 }
 ```
 
-`actor` — вычисленная по скелету рамка тела, головы и видимых копий персонажа.
-`props` — объединение текущих видимых `P.box` объёмного реквизита.
-`planned` — заранее заданный смысловой путь номера. Это границы предметов,
-а не полный прямоугольник WebGL-холста. Метод читает кэш кадра и не измеряет DOM.
-Камера может использовать план, чтобы не дёргаться вслед за каждой летящей частицей.
+Actor bounds include body, head and visible clones. Props union visible P.box
+bounds. Detail covers a local semantic result such as bubble text. Planned bounds
+capture the intended path. These are object bounds, not the entire WebGL canvas.
+Reads do not measure DOM; the camera can follow a plan instead of every particle.
 
-## Резерв траектории
+## Reserving a trajectory
 
-Внутренний сценарий может задать `action.canvasBounds` до `begin()` либо
-однократно вызвать `raw.tools.reserveCanvasBounds(bounds)`. Прямоугольник
-задаётся в абсолютных координатах сцены, объединяется с запасом для тела
-и резервируется на время текущего действия. Смена действия и `reset()`
-снимают резерв; спокойное состояние возвращает маленький холст.
+Set action.canvasBounds before begin(), or call reserveCanvasBounds(bounds) once.
+Absolute stage bounds are unioned with actor padding and reserved for the current
+action. Action changes and reset clear the reservation; rest returns to a small canvas.
 
-`action.frameBounds` для камеры и `action.canvasBounds` для рендера могут
-различаться. Невидимую часть полёта за границей сцены не нужно включать в
-камеру. После полного выхода предмета его callback должен вернуть `null`,
-чтобы рендерер не расширял буфер ради уже невидимого объекта.
+Camera frameBounds and renderer canvasBounds may differ. Offstage motion need not
+enter camera bounds. Return null once a prop leaves entirely so it does not expand
+the buffer for invisible geometry. SVG-based disc/message props use camera plans
+without a needless broad WebGL reservation. Flight has a plan; hulk reserves its
+maximum body size. Zero reallocations are not promised for all legacy actions.
 
-У прежних `disk` и `mail` знак рисуется в SVG, поэтому WebGL-холст изначально
-не следовал за его полётом. Им добавлены стабильные планы для камеры, без
-бессмысленного широкого WebGL-резерва. План также задан для обычного полёта;
-у `hulk` добавлен резерв максимального размера фигуры. Для этих старых номеров
-нулевое число перевыделений не заявляется.
+## Historical measurements
 
-## Измерения и пределы
+Measurements used one local HeadlessChrome153 on macOS arm64, DPR2, with frozen
+zoom poses and 480 manual steps at 1/60 s. Arrow reallocations dropped from 8 to 1;
+its p95 CPU step time changed from 1.2 to 1.1 ms. These synchronous CPU timings do
+not establish GPU throughput, real-time FPS or a worst-case frame-time guarantee.
+A later repeat recorded one preparation allocation and one in-run allocation for
+arrow and force push, with p95 CPU times 1.3 and 1.6 ms. Timing variance does not
+change those limits.
 
-Один локальный HeadlessChrome 153, macOS arm64, DPR 2. Поза зума заморожена,
-сценарии сравнивались в ручном прогоне 480 шагов по 1/60 с.
-
-| Номер | Перевыделения внутри прогона до → после | p95 CPU-времени шага до → после |
-|---|---:|---:|
-| Стрела | 8 → 1 | 1,2 → 1,1 мс |
-| Силовой толчок | 9 → 2 | 0,9 → 0,9 мс |
-
-Резерв выделяется при старте команды, до измеряемых шагов. Внутри прогона
-учитывается и финальное сжатие буфера. Эти числа показывают уменьшение
-перевыделений, но **не являются FPS или GPU-временем**. В синхронной пачке
-без обычной презентации кадров встречались CPU-остановки на resize:
-до 47,2 мс в одном замере после изменений. Снижение максимальной задержки
-по этим данным не заявляется; для него нужен отдельный прогон реальных кадров.
-
-Сырые локальные отчёты и кадры находятся в `drafts/renderer-final-before/`
-и `drafts/renderer-final-after/`; сопоставление крупного плана —
-`drafts/renderer-final-after/zoom-comparison.png`.
-Финальное подтверждение всех assertions — `drafts/renderer-final-verified/report.json`;
-в нём также сохранены SHA-256 проверенных исходников. В этом повторе у стрелы
-и силового толчка по одному выделению буфера при подготовке и одному внутри
-ручного прогона; p95 CPU — 1,3 и 1,6 мс соответственно. Вариация CPU-замеров
-не меняет ограничения сравнения выше.
-
-`tests/renderer-state.test.mjs` проверяет неизменяемость рамок, отсутствие
-DOM-чтений в API, включение двойника и валидацию резерва. Браузерный хелпер —
-`node tests/renderer-check.mjs`; для проверок исправления задаётся
-`BUDDY_RENDER_ASSERT=1`, папка отчёта — через `BUDDY_RENDER_REPORT`.
+renderer-state.test.mjs checks immutable bounds, no DOM reads, clone inclusion
+and reservation validation. Browser checks are in tests/browser/renderer-check.mjs;
+BUDDY_RENDER_ASSERT enables assertions and BUDDY_RENDER_REPORT selects output.
+Historical raw screenshots and logs are not part of the public package.

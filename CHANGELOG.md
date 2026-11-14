@@ -1,289 +1,194 @@
-# Изменения
+# Changelog
 
-## 0.9.0 — 15 ноября 2026
+## 0.9.1 — 2026-11-15
 
-- Общий brand: главный знак, произвольный список продуктов, акцент и
-  необязательные роли реквизита. При передаче изображений фирменные номера
-  включаются автоматически; пустой набор оставляет обычного героя.
-- Runtime использует роли, а не имена сервисов. Продукты участвуют в орбитах,
-  главный знак — в шаре, финале и полёте; акцент — в худи и энергетических эффектах.
-- Классический скрипт принимает data-brand со ссылкой на JSON-блок.
-  Пример examples/brand.html работает без сервера и изменений библиотеки.
-- Я360 стал примером общего набора (экспорт brand); прежние y360 + logos
-  поддерживаются. Изображения по-прежнему отделены от основного buddy.js.
-- В каталоге фирменные номера имеют preset: brand и группу «Бренд»;
-  прежние ID disk/mail/calendar/tracker сохранены.
-- Инструкция агенту описывает извлечение бренда из самой презентации,
-  отсутствие догадок при неопределённости и отдельное разрешение на веб-поиск.
+- English is now the primary language for README, API and agent guides,
+  contributor documentation, examples and the interactive action catalog.
+- Action titles, descriptions, groups, diagnostics, validation errors and the
+  call-out bubble are in English. API identifiers and behavior defaults are unchanged.
+  Integrations that matched Russian labels or error text must update those matches.
+- Leaf Lab replaces the Russian presentation copy in the fictional-brand example.
+- English and Russian source recognition is preserved. Buddy copies slide content
+  in its original language rather than translating or inventing it.
+- Release metadata, classic bundles, TypeScript help and exported documentation
+  use the same language.
 
-## 0.8.3 — 15 ноября 2026, кандидат к публикации
+## 0.9.0 — 2026-11-15
 
-- Изображения примера Яндекс 360 вынесены из buddy.js в buddy-y360.js.
-  В ESM импортируйте набор из presets/y360 и передайте logos явно;
-  прежний вызов только с presets.y360 больше не подгружает изображения.
-  Без них четыре номера используют нейтральный реквизит и одно предупреждение.
-- Добавлен отдельный пример examples/y360.html. В web-архиве его и знаков нет.
-- Неверный логический размер сцены вызывает понятное предупреждение;
-  корректная сцена с CSS scale предупреждений не вызывает.
-- README начинает с готового файла в dist. Manifest исключён из git;
-  фильтр экспорта больше не содержит названия личного проекта.
-  Адрес будущего репозитория и сведения об авторе не предполагаются.
+First public GitHub release.
 
-## 0.8.2 — 15 ноября 2026, локальная поставка
+- General brand configuration: main logo, any number of product images, accent
+  and optional prop roles. Images automatically enable brand actions; empty sets
+  keep normal behavior.
+- Runtime uses roles instead of service names. Products orbit shields and finales;
+  the main logo appears in the energy ball, finale and flight. Accent colors
+  affect the hoodie and energy effects.
+- Classic data-brand selects a JSON script. The fictional-brand example works
+  without a server or library modifications.
+- Y360 exports the general brand format while preserving legacy y360 + logos use.
+  Its images remain separate from the main bundle.
+- Four brand actions now use preset brand; disk/mail/calendar/tracker IDs remain.
+- Agent guidance covers identifying a brand from the deck, avoiding guesses and
+  obtaining permission before fallback web search.
 
-- Настройки slideSelector и activeClass подключают героя к своим классам
-  и вложенным слайдам без замены навигации. Они доступны и через data-атрибуты
-  классической сборки; контекст, цвет худи и прогресс используют тот же набор слайдов.
-- Короткий README, отдельный справочник, инструкция агенту и рабочая мини-дека.
-  Основной путь — один локальный скрипт, без npm, сервера и тестов для пользователя.
-- Публичный экспорт по списку файлов: отдельные web- и source-архивы без
-  истории git, внутренних заметок и личных презентаций.
+## 0.8.3 — 2026-11-15, pre-publication candidate
 
-## 0.8.1 — 15 ноября 2026, локальная поставка
+- Split Yandex 360 images into buddy-y360.js. ESM consumers pass explicitly
+  imported logos; the preset flag alone no longer loads images.
+  Missing images use neutral props and one warning.
+- Added the optional Y360 example; excluded it and its images from the web ZIP.
+- Warn on incorrect logical stage dimensions, while allowing uniform CSS scale.
+- README points at dist. Export manifests are ignored by git and private project
+  names no longer appear in the exporter. Repository metadata awaited publication.
 
-- Без настроек включены show/curious: герой сам двигается и показывает способности;
-  отдых реже выбирается в шоу. В демо эти настройки также включены сразу.
-- Способности появляются после 15% деки, пауза их выбора сокращается к финалу.
-  Деки короче пяти слайдов и одна страница больше не остаются без способностей.
-  progress() управляет и уровнем, и темпом; разрешённые профилем лазанье и магнит
-  также привязаны к доле деки, а не к девятому и одиннадцатому слайдам.
-- Автопилот вызывает фабрики зарегистрированных номеров: дополнительные
-  способности и контекстные истории действительно исполняются при выборе.
-- Явные manual, companion/live, calm, отключение пресетов и reduced motion сохранены.
-- Восстановлены браузерные инструменты после замены autoplay режимами;
-  в сборщике записи можно выбрать общий план, крупный план или автокадр.
+## 0.8.2 — 2026-11-15, local distribution
 
-## 0.8.0 — 14 ноября 2026, локальная поставка
+- slideSelector and activeClass support custom and nested markup without replacing
+  navigation. Classic data attributes, context, hoodie detection and progress use
+  the same slide collection.
+- Short README, separate API and agent guides, and a working mini-deck.
+  Integration needs one local script, no npm, server or consumer test suite.
+- Allowlisted web/source exports omit git history, private notes and personal decks.
 
-- Единые режимы manual/companion/show, характеры business/curious/playful,
-  методы setMode/setCharacter. Профиль ограничивает и самостоятельную жизнь,
-  и реакции. По умолчанию спутник использует live и любопытный характер;
-  старый явный autoplay сохраняет calm. Прежние методы доступны.
-- Деловой и любопытный персонажи не считают долгий слайд поводом заснуть.
-  Озорной допускает сон и зевоту. Ручные номера и размеченные сцены сохранены.
-- focus() заканчивает номер, спускается и занимает свободный пол;
-  focus(false) возвращает актуальные настройки.
-- perform/story возвращают finished и cancel. Сценарии поддерживают
-  постановочные сцены, паузы и взгляд, выбор контекстного источника,
-  AbortSignal и объяснимое прерывание при смене слайда/reset/destroy.
-  Очередь движка определяет конец номера; busy и таймеры не подменяют завершение.
-- В стенде появились режим, характер, focus и запуск/отмена короткой истории.
-  Обновлены типы, классическая сборка и документация.
+## 0.8.1 — 2026-11-15, local distribution
 
-## 0.7.0 — не выпущено
+- Active show/curious defaults in the library and demo; less resting in show mode.
+- Powers begin after 15% deck progress and become more frequent toward the finale.
+  Short and single-slide decks receive powers too. progress() controls confidence
+  and pace; climbing and magnet behavior use progress rather than fixed slide indices.
+- Automatic choices call registered action factories, so extra powers and context
+  stories actually run when selected.
+- Explicit manual, companion/live, calm, disabled presets and reduced motion remain.
+- Updated browser tools for modes and independently selectable capture views.
 
-- **Худи под цвет презентации.** Новая опция `hoodie`, по умолчанию `'auto'`:
-  при запуске бадди находит преобладающий насыщенный цвет слайдов и красит
-  в него худи (3D и SVG). Нет заметного цвета — остаётся синее. `'default'`
-  возвращает синее всегда, цвет `#rrggbb` задаёт своё. Итог — `buddy.hoodie`.
-  Модуль `outfit.js`.
-- `can('web')` и `can('grapple')` больше не обещают номер, от которого планировщик
-  откажется: проверяют те же кромки и площадки, что и сам номер, и называют причину.
-  Раньше `can()` отвечал `null`, а `play()` возвращал `false`.
+## 0.8.0 — 2026-11-14, local distribution
 
-## 0.6.0 — 12 ноября 2026
+- Added manual/companion/show modes, business/curious/playful characters and shared
+  profile filtering across autonomous behavior and reactions. At this version,
+  companion/live was the default; legacy explicit autoplay retained calm.
+- Business and curious no longer sleep on long slides; playful may yawn and nap.
+  Manual actions and marked scenes preserve author intent.
+- focus() finishes the action, descends and finds clear floor; focus(false) restores settings.
+- perform/story expose finished and cancel, staged actions, waits, gaze, context
+  selection, AbortSignal and explicit cancellation reasons. Completion follows the
+  whole engine queue, not an estimated busy flag or timer.
+- Added mode, character, focus and story controls to the catalog; updated types and bundle.
 
-Подготовка к внешней публикации: пакет работает сразу после установки.
+## 0.7.0 — unreleased separately
 
-- **Своя жизнь по умолчанию.** `createBuddy({ stage })` без настроек включает
-  `autonomous`: бадди сам ходит, лазает на блоки, проходит лестницу и финал.
-  Раньше по умолчанию работал спокойный планировщик, и на обычной странице
-  персонаж почти не двигался. Явный `autoplay` (true или false) сохраняет
-  прежнее поведение, так что существующие интеграции с `autoplay` не меняются.
-- Лестница `[data-buddy-stairs]` медленнее: пауза на каждой ступени, трусцой
-  вместо бега, обычный прыжок. Зритель успевает прочитать пункт.
-- `run([['sitRest', сек]])` принимает длительность посадки; `run([['edgeSit', сек]])`
-  сажает на кромку блока, ноги свешены.
-- Новый метод `setAutonomous(on)` и поле `state().autonomous`. `autoplay(true)`
-  выключает свою жизнь, `setAutonomous(true)` выключает `autoplay`.
-- Страница с одним слайдом сразу получает средний уровень смелости:
-  лазает по блокам. Раньше оставалась на начальном уровне без лазанья.
-- Готовая сборка `dist/buddy.js`: один классический скрипт для страниц без
-  сборщика и для `file://`. Атрибут `data-stage` подключает бадди без кода.
-- Из npm-пакета убраны тесты, внутренние отчёты и служебные документы:
-  141 файл → 31. README переписан для внешнего читателя; разработка описана
-  в `CONTRIBUTING.md`.
-- `npm test` — быстрый набор (около 20 с); тяжёлая геометрия вынесена
-  в `npm run test:slow`, браузерные сценарии — в `tests/browser/`.
-- Из комментариев и документации убраны внутренние ссылки и личные пути.
+- Automatic hoodie coloring from saturated deck accents in WebGL and SVG, with
+  original-blue fallback and explicit overrides. Added outfit.js and buddy.hoodie.
+- web/grapple availability now checks the same reachable edges and platforms as
+  the action, avoiding can() success followed by a declined play().
 
-## 0.5.1 — 11 ноября 2026
+## 0.6.0 — 2026-11-12, local distribution
 
-- Парашют запускается с пола через подготовку и настоящий прыжок. Перед взлётом
-  проверяется свободный коридор; при отсутствии места возвращается причина отказа.
-- Автокамера плавно меняет масштаб в обе стороны и удерживает видимый реквизит.
-  Исправлены границы головы, кистей и фигуры для кадрирования настоящей 3D-модели.
-- Сглажены подтверждённые стыки карабканья, прыжков, крюка, полёта, разворотов,
-  быстрого бега, ловли кометы и отдельных жестов.
-- Удерживаемые предметы согласованы с настоящими ладонями; лучи используют
-  точки модели. Уточнены направление указки и контакт контекстного реквизита.
-- Истории сохраняют исходные данные слайда и прекращаются при смене источника.
-- В первом переходе исправлена высота касания опоры; доработаны повторный запуск,
-  очистка и живое переключение уменьшенного движения.
-- Уменьшены лишние изменения WebGL-буфера с сохранением плотности изображения;
-  исправлена очистка private-текстур и поздно загрузившейся модели.
-- Подпись измеряется до построения пола; начальная стойка учитывает её ширину.
-- Добавлен внутренний контракт рига и реквизита.
-- Поставка завершает текущий этап разработки. Полная актуальная независимая
-  приёмка всех 93 действий на 8/10 не завершена; известные замечания перечислены
-  во внутреннем отчёте поставки 0.5.1.
+- Autonomous behavior enabled by default. Explicit autoplay true/false preserves
+  the legacy scheduler path. Added setAutonomous() and its state field.
+- Slower staircase pacing, a pause per step and normal jumps; internal seated
+  actions accept durations. Single-slide decks receive middle confidence.
+- One classic dist/buddy.js bundle with data-stage mounting and file:// support.
+- Reduced package contents to runtime and consumer docs; split fast, slow and
+  browser checks. Removed private paths and internal links from public materials.
 
-- Залез на блок — осваивается на новой площадке: шесть секунд не спускается ни ради
-  способности, ни по счётчику, ни прыжком на соседний блок. Раньше мог спрыгнуть сразу.
-- Сошёл с блока — 15 секунд не лезет обратно ни по стене, ни крюком, ни паутиной и не виснет
-  на кромке для подтягиваний. Раньше бывало «залез, спрыгнул и тут же крюком наверх».
-- Крюк-кошка цепляет блок только у боковой грани и поднимает вдоль неё. Раньше цель
-  была где угодно на верху, и трос тянул его наискосок сквозь нижний край карточки
-  или сквозь карточку, внутри которой лежит строка-площадка. Стоит под блоком —
-  сначала отходит к грани.
-- Ни крюк, ни лазанье не ведут на площадку, над которой нет места для роста
-  (ряды карточек с зазором 12 px).
-- Нижнее скругление карточки: кисти и стопы идут по дуге, первый хват — выше неё.
-- `jumpTo(..., { quick: 1 })` — прыжок с разбега: короткий присед и короткое приземление.
-- `createBuddy({ autonomous: true })` — своя жизнь из деки вместо планировщика. Раньше
-  `createBuddy` выключал её жёстко, а `reset()` ставил ожидание на час; включение через
-  `experimental.autonomous(true)` оставляло бадди стоять до конца этого часа.
-- Лестница (`data-buddy-stairs`) идёт в темпе деки: полсекунды на первом блоке, дальше
-  бегом и короткими прыжками с разбега — около 3 секунд на ступень вместо 8.
+## 0.5.1 — 2026-11-11, local distribution
 
-## 0.5.0
+- Parachute launches from the floor through preparation and a real jump, checking
+  a clear reachable corridor first. Auto framing smoothly zooms both ways and
+  accounts for the actual model's head, hands and body.
+- Smoothed confirmed transitions in climbing, jumping, grappling, flying, turning,
+  running, comet catches and gestures. Held props and beams use real model anchors.
+- Context stories preserve source data and stop when it changes. Fixed first-transition
+  contact height, restart, cleanup and live reduced-motion changes.
+- Reduced unnecessary canvas resizing, preserved density, and fixed private-texture
+  and late-model disposal. Measure signature geometry before the floor scan.
+- Added the internal rig/prop contract. A complete independent visual acceptance
+  of all 93 actions was not claimed for this local milestone.
+- Stay on a newly reached platform for six seconds; wait 15 seconds after descending
+  before climbing, grappling, webbing or pull-ups again.
+- Grappling follows side edges rather than pulling diagonally through cards.
+  Reject supports without headroom. Hands and feet follow rounded lower corners.
+- Added quick running jumps and fixed hour-long idle waits after reset or enabling
+  autonomous behavior. Staircase pacing was subsequently refined in 0.6.0.
 
-- Группа «Контекст слайда» завершена: десять новых номеров дополняют первую
-  семёрку до 17. В общем каталоге 93 ID.
-- Добавлены размеченные пары значений и изображений, графики, столбцы, маршруты,
-  схемы связей, списки и области изображения. Анализатор сохраняет точные данные
-  и объясняет ошибки структуры через `context().issues`.
-- Десять постановок используют отдельные движения и реквизит: мысль, сравнение,
-  указку, подъёмы, лупу, карточки и проекции. Исходные подписи, изображения и
-  отметки списка сохраняются; выдуманные значения и связи не добавляются.
-- Проекции связаны с источником и реквизитом, текст переносится по словам,
-  лупа увеличивает фрагмент минимум в 1,5 раза. Крупный план указки учитывает
-  локальный реквизит, автокадр — удалённую цель.
-- Устранены резкие переключения IK в `peekCard`, `perchRead` и `cardRoute`.
-  Движения проверяются полными траекториями с обеих сторон.
-- Между связями схемы луч гаснет, а указка плавно меняет направление.
-  Одна история принимает до трёх связей при прежней длительности.
-- SVG-копии сохраняют исходный viewport и letterboxing; корневой CSS-масштаб
-  применяется один раз. Неподдерживаемые корневые преобразования дают причину
-  отказа; внутренние преобразования рисунка сохраняются.
-- Исправлены координаты графика и схемы в WebKit, где SVG-матрица могла
-  пропускать CSS-масштаб сцены. Калибровка сохраняет `viewBox` и внутренние
-  преобразования; чтения DOM остаются в событийном анализе.
-- Обновлены демосцены, правила авторской разметки, типы и проверка жизненного
-  цикла. В режиме сокращённого движения контекстный `play()` возвращает `false`.
-- Результаты и пределы визуальной проверки и замеров:
-  внутреннем отчёте приёмки 0.5.0.
+## 0.5.0 — local distribution
 
-## 0.4.0
+- Ten new context stories complete a set of 17; the full catalog reaches 93 IDs.
+- Explicit value/image pairs, charts, bars, routes, diagrams, lists and crops,
+  with exact source data and structured issues instead of guessed or truncated facts.
+- Dedicated choreography and props for thinking, comparing, pointing, climbing,
+  magnifying, cards and projections. Preserve labels, images and checkbox states.
+- Source-linked projections, word-wrapped text and at least 1.5× crop magnification.
+  Close-ups include local props; automatic framing includes distant targets.
+- Smoothed IK handoffs in peekCard, perchRead and cardRoute. Diagram beams switch
+  off between links and smoothly re-aim; up to three links per story.
+- SVG copies preserve viewport, letterboxing and inner transforms. Root CSS scale
+  is applied once; unsupported root transforms give explicit rejection reasons.
+  Calibrated WebKit SVG matrices when ancestor CSS scale is omitted.
 
-Семь контекстных номеров проверены в браузере с обеих сторон. Сценарий и границы проверки —
-в `docs/context-verification.md`; результаты 0.3.x относятся к прежней версии.
+## 0.4.0 — local distribution
 
-- Добавлена группа «Контекст слайда»: `laptopNotes`, `thinkNumber`,
-  `hologramObject`, `hologramKeyword`, `traceFocus`, `peekCard`, `perchRead`.
-  В публичном каталоге 83 ID. Прежние контекстные умения получили тег
-  `context`, сохранив свои группы и идентификаторы.
-- `buddy.context()` возвращает неизменяемые факты с причинами и координатами;
-  `selectContext(id|null)` переключает ручной источник и автовыбор.
-  `rescan()` синхронно обновляет контекст. Анализатор и словарь доступны
-  из основного модуля и `@tony-prots/buddy/context`; типы входят в пакет.
-- Числа сохраняют знак, разделители, масштаб и единицу: `−18%`, `1,2 млн ₽`,
-  `250 тыс. руб.`, `12 мс`. Наличие цифры не вызывает одобрение автоматически.
-- Словарь восьми образов использует полные слова и контролируемые формы
-  на русском и английском; близкие отрицания подавляют совпадение.
-  Скрытые элементы, подпись, навигация и слой бадди не становятся источниками.
-- Авторские маркеры и ручной выбор приоритетнее эвристик. Неоднозначные
-  факты не выбираются случайно. `can()` проверяет совместимость источника
-  до стойки на полу и геометрии кромки.
-- Короткая мысль и подчёркивание включены в `calm`, длинные истории —
-  в `live` / `show`. Автопилот не повторяет контекстную историю в одном посещении.
-- Изменение текста, понятия, IMG/SVG, геометрии или удаление источника очищает старый
-  номер. Кэш обновляется по событиям; камерный `transform` всей сцены
-  не вызывает повторный анализ на каждом кадре.
-- `state().grounded` сообщает о физической опоре независимо от `surf`:
-  во время полёта `surf` может ещё указывать на пол.
-- Крупный план включает локальный результат из `framing().detail`: облачко
-  числа и подпись проекции остаются целыми. Выглядывание использует один
-  свободный участок кромки, учитывая место для ладоней.
+- First seven context actions: laptopNotes, thinkNumber, hologramObject,
+  hologramKeyword, traceFocus, peekCard and perchRead. Existing contextual actions
+  retain IDs and groups while gaining context tags.
+- Frozen context snapshots, manual source selection, synchronous rescan, standalone
+  analyzer and controlled bilingual concept dictionary with TypeScript exports.
+- Exact signs, separators, scale and units; no automatic approval based on a number.
+  Whole-word concepts honor nearby negation. Hidden content, signature, navigation
+  and Buddy's own layer are excluded.
+- Explicit markers and manual selection outrank heuristics; ambiguity is never
+  resolved randomly. Compatibility is checked before floor and edge geometry.
+- Short thoughts/highlights in calm; longer stories in live/show, once per visit.
+  Source changes cancel old actions without per-frame DOM scans.
+- grounded reports physical support independently of the retained surface label.
+  Local framing includes complete thought bubbles and projection captions.
 
-## 0.3.1
+## 0.3.1 — local distribution
 
-Исправлена вёрстка названий и идентификаторов в каталоге стенда: кнопки
-не сжимаются ниже содержимого, а строки мобильной сетки получают естественную
-высоту. Проверены все 76 кнопок на ширинах 320, 768, 1024 и 1440 px: подписи
-помещаются внутри кнопок, зазоры не меньше 8 px, горизонтального переполнения нет.
+- Catalog buttons no longer shrink below their text; mobile grid rows use natural
+  height. All 76 then-current actions were checked at 320, 768, 1024 and 1440 px
+  for text clipping, horizontal overflow and gaps of at least 8 px.
 
+## 0.3.0 — local distribution
 
-## 0.3.0
+- Separated ordinary gestures/props, Superhuman powers and optional Y360 actions,
+  preserving IDs. Ordinary additions no longer require superhuman.
+- Unified calm/live/show scheduling, seeded choices and independent autoplay/reaction
+  controls. Manual actions start a shared cooldown and are not interrupted.
+- Read-only analysis, support geometry, chosen reactions and rejection reasons.
+  Signature perches are separate from Y360 images.
+- Stars leave above the slide; crates and kicked comets leave sideways. Confetti
+  settles before cleanup, and time fragments do not restart their motion cycle.
+- Reserved trajectories before the first action frame; fixed paused CSS zoom
+  resolution and close-up outline thickness.
+- Catalog preserves scene and manual camera choice; automatic framing includes
+  actor, props, targets and full trajectories. Added slide-analysis diagnostics.
 
-- Каталог разделён на обычные жесты, реквизит, способности «Суперхьюман»
-  и четыре фирменных номера «Яндекс 360». Обычные новые номера доступны без
-  пресета `superhuman`; идентификаторы сохранены.
-- Единый автопилот получил профили `calm`, `live`, `show`, воспроизводимый
-  выбор по `seed` и независимые переключатели самостоятельных действий и реакций.
-  Ручной номер начинает общую паузу; автопилот его не перебивает.
-- `intelligence.state()` и `intelligence.inspect()` возвращают диагностику
-  только для чтения: признаки слайда, опоры, выбранную реакцию и причины запрета.
-  Опора Digital Review явно отделена от фирменных знаков Яндекс 360.
-- Звезда улетает за верхний край; ящик и пнутая комета выходят за боковой.
-  Конфетти оседают на пол до уборки, осколки времени не запускают новый цикл.
-  Рамки движения и WebGL-резерв задаются до первого кадра каждого номера.
-- Исправлены разрешение WebGL-холста при CSS-масштабировании на паузе
-  и толщина контура при крупном плане.
-- Стенд сохраняет выбранную сцену и ручной план при запуске обычных номеров.
-  Автокадр учитывает персонажа, предметы, цель и полную траекторию.
-- Панель «Что бадди видит на слайде» показывает роль сцены, цель, опоры,
-  причины ожидания и доступные реакции.
-- Предметы получают резерв холста на весь видимый путь; окончания номеров доработаны.
+## 0.2.0 — local distribution
 
-## 0.2.0
+- Rechoreographed 17 actions into preparation, action, contact and recovery phases.
+- Replaced their flat props with 14 types of volumetric props; flashlight retains
+  a soft SVG light spot. Open hands, fists and thumbs-up use actual finger bones.
+- Present/spotlight aim at explicit targets, then headings and media.
+  Flying objects move independently, attach on catch and detach on release.
+- Star enters from above and reaches the palm at 1.9 s. Orbit grows to 2.7×;
+  time bubble surrounds the body. Larger energy sphere, 96 paper confetti pieces,
+  clearer comet/umbrella handling, and corrected bow/string/arrow alignment.
+- sonicPulse uses a short call-out bubble instead of 3D rings and does not add a cape.
+  Force push moves a crate; spotlight reaches the actual target.
+- hulk grows to 3.4×, inspects its hands, takes two heavy steps, then shrinks back.
+- Removed binoculars from the public API, leaving 76 actions. Catalog clicks can
+  enable the Y360 example while library defaults keep it off.
+- step() preserves fractional time, including 24 fps exports. Geometry tests cover
+  contacts, independent flight, hand metadata and prop cleanup.
+- SVG fallback retains poses and the call-out, without 3D props or articulated fingers.
 
-Переработаны постановка, читаемость эффектов и запуск номеров в стенде.
-Проверки и их границы описаны в `docs/verification.md`.
+## 0.1.0 — 2026-11-10, local distribution
 
-- Переписаны 17 новых номеров: подготовка, действие, контакт с предметом
-  и возвращение в стойку теперь задаются отдельными фазами.
-- Плоские SVG-декорации этих номеров заменены объёмным реквизитом.
-  `ability-props.js` создаёт 14 видов предметов через `prop3`, включая ящик
-  для силового толчка. У фонарика сохранено мягкое SVG-пятно на цели.
-- Открытые ладони, кулаки и жест `thumbsUp` управляют костями кистей 3D-модели.
-- `present` и `spotlight` выбирают цель по `data-buddy-focus`, затем
-  `data-buddy-target`, заголовкам и медиа; бадди разворачивается к ней.
-- Летящие предметы движутся отдельно от тела, переходят в ладонь при ловле
-  и отделяются при выпуске.
-- Звезда падает из-за верхнего края слайда и попадает в ладонь на 1,9-й секунде.
-  Орбитальная система увеличена до 2,7× и поднята над головой; сфера остановки
-  времени охватывает тело и содержит увеличенные осколки.
-- Большая сфера вырастает из ядра и поднимается над ладонями; салют содержит 96 крупных бумажных конфетти.
-  Комета удерживается дальше от лица, зонт виден сложенным и раскрывается выше.
-  Изгиб лука и положение стрелы согласованы с заряжающей рукой.
-- В `sonicPulse` бадди зовёт «Эй!», машет в зал и прислушивается. Короткое
-  SVG-облачко заменяет объёмные кольца; номер не включает плащ.
-- Силовой толчок сдвигает ящик;
-  фонарик освещает выбранный элемент лучом и мягким световым пятном.
-- `hulk` увеличивает персонажа до 3,4×. Бадди рассматривает руки, делает
-  два тяжёлых шага с пылью и волнами, затем возвращается к обычному размеру.
-- Бинокль удалён из публичного API, типов и стенда; в каталоге осталось
-  76 приёмов. Клик по фирменному номеру в стенде включает Я360 и готовит сцену,
-  сохраняя `y360:false` по умолчанию в библиотеке.
-- Ручной `step()` учитывает дробный остаток времени: экспорт с частотой
-  24 кадра в секунду не ускоряет действие из-за округления.
-- Проверки используют настоящий решатель рук и модельное время; покрыты
-  контакт, самостоятельный полёт, метаданные кистей и очистка 3D-реквизита.
-- В SVG-режиме сохраняются позы и облачко оклика, но объёмный реквизит и новая артикуляция
-  пальцев не отображаются. Это ограничение явно описано в документации.
-
-## 0.1.0 — 10 ноября 2026
-
-Первая самостоятельная версия бадди из клубной деки.
-
-- 77 приёмов: жесты, отдых, разминка, акробатика, реквизит, способности и сцены.
-- 17 новых номеров: световая сфера, энергетический лук, зонт с дождём,
-  снежинка, ловля звезды, силовая стена и другие.
-- Пресет `superhuman` включён по умолчанию; фирменный `y360` — по выбору.
-- Локальные реакции на финалы, перебивки, изображения и крупные числа.
-- Модуль интро со стеклом и осколками; готовый каталог-проигрыватель.
-- Изолированные экземпляры, очистка ресурсов, динамический reduced motion.
-- Исправлены сброс позы, прерывание полёта и синхронная навигация.
-- Исправлены маски глаз и рта в шейдере; смягчена контактная тень кожи.
-- Локальная поставка без сборки и загрузок из CDN; проверяемые тесты.
+- First standalone Buddy: 77 actions, including 17 new gestures, powers and props.
+- Default superhuman and optional Y360; local reactions to closing slides, dividers,
+  images and prominent numbers; breakout intro and interactive catalog.
+- Isolated instances, resource cleanup and live reduced motion. Fixed pose reset,
+  interrupted flight and synchronous navigation.
+- Corrected eye/mouth shader masks and softened skin contact shadows.
+- Local modules without CDN loads, with automated checks.

@@ -67,7 +67,7 @@ async function demo() {
           if (['disk', 'mail', 'tracker', 'calendar'].includes(id) && !this.presets.y360) return 'Пресет выключен'
           if (id === 'tracker' && activeScene() !== 'platforms') return 'Нет плитки'
           const metadata = techniques.find(item => item.id === id), snapshot = this.context()
-          if (metadata?.contextKinds && !snapshot.facts.some(fact => (!selectedSource || fact.id === selectedSource) && metadata.contextKinds.includes(fact.kind))) return 'Нет совместимого источника'
+          if (metadata?.contextKinds && !snapshot.facts.some(fact => (!selectedSource || fact.id === selectedSource) && metadata.contextKinds.includes(fact.kind))) return 'No compatible source'
           return null
         },
         play(id) {
@@ -105,7 +105,7 @@ test('клик на диск, письмо и готовность включа�
     assert.deepEqual(d.played.at(-1), { id, scene: id === 'tracker' ? 'platforms' : 'empty', preset: true })
     assert.equal(d.element('y360').checked, true)
     assert.equal(d.created.at(-1).logos, y360Logos, 'Стенд явно передал отдельный набор изображений')
-    assert.match(d.element('status').textContent, /Пресет Я360 включён/)
+    assert.match(d.element('status').textContent, /Y360 example enabled/)
   }
   assert.equal(d.created.length, 2, 'Пресет подключается один раз, не при каждом клике')
   assert.notEqual(d.element('overview').attributes['aria-pressed'], 'true', 'Автокадр не заменяется ручным режимом при выборе номера')
@@ -119,7 +119,7 @@ test('ручное выключение Я360 сохраняется до сле
   await d.element('y360').listeners.get('change')(); await d.settle(); d.update()
   assert.equal(d.created.at(-1).presets.y360, false)
   assert.equal(d.played.length, count, 'Выключение не запускает выключенный приём заново')
-  assert.match(d.element('status').textContent, /Пресет Я360 выключен/)
+  assert.match(d.element('status').textContent, /Y360 example is off/)
   d.click('mail'); await d.settle()
   assert.equal(d.played.at(-1).id, 'mail')
   assert.equal(d.created.at(-1).presets.y360, true)
@@ -186,10 +186,10 @@ test('ручной несовместимый факт не заменяется
   d.click('hologramKeyword'); await d.settle(); d.update()
   assert.equal(d.played.length, count)
   assert.equal(d.activeScene(), 'context-keywords')
-  assert.match(d.element('status').textContent, /источник/i)
+  assert.match(d.element('status').textContent, /source/i)
   d.element('contextPlay').listeners.get('click')(); await d.settle()
   assert.equal(d.played.at(-1).id, 'hologramObject')
-  assert.equal(d.element('group').value, 'Контекст слайда')
+  assert.equal(d.element('group').value, 'Slide context')
   assert.equal(d.created.at(-1).context().selectedId, 'source:object')
 })
 

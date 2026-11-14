@@ -14,78 +14,78 @@ export { analyzeSlideContext, contextConcepts } from './slide-context.js'
 export { behaviorModes, characters } from './behavior.js'
 
 const groups = {
-  'Покой и внимание': [
-    ['idle', 'Стоять', 'Спокойная стойка, дыхание и редкое моргание.'],
-    ['lookSlide', 'Смотреть на слайд', 'Поворачивается к содержимому слайда.'],
-    ['lookHall', 'Смотреть в зал', 'Переводит внимание на зрителей.'],
-    ['yawn', 'Зевнуть', 'Прикрывает рот рукой.'],
-    ['sitRest', 'Сесть', 'Садится, обняв колени; таз и стопы опираются на пол.'],
-    ['sitLean', 'Отдохнуть сидя', 'Вариант спокойной посадки с наклоном.'],
-    ['nap', 'Заснуть', 'Опускает голову к коленям; появляются сонные z. Длится до прерывания.']
+  'Rest and attention': [
+    ['idle', 'Stand', 'A relaxed stance with breathing and occasional blinking.'],
+    ['lookSlide', 'Look at the slide', 'Turns toward the slide content.'],
+    ['lookHall', 'Look at the audience', 'Shifts attention to the audience.'],
+    ['yawn', 'Yawn', 'Covers the mouth with one hand.'],
+    ['sitRest', 'Sit down', 'Sits holding the knees, with hips and feet resting on the floor.'],
+    ['sitLean', 'Rest while seated', 'A relaxed seated pose with a slight lean.'],
+    ['nap', 'Take a nap', 'Rests the head on the knees with sleepy z bubbles. Continues until interrupted.']
   ],
-  'Жесты': [
-    ['wave', 'Помахать', 'Согнутая рука, ладонь обращена к зрителям.'],
-    ['clap', 'Похлопать', 'Ладони сходятся перед грудью.'],
-    ['point', 'Указать', 'Показывает рукой в сторону слайда.'],
-    ['cheer', 'Обрадоваться', 'Подпрыгивает с руками вверх.'],
-    ['dance', 'Потанцевать', 'Короткий танец с переносом веса.']
+  'Gestures': [
+    ['wave', 'Wave', 'Waves with a bent arm and the palm facing the audience.'],
+    ['clap', 'Clap', 'Brings the palms together in front of the chest.'],
+    ['point', 'Point', 'Points toward the slide.'],
+    ['cheer', 'Cheer', 'Jumps with both arms raised.'],
+    ['dance', 'Dance', 'A short dance with shifting weight.']
   ],
-  'Передвижение и акробатика': [
-    ['stroll', 'Пройтись', 'Идёт к свободной точке пола, сохраняя опорную стопу.'],
-    ['jog', 'Пробежаться', 'Трусца к более далёкой точке.'],
-    ['hop', 'Подпрыгнуть', 'Небольшой прыжок на текущей опоре.'],
-    ['stumble', 'Споткнуться', 'Идёт, спотыкается и восстанавливает равновесие.'],
-    ['handstand', 'Встать на руки', 'Балансирует на руках; доступен со второго уровня.'],
-    ['backflip', 'Сальто назад', 'Прыжок с оборотом; доступен на четвёртом уровне.'],
-    ['climb', 'Залезть', 'Подходит к свободной стене и залезает на скруглённый верх.', 'wall'],
-    ['pullups', 'Подтянуться', 'Повисает на кромке и подтягивается.', 'wall'],
-    ['logo', 'Забраться на подпись', 'Запрыгивает на выбранную опору бренда: аватарку или верх букв подписи.', 'brand'],
-    ['descend', 'Спуститься', 'Слезает с текущей площадки; на полу не запускается.', 'elevated']
+  'Movement and acrobatics': [
+    ['stroll', 'Stroll', 'Walks to a free spot on the floor while keeping the planted foot stable.'],
+    ['jog', 'Jog', 'Jogs to a more distant spot.'],
+    ['hop', 'Hop', 'A small jump on the current support.'],
+    ['stumble', 'Stumble', 'Trips while walking, then regains balance.'],
+    ['handstand', 'Handstand', 'Balances on both hands; available from confidence level two.'],
+    ['backflip', 'Backflip', 'A backward somersault; available at confidence level four.'],
+    ['climb', 'Climb', 'Walks to an accessible wall and climbs onto its rounded top.', 'wall'],
+    ['pullups', 'Pull-ups', 'Hangs from an edge and pulls up.', 'wall'],
+    ['logo', 'Climb onto the signature', 'Jumps onto the chosen brand perch: an avatar or the top of the signature letters.', 'brand'],
+    ['descend', 'Climb down', 'Descends from the current platform; unavailable on the floor.', 'elevated']
   ],
-  'Разминка': [
-    ['stretch', 'Потянуться', 'Поднимает руки и вытягивается.'],
-    ['squats', 'Присесть', 'Несколько приседаний вполоборота к залу.'],
-    ['jacks', 'Прыжки с разведением рук', 'Серия прыжков с синхронным движением рук и ног.'],
-    ['toeTouch', 'Наклониться к стопам', 'Наклоняется вперёд.'],
-    ['sideBend', 'Наклониться вбок', 'Наклоны корпуса вправо и влево.'],
-    ['shadowbox', 'Бой с тенью', 'Чередует короткие удары руками.'],
-    ['kick', 'Ударить ногой', 'Поднимает колено, выпрямляет ногу, возвращается в стойку.']
+  'Warm-up': [
+    ['stretch', 'Stretch', 'Raises both arms and stretches upward.'],
+    ['squats', 'Squats', 'Does a few squats, partly turned toward the audience.'],
+    ['jacks', 'Jumping jacks', 'Jumps while moving arms and legs together.'],
+    ['toeTouch', 'Touch toes', 'Bends forward.'],
+    ['sideBend', 'Side bends', 'Leans the torso to either side.'],
+    ['shadowbox', 'Shadowboxing', 'Alternates short punches.'],
+    ['kick', 'Kick', 'Raises a knee, extends the leg, then returns to a standing pose.']
   ],
-  'Реквизит': [
-    ['popcorn', 'Есть попкорн', 'Садится на табурет, держит ведёрко, подносит попкорн ко рту.'],
-    ['read', 'Читать книгу', 'Держит книгу снизу; страницы видны зрителям.'],
-    ['note', 'Записать идею', 'Держит блокнот за край и пишет карандашом; появляется лампочка.']
+  'Props': [
+    ['popcorn', 'Eat popcorn', 'Sits on a stool, holds a bucket and brings popcorn to the mouth.'],
+    ['read', 'Read a book', 'Supports a book from below, with its pages visible to the audience.'],
+    ['note', 'Write down an idea', 'Holds a notebook by its edge and writes with a pencil; a light bulb appears.']
   ],
-  'Способности': [
-    ['levitate', 'Левитировать', 'Скрещивает голени и парит над полом.'],
-    ['shield', 'Создать щит', 'Раскрывает руки, вокруг вспыхивает силовое поле.'],
-    ['laser', 'Лазер из глаз', 'Смотрит в пол, оставляет дымящуюся подпалину.'],
-    ['shrink', 'Уменьшиться', 'Бегает маленьким и возвращается к обычному размеру.'],
-    ['smoke', 'Дымовая телепортация', 'Прячется в дыму и выходит из второго облака.'],
-    ['lightning', 'Молния', 'Направляет разряды из ладоней в пол.'],
-    ['fire', 'Огненный шар', 'Собирает шар между ладонями и толкает вдоль пола.'],
-    ['ice', 'Ледяная дорожка', 'Замораживает пол и скользит по нему.'],
-    ['portal', 'Портал', 'Ныряет в одно кольцо и вылетает из другого.'],
-    ['speed', 'Суперскорость', 'Разгоняется со шлейфом и тормозит с пылью.'],
-    ['clone', 'Двойник', 'Создаёт копию; оба машут и прыгают.'],
-    ['fly', 'Полёт', 'Летает над полом; использует знак бренда в роли доски.'],
-    ['hulk', 'Вырастить великана', 'Вырастает до 3,4×, рассматривает руки, делает два тяжёлых шага с пылью и волнами, затем уменьшается.'],
-    ['web', 'Паутина', 'Цепляется нитью за карточку и подтягивается наверх.', 'platform'],
-    ['magnet', 'Магнит', 'Притягивает иконку, крутит над ладонями и возвращает.', 'icon'],
-    ['tracker', 'Отметить готовность', 'Отметка опускается на плитку; появляется галочка.'],
-    ['disk', 'Бросить диск', 'Достаёт диск из люка, бросает как фрисби и ловит.'],
-    ['mail', 'Отправить письмо', 'Посылает письмо за край слайда и получает ответ.'],
-    ['calendar', 'Вспомнить о встрече', 'Календарь появляется над головой: хлопок по лбу и пробежка.'],
-    ['grapple', 'Выстрелить крюком', 'Забрасывает крюк на верхнюю площадку и подтягивается.', 'platform'],
-    ['construct', 'Собрать световую копию', 'Кольцо на кулаке собирает копию иконки со слайда.', 'icon']
+  'Powers': [
+    ['levitate', 'Levitate', 'Crosses the lower legs and floats above the floor.'],
+    ['shield', 'Raise a shield', 'Opens both arms as a force field lights up around the body.'],
+    ['laser', 'Eye laser', 'Looks at the floor, leaving a smoking scorch mark.'],
+    ['shrink', 'Shrink', 'Runs around at a tiny scale, then returns to normal size.'],
+    ['smoke', 'Smoke teleport', 'Disappears into smoke and emerges from a second cloud.'],
+    ['lightning', 'Lightning', 'Directs electric arcs from the palms into the floor.'],
+    ['fire', 'Fireball', 'Builds a ball between the palms and pushes it along the floor.'],
+    ['ice', 'Ice trail', 'Freezes the floor and slides across it.'],
+    ['portal', 'Portal', 'Dives into one ring and flies out of another.'],
+    ['speed', 'Super speed', 'Accelerates with a motion trail and brakes in a cloud of dust.'],
+    ['clone', 'Clone', 'Creates a copy; both wave and jump.'],
+    ['fly', 'Fly', 'Flies above the floor, using the brand image assigned to the board role.'],
+    ['hulk', 'Become a giant', 'Grows to 3.4 times normal size, examines both hands, takes two heavy steps with dust and shock waves, then shrinks back.'],
+    ['web', 'Web swing', 'Attaches a thread to a card and pulls up onto it.', 'platform'],
+    ['magnet', 'Magnet', 'Attracts an icon, spins it above the palms, then returns it.', 'icon'],
+    ['tracker', 'Mark as done', 'Lowers a stamp onto a tile, leaving a check mark.'],
+    ['disk', 'Throw a disc', 'Takes a disc from a hatch, throws it like a frisbee and catches it.'],
+    ['mail', 'Send a message', 'Sends a message beyond the slide edge and receives a reply.'],
+    ['calendar', 'Remember a meeting', 'A calendar appears overhead, followed by a forehead slap and a quick run.'],
+    ['grapple', 'Grappling hook', 'Throws a hook onto an upper platform and pulls up.', 'platform'],
+    ['construct', 'Build a light copy', 'A ring on the fist assembles a copy of a slide icon.', 'icon']
   ],
-  'Постановочные сцены': [
-    ['land', 'Падение на блок', 'Падает сверху на data-buddy-land и машет.', 'land'],
-    ['stairs', 'Лестница', 'Крюк к первому блоку, проход с паузами, парашют в конце.', 'stairs'],
-    ['parachute', 'Парашют', 'Падение с высоты с гарантированным раскрытием купола.'],
-    ['finale', 'Финальный полёт', 'Летит к data-buddy-fly, ставит лайк и облетает слайд.', 'finale'],
-    ['leap', 'Прыжок на зрителя', 'Приближается до пятикратного масштаба и возвращается на пол.'],
-    ['flip', 'Прыжок с сальто', 'Вариант прыжка на зрителя с оборотом на обратном пути.']
+  'Staged scenes': [
+    ['land', 'Land on a block', 'Drops onto data-buddy-land from above and waves.', 'land'],
+    ['stairs', 'Staircase', 'Hooks onto the first step, climbs with pauses and finishes with a parachute.', 'stairs'],
+    ['parachute', 'Parachute', 'A fall from above with a guaranteed canopy opening.'],
+    ['finale', 'Final flight', 'Flies toward data-buddy-fly, gives a like and circles the slide.', 'finale'],
+    ['leap', 'Leap toward the audience', 'Approaches at up to five times normal size, then returns to the floor.'],
+    ['flip', 'Leap with a flip', 'Leaps toward the audience and somersaults on the way back.']
   ]
 }
 
@@ -97,27 +97,27 @@ const contextModules = [{ techniques: contextTechniques, create: createContextPl
 
 export const techniques = Object.freeze([...Object.entries(groups).flatMap(([group, items]) =>
   items.map(([id, title, description, requires = 'floor']) => Object.freeze({ id, title, description,
-    group: branded.has(id) ? 'Бренд' : group === 'Способности' ? 'Суперхьюман' : group, requires,
-    preset: branded.has(id) ? 'brand' : group === 'Способности' ? 'superhuman' : 'base',
+    group: branded.has(id) ? 'Brand' : group === 'Powers' ? 'Superhuman' : group, requires,
+    preset: branded.has(id) ? 'brand' : group === 'Powers' ? 'superhuman' : 'base',
     ...(contextual.has(id) ? { tags: Object.freeze(['context']) } : {}) }))),
   ...extraTechniques.map(item => contextual.has(item.id) ? Object.freeze({ ...item, tags: Object.freeze(['context']) }) : item), ...allContextTechniques])
 
 export const abilityPresets = Object.freeze({
-  superhuman: Object.freeze({ title: 'Суперхьюман', enabled: true }),
-  brand: Object.freeze({ title: 'Бренд презентации', enabled: false }),
-  y360: Object.freeze({ title: 'Яндекс 360', enabled: false })
+  superhuman: Object.freeze({ title: 'Superhuman', enabled: true }),
+  brand: Object.freeze({ title: 'Presentation brand', enabled: false }),
+  y360: Object.freeze({ title: 'Yandex 360', enabled: false })
 })
 
 const registry = new Map(techniques.map(item => [item.id, item])), owners = new WeakMap(),
   sceneNames = new Set(['land', 'stairs', 'finale', 'leap', 'flip']), bubbles = new Set(['!', '?', '…', 'heart', 'bulb', 'z'])
 
 function resolvePresets(input = {}, brandImages = false) {
-  if (!input || typeof input !== 'object' || Array.isArray(input)) throw new TypeError('Пресеты задаются объектом')
+  if (!input || typeof input !== 'object' || Array.isArray(input)) throw new TypeError('presets must be an object')
   const result = {}
   for (const [key, value] of Object.entries(input))
-    if (!Object.hasOwn(abilityPresets, key) || typeof value !== 'boolean') throw new TypeError(`Неизвестный пресет или значение: ${key}`)
+    if (!Object.hasOwn(abilityPresets, key) || typeof value !== 'boolean') throw new TypeError(`Unknown preset or value: ${key}`)
   for (const [key, value] of Object.entries(abilityPresets)) result[key] = input[key] ?? value.enabled
-  if (input.brand === false && input.y360 === true) throw new TypeError('brand: false несовместим с y360: true')
+  if (input.brand === false && input.y360 === true) throw new TypeError('brand: false cannot be combined with y360: true')
   result.brand = input.brand ?? (result.y360 || brandImages)
   return Object.freeze(result)
 }
@@ -132,7 +132,7 @@ function createContextRouter(raw, options) {
     }
   } catch (error) { for (const player of players) player.destroy(); throw error }
   return {
-    can(id) { const player = routes.get(id); return player ? player.can(id) : 'Неизвестный контекстный приём' },
+    can(id) { const player = routes.get(id); return player ? player.can(id) : 'Unknown context action' },
     create(id) { return routes.get(id)?.create(id) ?? null },
     refresh() { for (const player of players) player.refresh?.() },
     reset() { for (const player of players) player.reset() },
@@ -143,41 +143,41 @@ function createContextRouter(raw, options) {
 /** Подключает одного бадди к сцене 1280×720. Сцена принадлежит вызывающему приложению. */
 export async function createBuddy({ stage, slideSelector = ':scope > .slide', activeClass = 'on', logos = {}, brand: brandOption, mode: modeOption, character = 'curious', autonomous: autonomousOption, autoplay: autoplayOption, profile: profileOption, keyboard = false, motion = 'system', renderer = 'auto', seed = 1,
   presets = {}, reactions = true, hoodie = 'auto', signal } = {}) {
-  if (typeof HTMLElement === 'undefined' || !(stage instanceof HTMLElement)) throw new TypeError('Нужен HTMLElement сцены')
+  if (typeof HTMLElement === 'undefined' || !(stage instanceof HTMLElement)) throw new TypeError('stage must be an HTMLElement')
   if (typeof slideSelector !== 'string' || !slideSelector.trim() || typeof activeClass !== 'string' || !activeClass || /\s/.test(activeClass))
-    throw new TypeError('Нужны CSS-селектор слайдов и одно имя активного класса')
-  if (owners.has(stage)) throw new Error('В этой сцене уже есть бадди')
+    throw new TypeError('Provide a slide CSS selector and a single active class name')
+  if (owners.has(stage)) throw new Error('This stage already has a Buddy instance')
   if (modeOption !== undefined) {
     validateMode(modeOption)
-    if (autonomousOption !== undefined || autoplayOption !== undefined) throw new TypeError('mode нельзя смешивать с autonomous/autoplay')
+    if (autonomousOption !== undefined || autoplayOption !== undefined) throw new TypeError('mode cannot be combined with autonomous/autoplay')
   }
   validateCharacter(character)
   let profile = profileOption ?? (modeOption ? behaviorModes[modeOption].profile : autoplayOption === undefined ? 'show' : 'calm')
   resolveAutoplayProfile(profile)
   if (!['system', 'reduce', 'full'].includes(motion) || !['auto', 'svg'].includes(renderer))
-    throw new TypeError('Неизвестный режим движения или отрисовки')
+    throw new TypeError('Unknown motion or renderer mode')
   // Без настроек бадди живёт сам: ходит, лазает на блоки, проходит лестницу и финал.
   // Явный autoplay (true или false) означает управление через планировщик, и тогда своя жизнь выключена.
   const autonomous = modeOption === undefined ? autonomousOption ?? autoplayOption === undefined : modeOption !== 'manual'
   let autoplay = modeOption === undefined ? autoplayOption ?? !autonomous : false
-  if (typeof autonomous !== 'boolean') throw new TypeError('autonomous — логическое значение')
-  if (autonomous && autoplay) throw new TypeError('autonomous и autoplay взаимоисключающие: своя жизнь бадди уже сама выбирает номера')
+  if (typeof autonomous !== 'boolean') throw new TypeError('autonomous must be a boolean')
+  if (autonomous && autoplay) throw new TypeError('autonomous and autoplay are mutually exclusive: autonomous behavior already selects actions')
   if (typeof autoplay !== 'boolean' || typeof keyboard !== 'boolean' || !Number.isInteger(seed) || seed < 0 || seed > 0xffffffff)
-    throw new TypeError('autoplay и keyboard — логические значения; seed — целое 0…4294967295')
+    throw new TypeError('autoplay and keyboard must be booleans; seed must be an integer from 0 to 4294967295')
   if (reactions !== true && reactions !== false && (!reactions || typeof reactions !== 'object' || Array.isArray(reactions)))
-    throw new TypeError('reactions принимает true, false или настройки реакций')
+    throw new TypeError('reactions must be true, false or a reaction options object')
   if (signal && (typeof signal.addEventListener !== 'function' || typeof signal.removeEventListener !== 'function'))
-    throw new TypeError('signal должен быть AbortSignal')
+    throw new TypeError('signal must be an AbortSignal')
   if (typeof hoodie !== 'string' || hoodie !== 'auto' && hoodie !== 'default' && !parseColor(hoodie))
-    throw new TypeError("hoodie — 'auto', 'default' или цвет #rgb, #rrggbb, rgb()")
-  if (signal?.aborted) throw signal.reason ?? new DOMException('Запуск отменён', 'AbortError')
+    throw new TypeError('hoodie must be \'auto\', \'default\' or a #rgb, #rrggbb or rgb() color')
+  if (signal?.aborted) throw signal.reason ?? new DOMException('Startup aborted', 'AbortError')
   const brand = resolveBrand(brandOption, presets?.y360 === true ? logos : {}),
     enabledPresets = resolvePresets(presets, hasBrandImages(brand)),
     enabled = item => item.preset === 'base' || enabledPresets[item.preset],
     enabledPowers = new Set(techniques.filter(item => enabled(item)).map(item => item.id))
   const slides = [...stage.querySelectorAll(slideSelector)],
     presentation = { slides, activeClass, current: () => slides.find(slide => slide.classList.contains(activeClass)) || slides[0] }
-  if (!slides.length) throw new TypeError('В сцене не найдены слайды по селектору ' + slideSelector)
+  if (!slides.length) throw new TypeError('No slides match the selector ' + slideSelector)
   owners.set(stage, true)
   let outfit, host, raw, player, contextPlayer, slideContext, controller, playback, dead = false, paused = false, living = autonomous,
     mode = modeOption ?? (autonomous || autoplay ? profile === 'show' ? 'show' : 'companion' : 'manual'),
@@ -185,12 +185,12 @@ export async function createBuddy({ stage, slideSelector = ':scope > .slide', ac
     behavior = createBehaviorPolicy(profile, character, techniques)
   try {
     const dependencies = renderer === 'auto' ? await import('./vendor.js') : null
-    if (signal?.aborted) throw signal.reason ?? new DOMException('Запуск отменён', 'AbortError')
+    if (signal?.aborted) throw signal.reason ?? new DOMException('Startup aborted', 'AbortError')
     if (brandOption == null && enabledPresets.y360 && ['disk', 'mail', 'calendar', 'tracker'].some(id => !logos?.[id]))
-      console.warn('Бадди: не все знаки пресета y360 переданы через logos; вместо отсутствующих знаков используется нейтральный реквизит. Пример подключения: examples/y360.html.')
+      console.warn('Buddy: some y360 images are missing from logos; missing images use neutral props. See examples/y360.html.')
     const { offsetWidth: width, offsetHeight: height } = stage
     if (width > 0 && height > 0 && (Math.abs(width - 1280) > 1 || Math.abs(height - 720) > 1))
-      console.warn(`Бадди: размер сцены ${width}×${height}; нужен логический размер 1280×720. Для другого окна масштабируйте всю сцену через transform: scale().`)
+      console.warn(`Buddy: stage size is ${width}×${height}; expected a logical size of 1280×720. Scale the entire stage with transform: scale() to fit the viewport.`)
     // цвет худи считывается до появления самого бадди на сцене
     outfit = resolveHoodie(hoodie === 'auto' && brand.accent ? brand.accent : hoodie, stage, undefined, slides)
     if (hoodie === 'auto' && brand.accent) outfit.source = 'brand'
@@ -204,7 +204,7 @@ export async function createBuddy({ stage, slideSelector = ':scope > .slide', ac
       svg.style.cssText = 'position:absolute;left:0;top:0;width:1280px;height:720px;overflow:visible'
     raw.seed(seed)
     await raw.ready
-    if (signal?.aborted) throw signal.reason ?? new DOMException('Запуск отменён', 'AbortError')
+    if (signal?.aborted) throw signal.reason ?? new DOMException('Startup aborted', 'AbortError')
     player = createAbilityPlayer(raw, { host })
     slideContext = createSlideContext({ stage, presentation, techniques: allContextTechniques, onRefresh: () => contextPlayer?.refresh?.() })
     contextPlayer = createContextRouter(raw, { host, context: id => slideContext.resolve(id) })
@@ -219,29 +219,29 @@ export async function createBuddy({ stage, slideSelector = ':scope > .slide', ac
     throw error
   }
 
-  const active = () => { if (dead) throw new Error('Бадди уже отключён') },
-    finite = (n, min, max) => { if (!Number.isFinite(n) || n < min || n > max) throw new RangeError(`Число вне диапазона ${min}…${max}`) },
+  const active = () => { if (dead) throw new Error('Buddy has been destroyed') },
+    finite = (n, min, max) => { if (!Number.isFinite(n) || n < min || n > max) throw new RangeError(`Value outside range ${min}…${max}`) },
     check = id => {
       const item = registry.get(id)
-      if (!item) throw new RangeError(`Неизвестный приём: ${id}`)
+      if (!item) throw new RangeError(`Unknown action: ${id}`)
       const slide = presentation.current(),
         world = raw.W, state = raw.state(), requirement = item.requires
-      if (!enabled(item)) return `Пресет «${abilityPresets[item.preset].title}» выключен`
+      if (!enabled(item)) return `Preset "${abilityPresets[item.preset].title}" is disabled`
       if (item.contextKinds && !slideContext.resolve(id)) {
         const context = slideContext.snapshot(), issue = context.issues.find(issue => item.contextKinds.includes(issue.kind))
-        return context.selectedId ? 'Выбранный источник несовместим с этим номером' : issue?.reason
-          || 'Нет однозначного совместимого источника; выберите факт на слайде'
+        return context.selectedId ? 'The selected source is incompatible with this action' : issue?.reason
+          || 'No unambiguous compatible source; select a fact on the slide'
       }
-      if (requirement === 'floor' && (state.surf !== 'floor' || raw.B.mode !== 'ground')) return 'Нужна стойка на полу'
-      if (requirement === 'wall' && !world.walls.length) return 'Нет доступной стены'
-      if (requirement === 'platform' && !world.plats.length) return 'Нет доступной площадки'
-      if (requirement === 'icon' && !slide.querySelector('svg, img')) return 'На слайде нет иконки'
-      if (requirement === 'brand' && !world.logo?.spans.length) return 'Не задана опора .brand'
-      if (requirement === 'elevated' && state.surf === 'floor') return 'Персонаж уже на полу'
-      if (requirement === 'land' && !slide.querySelector('[data-buddy-land]')) return 'Нужен блок data-buddy-land'
-      if (requirement === 'stairs' && !slide.querySelector('[data-buddy-stairs]')) return 'Нужна лестница data-buddy-stairs'
-      if (requirement === 'finale' && !slide.querySelector('[data-buddy-fly], .tile.main')) return 'Нужна цель data-buddy-fly'
-      if (id === 'handstand' && state.level < 1 || id === 'backflip' && state.level < 3) return 'Недостаточный уровень смелости'
+      if (requirement === 'floor' && (state.surf !== 'floor' || raw.B.mode !== 'ground')) return 'Requires a standing pose on the floor'
+      if (requirement === 'wall' && !world.walls.length) return 'No accessible wall'
+      if (requirement === 'platform' && !world.plats.length) return 'No accessible platform'
+      if (requirement === 'icon' && !slide.querySelector('svg, img')) return 'No icon on the slide'
+      if (requirement === 'brand' && !world.logo?.spans.length) return 'No .brand perch configured'
+      if (requirement === 'elevated' && state.surf === 'floor') return 'Already on the floor'
+      if (requirement === 'land' && !slide.querySelector('[data-buddy-land]')) return 'Requires a data-buddy-land block'
+      if (requirement === 'stairs' && !slide.querySelector('[data-buddy-stairs]')) return 'Requires a data-buddy-stairs staircase'
+      if (requirement === 'finale' && !slide.querySelector('[data-buddy-fly], .tile.main')) return 'Requires a data-buddy-fly target'
+      if (id === 'handstand' && state.level < 1 || id === 'backflip' && state.level < 3) return 'Confidence level is too low'
       if (item.contextKinds) return contextPlayer.can(id)
       return raw.availability(id)
     }
@@ -280,7 +280,7 @@ export async function createBuddy({ stage, slideSelector = ':scope > .slide', ac
     can(id) { active(); raw.ensureWorld(); return check(id) },
     play(id) {
       active()
-      if (!registry.has(id)) throw new RangeError(`Неизвестный приём: ${id}`)
+      if (!registry.has(id)) throw new RangeError(`Unknown action: ${id}`)
       // Сам runtime сообщает об успешном замещении; недоступная команда историю не отменяет.
       return launch(id)
     },
@@ -289,7 +289,7 @@ export async function createBuddy({ stage, slideSelector = ':scope > .slide', ac
     sequence(ids) {
       active()
       if (!Array.isArray(ids) || !ids.length || ids.some(id => !registry.has(id) || !enabled(registry.get(id)) || sceneNames.has(id) || id === 'parachute'))
-        throw new TypeError('Последовательность принимает непустой список действий и способностей без постановочных сцен')
+        throw new TypeError('sequence requires a nonempty list of actions and powers without staged scenes')
       if (raw.reduced) return false
       raw.rescan()
       if (ids.some(id => registry.get(id)?.contextKinds)) slideContext.refresh()
@@ -301,8 +301,8 @@ export async function createBuddy({ stage, slideSelector = ':scope > .slide', ac
     resume() { active(); paused = false; raw.manual(false); syncAutomation() },
     step(seconds = 1 / 60, fps = 60) { active(); finite(seconds, 0, 300); finite(fps, 1, 240); paused = true; controller?.pause(); raw.manual(true); raw.step(seconds, fps) },
     reset() { active(); contextPlayer.reset(); raw.rescan(); raw.reset(); controller?.activity() },
-    autoplay(on) { active(); if (typeof on !== 'boolean') throw new TypeError('Ожидается логическое значение'); if (on) living = false; autoplay = on; mode = living || autoplay ? profile === 'show' ? 'show' : 'companion' : 'manual'; syncAutomation() },
-    setAutonomous(on) { active(); if (typeof on !== 'boolean') throw new TypeError('Ожидается логическое значение'); if (on) autoplay = false; living = on; mode = living || autoplay ? profile === 'show' ? 'show' : 'companion' : 'manual'; syncAutomation() },
+    autoplay(on) { active(); if (typeof on !== 'boolean') throw new TypeError('Expected a boolean'); if (on) living = false; autoplay = on; mode = living || autoplay ? profile === 'show' ? 'show' : 'companion' : 'manual'; syncAutomation() },
+    setAutonomous(on) { active(); if (typeof on !== 'boolean') throw new TypeError('Expected a boolean'); if (on) autoplay = false; living = on; mode = living || autoplay ? profile === 'show' ? 'show' : 'companion' : 'manual'; syncAutomation() },
     setProfile(id) { active(); resolveAutoplayProfile(id); profile = id; updateBehavior(); controller.setProfile(id) },
     setCharacter(id) { active(); validateCharacter(id); character = id; updateBehavior() },
     setMode(id) {
@@ -311,18 +311,18 @@ export async function createBuddy({ stage, slideSelector = ':scope > .slide', ac
       syncAutomation()
     },
     focus(on = true) {
-      active(); if (typeof on !== 'boolean') throw new TypeError('Ожидается логическое значение')
+      active(); if (typeof on !== 'boolean') throw new TypeError('Expected a boolean')
       focusing = on
       if (on) playback.cancel()
       raw.focus(on); syncAutomation()
     },
-    setReactions(on) { active(); if (typeof on !== 'boolean') throw new TypeError('Ожидается логическое значение'); reacting = on; syncAutomation() },
+    setReactions(on) { active(); if (typeof on !== 'boolean') throw new TypeError('Expected a boolean'); reacting = on; syncAutomation() },
     progress(value) { active(); finite(value, 0, 1); raw.progress(value) },
-    say(kind) { active(); if (!bubbles.has(kind)) throw new RangeError('Неизвестный пузырь'); if (!raw.reduced) raw.say(kind) },
+    say(kind) { active(); if (!bubbles.has(kind)) throw new RangeError('Unknown bubble'); if (!raw.reduced) raw.say(kind) },
     lookAt(target, duration = 1.5) {
       active(); finite(duration, .05, 60)
       if (target === null) { raw.mind().look(null); return }
-      if (!target || ![target.x, target.y, target.z ?? 0].every(Number.isFinite)) throw new TypeError('Нужна конечная точка {x,y,z?} сцены')
+      if (!target || ![target.x, target.y, target.z ?? 0].every(Number.isFinite)) throw new TypeError('Expected a finite stage point {x,y,z?}')
       raw.mind().look({ x: target.x, y: target.y, z: target.z ?? 0 }, duration)
     },
     state() { active(); return { ...raw.state(), grounded: raw.B.mode === 'ground', paused, autoplay, autonomous: living, mode, character, performing: !!playback?.running, renderer: raw.renderer, reducedMotion: raw.reduced } },

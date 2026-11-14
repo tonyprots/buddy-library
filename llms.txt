@@ -1,18 +1,18 @@
-# Бадди
+# Buddy
 
-> Локальная библиотека анимированного героя для HTML-презентаций.
-> Эта карта помогает найти инструкции; автоматическое чтение агентом не гарантируется.
+> An animated companion library for HTML presentations.
+> This map helps coding agents find documentation; automatic discovery is not guaranteed.
 
-## Начало
+## Start here
 
-- [README](README.md): прямой файл dist/buddy.js, подключение одним скриптом, активные настройки.
-- [Интеграция агентом](docs/agent-integration.md): сохранение навигации и лёгкая проверка.
-- [Рабочий пример](examples/quick-start.html): мини-дека без сервера и сборки.
-- [Бренд презентации](examples/brand.html): вымышленный набор, подключённый через JSON.
+- [README](README.md): dist/buddy.js, one-script integration and active defaults.
+- [Agent integration](docs/agent-integration.md): preserve navigation and verify with a light check.
+- [Quick-start deck](examples/quick-start.html): no server or build step.
+- [Presentation brand](examples/brand.html): a fictional brand configured through JSON.
 
-## Справочники
+## References
 
-- [API](docs/api.md): режимы, сценарии, жизненный цикл, ESM.
-- [Контекст](docs/slide-context.md): данные слайда для постановки.
-- [Реакции](docs/slide-reactions.md): автоматическое поведение.
-- [Разработка](CONTRIBUTING.md): только для изменения библиотеки.
+- [API](docs/api.md): modes, stories, lifecycle and ESM.
+- [Slide context](docs/slide-context.md): source data for contextual actions.
+- [Reactions](docs/slide-reactions.md): automatic behavior.
+- [Contributing](CONTRIBUTING.md): only for changes to the library itself.

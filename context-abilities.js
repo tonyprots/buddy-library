@@ -3,13 +3,13 @@ import { reachArm } from './new-abilities.js'
 import { contextSource, sameContextSource } from './context-source.js'
 
 const entries = [
-  ['laptopNotes', 'Записать в ноутбук', 'Садится, раскрывает ноутбук на коленях, записывает выбранный факт и закрывает экран.', 8.6, ['text', 'number', 'keyword']],
-  ['thinkNumber', 'Обдумать число', 'Перечитывает точное число с единицей, показывает его в облачке мысли и возвращается к слайду.', 7.2, ['number']],
-  ['hologramObject', 'Спроецировать объект', 'Связывает кольцо с выбранным изображением, поднимает его проекцию и сворачивает её обратно.', 7.8, ['object']],
-  ['hologramKeyword', 'Спроецировать понятие', 'Выводит из кольца объёмный образ выбранного понятия и точное слово со слайда.', 8, ['keyword']],
-  ['traceFocus', 'Подчеркнуть факт', 'Находит выбранную цель, проводит световое подчёркивание и возвращает руку.', 6, ['number', 'text', 'keyword', 'object', 'card']],
-  ['peekCard', 'Выглянуть из-за карточки', 'Подходит, прячется за карточкой, выглядывает над кромкой и возвращается на пол.', 9.2, ['card']],
-  ['perchRead', 'Прочитать с карточки', 'Взбирается по доступной кромке, читает карточку и спускается тем же путём.', 12.8, ['card']]
+  ['laptopNotes', 'Take laptop notes', 'Sits down, opens a laptop on the knees, records the selected fact and closes the screen.', 8.6, ['text', 'number', 'keyword']],
+  ['thinkNumber', 'Think about a number', 'Rereads the exact number with its unit, shows it in a thought bubble and looks back at the slide.', 7.2, ['number']],
+  ['hologramObject', 'Project an object', 'Links the ring to a selected image, raises its projection and folds it back.', 7.8, ['object']],
+  ['hologramKeyword', 'Project a concept', 'Projects a 3D representation of the selected concept and the exact word from the slide.', 8, ['keyword']],
+  ['traceFocus', 'Underline a fact', 'Locates the selected target, draws a light underline and lowers the hand.', 6, ['number', 'text', 'keyword', 'object', 'card']],
+  ['peekCard', 'Peek over a card', 'Walks up to a card, hides behind it, peeks over the edge and returns to the floor.', 9.2, ['card']],
+  ['perchRead', 'Read from a card', 'Climbs an accessible edge, reads the card and descends the same way.', 12.8, ['card']]
 ], concepts = new Set(['memory', 'target', 'team', 'chain', 'link', 'cloud', 'rules', 'search']),
   clamp = (x, a = 0, b = 1) => Math.max(a, Math.min(b, x)),
   smooth = x => (x = clamp(x), x * x * (3 - 2 * x)),
@@ -19,7 +19,7 @@ const entries = [
 
 export const contextTechniques = Object.freeze(entries.map(([id, title, description, duration, kinds]) =>
   Object.freeze({ id, title, description, duration, contextKinds: Object.freeze(kinds), requires: 'floor',
-    group: 'Контекст слайда', tags: Object.freeze(['context']),
+    group: 'Slide context', tags: Object.freeze(['context']),
     preset: id.startsWith('hologram') ? 'superhuman' : 'base' })))
 
 const registry = new Map(contextTechniques.map(item => [item.id, item])),
@@ -90,15 +90,15 @@ export function createContextPlayer(raw, { host, context = () => null } = {}) {
     },
     can = id => {
       const entry = registry.get(id)
-      if (!entry) return 'Неизвестный контекстный приём'
-      if (dead) return 'Проигрыватель отключён'
-      if (raw.reduced) return 'Движение сокращено'
-      if (B.surf?.kind !== 'floor' || B.mode !== 'ground') return 'Нужна стойка на полу'
+      if (!entry) return 'Unknown context action'
+      if (dead) return 'Player has been destroyed'
+      if (raw.reduced) return 'Reduced motion'
+      if (B.surf?.kind !== 'floor' || B.mode !== 'ground') return 'Requires a standing pose on the floor'
       const selection = context(id)
-      if (!valid(selection) || !entry.contextKinds.includes(selection.fact.kind)) return 'На слайде нет подходящего факта'
-      if (id === 'hologramKeyword' && !concepts.has(selection.fact.concept)) return 'Для понятия не задан подготовленный образ'
-      if (id === 'hologramObject' && !/^(img|svg)$/i.test(selection.element?.tagName || '')) return 'Нужно изображение или SVG'
-      if ((id === 'peekCard' || id === 'perchRead') && !route(selection)) return 'Нет безопасной кромки и пути к выбранной карточке'
+      if (!valid(selection) || !entry.contextKinds.includes(selection.fact.kind)) return 'No suitable fact on the slide'
+      if (id === 'hologramKeyword' && !concepts.has(selection.fact.concept)) return 'No prepared visual for this concept'
+      if (id === 'hologramObject' && !/^(img|svg)$/i.test(selection.element?.tagName || '')) return 'Requires an image or SVG'
+      if ((id === 'peekCard' || id === 'perchRead') && !route(selection)) return 'No safe edge and route to the selected card'
       return null
     }
 

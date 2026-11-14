@@ -1,63 +1,63 @@
-# Разработка
+# Contributing
 
-Этот файл для тех, кто меняет саму библиотеку. Пользователю пакета хватит
-[README](README.md). В npm-пакет попадают только файлы из поля `files`
-в `package.json`; всё, что описано ниже, остаётся в репозитории.
+This guide is for changes to the library itself. To integrate Buddy into a
+presentation, use the [README](README.md) and [agent guide](docs/agent-integration.md).
+Only the package.json `files` allowlist is included in the TGZ.
 
-## Устройство
+## Architecture
 
-| Файл | Назначение |
+| Module | Responsibility |
 |---|---|
-| `index.js` | `createBuddy`, проверка настроек, каталог и пресеты |
-| `behavior.js`, `playback.js` | Общая политика автоматического выбора, сценарии и отмена |
-| `brand.js` | Общий набор бренда и адаптация прежних сервисных ключей в роли |
-| `runtime.js` | Скелет, физика, карта опор, движения, своя жизнь |
-| `vendor.js` | Three.js r186, GLTFLoader, модель Quaternius и 3D-риг одним модулем |
-| `new-abilities.js`, `ability-props.js` | Дополнительные номера и их объёмный реквизит |
-| `slide-intelligence.js` | Классификация слайдов, планировщик `autoplay`, реакции |
-| `slide-context.js`, `context-*.js` | Факты слайда и 17 контекстных историй |
-| `camera.js` | Кадрирование стенда `index.html` |
-| `effects.js` | Интро со взрывом обложки |
-| `presets/y360.js` | Номера со знаками сервисов, выключены по умолчанию |
-| `scripts/build.mjs` | Основной `dist/buddy.js` и отдельный пример `dist/buddy-y360.js` |
+| index.js | createBuddy, validation, catalog and presets |
+| behavior.js, playback.js | Shared automatic policy, stories and cancellation |
+| brand.js | General brand configuration and legacy service-key adapter |
+| runtime.js | Skeleton, physics, supports, movement and autonomous behavior |
+| vendor.js | Bundled Three.js r186, GLTFLoader, Quaternius model and rig |
+| new-abilities.js, ability-props.js | Additional actions and 3D props |
+| slide-intelligence.js | Classification, autoplay and reactions |
+| slide-context.js, context-*.js | Source facts and 17 context actions |
+| camera.js | Catalog framing |
+| effects.js | Cover breakout intro |
+| presets/y360.js | Optional example assets, not enabled by import |
+| scripts/build.mjs | Main buddy.js and separate buddy-y360.js bundles |
 
-Внутренние заметки для авторов движений — в `docs/dev/`: контракт рига
-и реквизита, реквизит способностей, рендерер и качество рисовки.
+See `docs/dev/` for the [rig contract](docs/dev/internal-rig-contract.md),
+[prop builders](docs/dev/ability-props.md), [additional actions](docs/dev/new-abilities.md)
+and renderer notes.
 
-## Команды
+## Commands
 
 ```bash
-npm install          # только esbuild для сборки dist/
-npm run check        # синтаксис всех модулей
-npm test             # быстрый набор, около 20 с
-npm run test:slow    # тяжёлая геометрия контактов и зазоров, около 45 с
-npm run test:all     # оба набора
-npm run build        # dist/buddy.js
-npm pack             # перед упаковкой сборка запускается сама (prepack)
-npm run export -- drafts/public-export  # Python 3: web/source ZIP без приватного дерева
+npm install          # esbuild for dist only
+npm run check        # Module syntax
+npm test             # Fast suite
+npm run test:slow    # Model geometry, contacts and clearances
+npm run test:all     # Both suites
+npm run build        # Classic bundles
+npm pack             # prepack rebuilds automatically
+npm run export -- drafts/public-export  # Python 3; web/source ZIPs
 ```
 
-Тесты не требуют браузера и зависимостей: DOM подменяется фикстурами
-из `tests/support/`. `tests/slow/` проверяет настоящую геометрию модели
-(ладони, глаза, зазоры реквизита) по всему циклу движения с шагом до 120 Гц.
+Unit tests need no browser or installed dependencies. DOM fixtures are in
+`tests/support/`; slow tests examine actual mesh geometry across motion cycles,
+with sampling up to 120 Hz. Keep identifiers stable when translating labels.
+Russian input fixtures deliberately exercise multilingual slide recognition.
 
-## Браузерные проверки
+## Browser checks
 
-`tests/browser/` — сценарии на локальном Chromium через CDP без сторонних
-зависимостей. Браузер ищется сам; другой путь задаётся `BUDDY_CHROME`.
-Отчёты и кадры пишутся в `drafts/` (не попадает ни в git, ни в пакет).
+The CDP harness in `tests/browser/` uses a local Chromium without extra packages.
+Set `BUDDY_CHROME` to override browser discovery. Reports and screenshots go to
+`drafts/`, outside git and packages. Run browser scenarios sequentially.
 
 ```bash
-node tests/browser/browser-check.mjs            # жизненный цикл, пресеты, приёмы, реакции, интро
-node tests/browser/context-browser-check.mjs    # контекст слайда, первая серия
+node tests/browser/browser-check.mjs
+node tests/browser/context-browser-check.mjs
 node tests/browser/context-stories-browser-check.mjs
 node tests/browser/behavior-browser-check.mjs
+node tests/browser/integration-example-check.mjs . brand.html
 ```
 
-Запускайте их по одному. Сценарии для личных презентаций не входят в публичную поставку.
-`*-capture.mjs` снимают покадровые ролики для ручного просмотра.
-
-Для проверки движения в масштабе целого слайда:
+Capture motion at full-slide scale:
 
 ```bash
 BUDDY_CAPTURE_IDS=climb BUDDY_CAPTURE_VIEW=overview \
@@ -65,57 +65,47 @@ BUDDY_CAPTURE_IDS=climb BUDDY_CAPTURE_VIEW=overview \
   node tests/browser/catalog-quality-capture.mjs
 ```
 
-`BUDDY_CAPTURE_VIEW` выбирает камеру записи: `overview` — весь слайд,
-`closeup` — крупный план, `auto` — автокадр (по умолчанию).
-Дополнительные крупные фазы сохраняются во всех режимах. `BUDDY_PERF_VIEW`
-независимо задаёт ракурс замера производительности. Для каждого нового снимка
-исходников или настроек нужна новая папка: сборщик проверяет хэши при продолжении.
-Видео содержит модельные 24 кадра/с и само по себе не доказывает реальный FPS.
+`BUDDY_CAPTURE_VIEW` selects overview, closeup or auto (default).
+`BUDDY_PERF_VIEW` independently selects the performance measurement view.
+Use a new output folder when source or settings change; resumed captures verify
+hashes. A video exported at 24 simulation frames per second does not prove real-time FPS.
 
-## Как добавить движение
+## Adding an action
 
-Основные действия — в `runtime.js`, дополнительные — в `new-abilities.js`,
-их объёмные предметы — в `ability-props.js` (через `prop3`). Реестр
-`techniques` в `index.js` — единственный каталог для API и стенда; новый ID
-нужно добавить и в `TechniqueId` в `index.d.ts` (это проверяет тест).
+Core actions live in runtime.js; additional actions in new-abilities.js and their
+props in ability-props.js through `prop3`. The shared techniques registry drives
+both the API and catalog. Add each new ID to TechniqueId in index.d.ts as well.
 
-Порядок работы: сценическая задача и условия запуска, затем поза, тайминг,
-эффект и очистка. У скелета скалярные каналы `rot`, `tl`, `ts`, `hp`, `hy`,
-`mouth`, `smile`, `lid`, `brow` и парные `sf`, `sa`, `ef`, `ea`, `hf`, `ha`,
-`kf`, `ka`, `af`. Угол предплечья задаётся в абсолютных осях (`sf + ef`).
-Для кистей 3D-риг принимает `handOpen`, `handFist`, `handShape`.
+Define intent and preconditions before poses, timing, effects and cleanup.
+Scalar pose channels are rot, tl, ts, hp, hy, mouth, smile, lid, brow; paired
+channels are sf, sa, ef, ea, hf, ha, kf, ka, af. Forearm angles use absolute axes
+(sf + ef). The rig also accepts handOpen, handFist and handShape metadata.
 
-- Позы под реквизит подбирайте по целевым координатам кистей:
-  `buddy.experimental.kin(pose)` отдаёт суставы и оси головы.
-- Общую константу позы нельзя мутировать во время кадра — копируйте её.
-- На каждом кадре не создавайте DOM-узлы, векторы и материалы: создавайте
-  при старте, обновляйте значения, удаляйте при завершении и прерывании.
+Use `buddy.experimental.kin(pose)` to inspect joints and head axes. Copy shared
+pose constants before editing. Create DOM, vectors and materials at setup,
+update existing values per frame, and clean up on completion and interruption.
 
-## Выпуск
+## Releases
 
-Экспорт создаёт отдельное дерево исходников без истории git, внутренних заметок
-и личных дек. Именно оно предназначено для будущего репозитория.
-Скрипт отказывается перезаписывать результаты; для следующего запуска выберите
-новую папку. ZIP имеет фиксированные метаданные и manifest.sha256.json.
-Создание репозитория, push и npm publish выполняются отдельно, по решению владельца.
-Подготовка страницы репозитория и выпуска — в [памятке публикации](docs/publishing.md).
-Для дополнительных локальных ограничений экспорта задайте
-`BUDDY_EXPORT_PRIVATE_TERMS` как JSON-массив строк. Эти строки проверяются
-при экспорте, но не записываются в публичные файлы.
+Export produces a clean tree without local git history, private notes or personal
+decks. It refuses to overwrite existing output. ZIP metadata is deterministic and
+includes manifest.sha256.json; the manifest is not committed to git.
+`BUDDY_EXPORT_PRIVATE_TERMS` can add a local JSON list of prohibited strings
+without writing those strings into public files.
 
-1. Обновить версию в `package.json` и запись в `CHANGELOG.md`.
-2. `npm run check && npm run test:all`.
-3. `npm pack` и проверка архива в чистой папке, как у внешнего пользователя:
+1. Update package.json and CHANGELOG.md.
+2. Run syntax and relevant tests, then the complete suite before release.
+3. Build and pack; verify the TGZ with `scripts/check-package.py`.
+4. Export to a new folder and check the source tree independently.
+5. Install the TGZ into a clean consumer project and check ESM, classic and
+   bundled use with `tests/browser/package-check/verify.mjs`.
+6. Publish through the [release workflow](docs/publishing.md), then download and
+   verify the actual release files.
 
-   ```bash
-   mkdir /tmp/buddy-app && cp tests/browser/package-check/*.{html,css,js} /tmp/buddy-app/
-   cd /tmp/buddy-app && npm init -y && npm install /путь/к/tony-prots-buddy-X.Y.Z.tgz
-   npx esbuild app.js --bundle --format=esm --outfile=bundle.js
-   for s in life classic bundled scenes effects keys reduced; do
-     node /путь/к/библиотеке/tests/browser/package-check/verify.mjs /tmp/buddy-app $s
-   done
-   ```
+For a package consumer check, copy the HTML/CSS/JS fixtures from
+`tests/browser/package-check/` into an empty application, install the local TGZ,
+and bundle app.js with esbuild. Run verify.mjs with the application directory and
+one scenario: defaults, behavior, optional-brand, life, classic, bundled, scenes,
+effects, keys or reduced. Screenshots are written under the consumer's shots/ folder.
 
-   Сценарии проверяют страницу из README через ES-модули, `dist/buddy.js`
-   через `file://`, сборку сборщиком, сцены, интро, клавиши и reduced motion.
-   Кадры сохраняются в `/tmp/buddy-app/shots/`.
+Consumers do not need this workflow merely to add Buddy to a presentation.

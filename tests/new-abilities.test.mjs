@@ -161,7 +161,7 @@ test('оклик виден в SVG без 3D-реквизита и плаща, �
       f.advance(1.8)
       assert.equal(f.history.length, 0, 'Оклик не создаёт объёмные волны')
       assert.equal(f.raw.B.act.power, false, 'Оклик не включает плащ')
-      const effect = f.raw.B.fxs.find(item => item.el.children.some(child => child.tagName === 'TEXT' && child.textContent === 'Эй!'))
+      const effect = f.raw.B.fxs.find(item => item.el.children.some(child => child.tagName === 'TEXT' && child.textContent === 'Hey!'))
       assert.ok(effect, 'Облачко с окликом действительно создано')
       assert.ok(effect.el.parentNode, 'Облачко находится в SVG-сцене')
       assert.ok(Number(effect.el.getAttribute('opacity')) > .9, 'Оклик виден в фазе обращения к залу')

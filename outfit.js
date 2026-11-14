@@ -116,7 +116,7 @@ export function collectColorSamples(stage, getStyle = globalThis.getComputedStyl
 /** Палитра худи из одного цвета: основа с поджатыми насыщенностью и светлотой, свет, тень, контур. */
 export function hoodiePalette(color) {
   const rgb = Array.isArray(color) ? color : parseColor(color)
-  if (!rgb) throw new TypeError('Цвет худи: #rgb, #rrggbb или rgb()')
+  if (!rgb) throw new TypeError('Hoodie color must be #rgb, #rrggbb or rgb()')
   const [h, s0, l0] = toHsl(rgb), s = clamp(s0, .55, .95), l = clamp(l0, .42, .58)
   const base = toHex(fromHsl(h, s, l))
   return Object.freeze({

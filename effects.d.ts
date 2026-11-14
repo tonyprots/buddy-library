@@ -4,7 +4,7 @@ export type IntroVariant = 'line' | 'leap' | 'flip'
 export interface DeckEffectsOptions {
   stage: HTMLElement
   buddy: Pick<Buddy, 'experimental' | 'reducedMotion'>
-  /** Синхронно переключает .on на слайд с указанным индексом. */
+  /** Synchronously moves the .on class to the slide at this index. */
   show(index: number): void
   keyboard?: boolean
 }

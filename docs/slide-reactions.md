@@ -1,210 +1,153 @@
-# Автопилот и реакции на слайды
+# Automatic behavior and slide reactions
 
-С версии 0.8 режимы `manual`, `companion`, `show` согласуют самостоятельную
-жизнь и реакции. Профиль и характер ограничивают автоматический репертуар
-обоих механизмов. По умолчанию — любопытный герой в режиме `show`: способности включены,
-репертуар расширяется, а пауза между номерами сокращается к финалу.
-`companion` с профилем `live` остаётся более сдержанным явным выбором.
-Старый явный `autoplay` включает отдельный планировщик с профилем `calm`.
+Buddy has one controller for semantic reactions and scheduled actions. Autonomous
+movement is active by default, with show/curious settings. Use mode, character and
+profile controls described in the [API reference](api.md#default-behavior).
 
-Контроллер использует разметку, размеры DOM-элементов и доступность приёмов.
-Он не анализирует пиксели и смысл произвольного текста; сетевых запросов нет.
-Во время `story()` и `focus()` реакции приостановлены. Подробности режимов,
-характера и сценариев — в [справочнике](api.md#режим-характер-и-внимание).
+## Rhythm and scheduling
 
-## Управление
+`autoplay()` controls the separate interval scheduler; `setReactions()` controls
+slide-content reactions. `pause()` suspends both and simulation time;
+`resume()` restores their settings. Changing profiles does not interrupt an action.
 
-```js
-const buddy = await createBuddy({
-  stage,
-  profile: 'calm',
-  seed: 14,
-  autoplay: true,
-  reactions: true
-})
-
-buddy.setProfile('live')
-buddy.autoplay(false)      // самостоятельные номера выключены
-buddy.setReactions(true)  // реакции на смену слайда остаются включены
-console.log(buddy.intelligence.inspect())
-```
-
-`autoplay` и `reactions` независимы. Оба выключены — контроллер продолжает
-обновлять диагностику при изменении сцены, но не планирует номера.
-`pause()` и ручной `step()` останавливают оба режима; `resume()` возвращает
-их прежние настройки. Смена профиля и переключателей не прерывает текущий номер.
-
-| Профиль | Тихое окно после смены | Минимум между событиями | Интервал самостоятельных действий | Репертуар |
+| Profile | Quiet window | Minimum cooldown | Scheduled action interval | Repertoire |
 |---|---:|---:|---:|---|
-| `calm` — спокойный | 6 с | 45 с | 45–50 с | Взгляд, приветствие, представление, чтение, заметки, растяжка, прогулка |
-| `live` — живой | 4 с | 24 с | 24–30 с | Жесты, зонт, фонарик, разминка, ходьба, лазанье и подпись |
-| `show` — шоу | 2,5 с | 14 с | 14–18 с | Разнообразные старые и новые номера, акробатика и способности |
+| calm | 6 s | 45 s | 45–50 s | Glances, greetings, presenting, reading, notes, stretching, walks |
+| live | 4 s | 24 s | 24–30 s | Gestures, umbrella, flashlight, warm-up, walking, climbing, signature |
+| show | 2.5 s | 14 s | 14–18 s | Broader repertoire, acrobatics and powers |
 
-Эти интервалы относятся к отдельному планировщику `autoplay` и реакциям.
-У включённой по умолчанию самостоятельной жизни частота выбора номеров растёт
-по доле пройденной деки: в `show` примерно от 25–34 до 10–13 секунд.
-Текущий номер завершается до следующего выбора. На одной странице используется
-середина диапазона; ручной `progress()` управляет и смелостью, и темпом.
+These timings govern reactions and explicit autoplay. Default autonomous behavior
+also responds to deck progress: in show mode its power selection interval decreases
+from about 25–34 to 10–13 seconds. Current actions finish first. Single-slide decks
+use the middle of the range; `progress()` controls confidence and pace manually.
 
-В `autoplayProfiles` экспортированы точные наборы `actions` и настройки.
-`ambientMs` содержит исходный диапазон случайной задержки; итоговая задержка
-не короче `cooldownMs`. Пресеты и геометрические условия дополнительно
-ограничивают репертуар: профиль шоу сам не включает пресет `y360`.
+`autoplayProfiles` exports exact action sets and timing options. `ambientMs` is the
+raw random-delay range; the final delay is at least `cooldownMs`. Presets and actual
+geometry further limit availability. Show does not enable Y360 images.
 
-Порядок кандидатов перемешивается локальным генератором с `seed`. Одинаковые
-`seed`, события и доступность дают одинаковый выбор. Последний приём не повторяется
-подряд; кандидаты самостоятельных номеров выбираются из перемешанного набора,
-а не из списка по порядку. Диагностика не расходует случайные значения.
-Фактическое время в браузере зависит от загрузки и времени завершения движений.
+A seeded generator shuffles candidates. Equal seeds, events and availability give
+equal choices. The previous action is not repeated immediately; inspection does
+not consume randomness. Browser timing still depends on load and action duration.
 
-Параметры `reactions:{quietMs,cooldownMs,revisitMs,staleMs,debounceMs,onReaction}`
-позволяют переопределить интервалы. `cooldownMs` действует на оба режима.
-Все интервалы — миллисекунды. Ручной `play()`, `sequence()` или `reset()`
-пропускает реакцию текущего посещения и начинает новую общую паузу.
+`reactions: { quietMs, cooldownMs, revisitMs, staleMs, debounceMs, onReaction }`
+overrides timing in milliseconds. Cooldown applies to both controller modes.
+Manual play, sequence and reset skip the current visit's reaction and start a new
+shared cooldown.
 
-## Сцена → реакция
+## Slide classification
 
-Порядок ниже — порядок распознавания. Явная роль имеет приоритет.
-Число `confidence` — фиксированная оценка правила, а не вероятность модели.
+Rules run in this order; explicit markup takes precedence. Confidence is a fixed
+rule score, not a statistical probability.
 
-| Сцена | Как определяется | Кандидаты реакции | Условия |
-|---|---|---|---|
-| `off` | `data-buddy-react="none"` или роль `off` | Нет | Выключает семантическую реакцию; самостоятельные номера управляются отдельно |
-| Явная роль | `data-buddy-scene` | По указанному виду сцены | Поддерживаются также `data-buddy-kind` и `data-scene` |
-| `finale` | `[data-buddy-fly]` либо короткий заголовок «Спасибо», «Спасибо за внимание», «Вопросы?», `Thank you`, `Questions?` | `bow`, `celebrate`, `wave` | `celebrate` только в профиле шоу |
-| `divider` | `.divider` либо `role="separator"` | `salute`, `present`, `lookSlide` | Кандидат должен входить в репертуар профиля |
-| `title` | `.cover` | `salute`, `wave`, `lookSlide` | То же |
-| `image` | Самое крупное видимое `img`, `video`, `svg` или `canvas` занимает ≥30% площади | `present`, `point`, `lookSlide` | Размер медиа не меньше 200×140 в координатах сцены |
-| `number` | Цифра в `[data-buddy-number]`, либо в `h1`–`h3`, `strong`, `.stat`, `.num` со шрифтом ≥40 px | Контекстная мысль или выделение; без однозначного источника — `note`, `point` | Нулевая геометрия и скрытые элементы исключаются; наличие числа не означает успех |
-| `content` | Остальные слайды | Взгляд на выбранную цель | Самостоятельные номера остаются отдельным режимом |
+| Kind | Detection | Candidates |
+|---|---|---|
+| off | data-buddy-react="none" or role off | No semantic reaction; autonomous movement is separate |
+| Explicit role | data-buddy-scene; legacy data-buddy-kind or data-scene | Candidates for the selected kind |
+| finale | data-buddy-fly, or a short Thank you / Questions? heading; Russian equivalents also work | bow, celebrate, wave; celebrate requires show |
+| divider | .divider or role="separator" | salute, present, lookSlide |
+| title | .cover | salute, wave, lookSlide |
+| image | Largest visible img/video/svg/canvas covers at least 30% of the slide and is at least 200×140 | present, point, lookSlide |
+| number | data-buddy-number, or a number in h1–h3/strong/.stat/.num at font size ≥40 px | Context thought or highlight; otherwise note or point |
+| content | Other slides | Glance at the selected target |
 
-Роли `stat` и `numbers` означают `number`; `empty`, `platforms`, `stairs`
-означают `content`. Фоновые CSS-картинки не распознаются. Проверяются первые
-80 медиа и первые 100 кандидатов чисел; площадь нескольких медиа не суммируется.
-`data-buddy-ignore` исключает медиа и числа внутри помеченного блока.
-Внутренности SVG и собственный слой бадди не считаются отдельными картинками.
+Aliases stat/numbers mean number; empty/platforms/stairs mean content.
+CSS background images are not recognized. The analyzer checks up to 80 media
+and 100 numeric candidates, without adding separate image areas together.
+Hidden and zero-size elements, `data-buddy-ignore`, SVG internals and Buddy's own
+layer are excluded. A number does not imply a positive result.
 
-Над этой общей классификацией действует [контекст слайда](slide-context.md):
-он сохраняет точные числа, короткие тексты, понятия, изображения и карточки.
-Авторская разметка также передаёт пары значений и картинок, график, столбцы,
-маршрут карточек, связи, список и область изображения. Всего доступны
-17 контекстных номеров; состав источника проверяется до запуска.
-Если найден однозначный подходящий источник, его история приоритетнее общего
-жеста. Спокойный профиль использует короткую мысль, выделение и `thinkKeyword`;
-длинные истории входят в `live` и `show`. Телесные `chartClimb` и `cardRoute`
-автоматически доступны только в `show`. За одно посещение автоматическая
-контекстная история не повторяется, независимо от серии.
+[Slide context](slide-context.md) adds exact numbers, text, concepts, images,
+cards and explicit structured sources. An unambiguous compatible context story
+outranks a generic gesture. Calm uses short thoughts and highlights; live/show
+allow longer stories, while automatic chartClimb/cardRoute require show.
+Only one context story runs per visit. Equal top-priority sources are not chosen
+randomly; use `selectContext()` or `data-buddy-react` to specify intent.
 
-Два разных источника с одинаковым высшим приоритетом не выбираются случайно
-даже при разных видах. Ручной `selectContext()` или авторский
-`data-buddy-react` позволяет задать намерение явно.
-
-Цель выбирается из `[data-buddy-focus]`, затем `[data-buddy-target]`, затем
-из цели распознанного вида и заголовка. Координаты — центр и размеры элемента
-в сцене 1280×720. Это цель взгляда, а не вывод о смысле текста.
+Targets are chosen from `data-buddy-focus`, then `data-buddy-target`, then the
+classified content and heading. Their center and dimensions use stage coordinates.
+A gaze target is geometry, not an interpretation of meaning.
 
 ```html
 <section class="slide" data-buddy-scene="number">
-  <h2>Результат эксперимента</h2>
-  <strong data-buddy-number data-buddy-focus>4,2×</strong>
+  <h2>Experiment result</h2>
+  <strong data-buddy-number data-buddy-focus>4.2×</strong>
 </section>
 ```
 
-`data-buddy-react="wave"` задаёт конкретный приём вместо подбора по профилю.
-Авторская команда всё равно проходит проверку доступности, пауз и занятости;
-неизвестный ID не запускается, причина остаётся в диагностике. При отсутствии
-доступного кандидата контроллер ограничивается взглядом.
+`data-buddy-react="wave"` chooses an explicit action. It still respects availability,
+quiet windows and busy state. Unknown or unavailable IDs appear in diagnostics;
+when no candidate can run, the controller uses a glance.
 
-## Опоры и подпись
+## Supports and signature
 
-### Какие приёмы используют содержимое слайда
-
-| Что на слайде | Приёмы | Что происходит |
+| Source | Actions | Result |
 |---|---|---|
-| Явная цель, заголовок или медиа | `present`, `spotlight` | Бадди поворачивается к цели; фонарик доводит до неё луч и пятно |
-| Сторона слайда и цель внимания | `lookSlide`, `point` | Готовые позы взгляда и указательного жеста; автопилот отдельно направляет глаза к найденной цели |
-| Подходящая карточка и свободная кромка | `climb`, `pullups` | Подход, подъём или подтягивания; кромка должна быть достижимой |
-| Подходящая площадка | `web`, `grapple` | Паутина или крюк цепляются за площадку и подтягивают персонажа |
-| Доступная иконка | `magnet`, `construct` | Магнит притягивает и возвращает иконку; световая копия повторяет её форму |
-| Близкая плитка и включённый `y360` | `tracker` | Знак сервиса отмечает плитку галочкой |
-| `[data-buddy-land]` | `land` | Посадка сверху на авторский блок |
-| `[data-buddy-stairs]` | `stairs` | Проход по авторской лестнице и парашют |
-| `[data-buddy-fly]` | `finale` | Полёт к карточке, лайк и облёт |
-| Опора `.brand` | `logo`, `descend` | Подъём на выбранную часть подписи и спуск |
+| Explicit target, heading or media | present, spotlight | Turn toward the target; flashlight beam reaches it |
+| Slide direction and attention target | lookSlide, point | Prepared gestures; eyes separately track the target |
+| Accessible card edge | climb, pullups | Approach, climb or hang and pull up |
+| Reachable platform | web, grapple | Attach a thread or hook and pull up |
+| Accessible icon | magnet, construct | Attract and return the icon, or copy its shape in light |
+| Nearby tile and enabled brand preset | tracker | Stamp the tile with a check mark |
+| data-buddy-land | land | Land on the marked block |
+| data-buddy-stairs | stairs | Follow the staircase and parachute down |
+| data-buddy-fly | finale | Fly, like and circle |
+| .brand perch | logo, descend | Climb onto the signature and return |
 
-Остальные обычные жесты и новые способности ставятся на свободном полу.
-Например, звезда, комета, ящик и сфера — собственный реквизит номера;
-они не означают, что бадди распознал звезду или ящик в картинке на слайде.
-Условия доступности проверяются через `can(id)` и настоящую геометрию;
-наличия любого прямоугольника на экране недостаточно.
+Other gestures and powers use clear floor space. Their stars, comets, boxes and
+spheres are authored props, not objects recognized in a slide image.
+`can()` checks real geometry; an arbitrary rectangle is not necessarily usable.
+The legacy point pose indicates the slide's direction without exact fingertip
+alignment. Spotlight provides precise beam aiming.
 
-У старого `point` рука показывает в сторону слайда и не рассчитывает точное
-попадание пальца в произвольную цель. Подсветка цели в стенде показывает объект
-внимания. Точное наведение светового луча реализовано у `spotlight`.
+A `.brand` element can contain an avatar `[data-perch]` and lettering
+`[data-perch-text]`. This physical perch is separate from the optional brand image
+configuration. It does not enable or replace brand actions.
+Buddy uses the avatar on slide indices 0, 3, 6… and letter tops otherwise.
+If one marker is absent, the available one is used. With neither, legacy `.brand`
+geometry is used and needs a layout check. Autonomous climbing and logo actions
+belong to live/show.
 
-### Как устроена подпись
+`inspect().analysis.brand` shows the signature text, markers and chosen support.
+`inspect().world` contains clear floor intervals, platform ranges, reachable walls
+and a logo perch or null. Text, tight areas, unsuitable heights and continuously
+moving blocks are excluded. Supports guide Buddy's own contacts; props do not have
+universal collisions against every DOM element. A moving box can briefly pass in
+front of the signature. Auto framing does not turn the slide into a physics engine.
 
-Подпись — элемент `.brand` в сцене с аватаркой `[data-perch]` и надписью
-`[data-perch-text]`. Это опора сцены, отдельная от пресета `y360`.
-`logo` забирается на эту опору, `descend` спускается с неё.
-Номера `disk`, `mail`, `tracker`, `calendar` используют собственные знаки;
-подпись их не включает и не заменяет.
+## What blocks a reaction
 
-Движок использует аватарку на слайдах с индексом 0, 3, 6…; на остальных —
-верх букв надписи. Если одного маркера нет, выбирает доступный; без обоих
-применяет унаследованную геометрию `.brand`, которую нужно проверить на своей
-вёрстке. Самостоятельные `logo` и лазанье включены в `live` и `show`.
+A new reaction starts only in idle with no queued movement. It does not interrupt
+walking, poses, sleep or powers. At most one semantic reaction (including a glance)
+runs per visit, with at least 90 seconds before revisiting the same DOM slide.
+The controller looks for a suitable moment for 16 seconds after the quiet window;
+late reactions are skipped. A scheduled action that finds Buddy busy receives a
+fresh delay instead of accumulating in a queue.
 
-В `inspect().analysis.brand` видны текст, найденные маркеры и выбранная опора.
-`inspect().world` содержит результат настоящего геометрического сканирования:
-`floor` — свободные интервалы пола; `plats` — площадки с разрешёнными интервалами;
-`walls` — достижимые боковые кромки; `logo` — интервалы опоры бренда или `null`.
-Это не все прямоугольники на слайде: движок исключает текст, тесные зоны,
-неподходящую высоту и непрерывно движущиеся блоки.
+Pause, hidden tabs, offscreen or zero-size stages and reduced motion block new
+actions. Returning to the page starts a fresh schedule, not an immediate backlog.
+The current action and chosen settings are preserved across pause/resume.
 
-Опоры используются для маршрута и контактов самого персонажа. У реквизита
-новых способностей нет универсальных столкновений с каждым элементом DOM:
-например, летящий вдоль пола ящик может кратко пройти перед подписью.
-Автокадр показывает путь, но не превращает весь слайд в физическую сцену.
+## Diagnostics and cost
 
-## Что мешает реакции
+`buddy.intelligence` is a read-only facade. `state()` exposes cached analysis,
+the last event, profile, flags, measure count and timer state. `inspect()` adds
+the current verdict, candidates and can() rejections, world supports and rhythm.
+`last.source` distinguishes semantic and ambient actions; `last.rejected` records
+reasons from the last attempt. Results are deeply frozen copies with no DOM or
+engine references. `reactionState()` is a shortcut to state().
 
-Запуск разрешён только в `idle`, без очереди движений. Режиссёр не перебивает
-ходьбу, позу, жест, сон или способность. На одно посещение — не более одной
-семантической реакции, включая один взгляд; повтор на том же DOM-слайде
-не раньше 90 секунд. Подходящий момент ищется до 16 секунд после тихого окна.
-Поздние реакции пропускаются. Самостоятельный номер, совпавший с занятым
-персонажем, тоже пропускает момент и получает новую задержку.
+`context.issues` reports malformed structures such as mismatched units, missing
+link endpoints or out-of-image crops. Relevant issues also explain can() failures.
 
-Пауза, скрытая вкладка, сцена вне экрана, нулевой размер и reduced motion
-блокируют запуск. После возврата самостоятельные номера получают свежую
-задержку; пропущенные номера не копятся в очереди. На возврате с паузы
-действуют прежний номер и текущие настройки, без немедленного нового шоу.
+Analysis runs on slide changes, DOM mutations, media loads and resize. Mutations
+are debounced for 140 ms. inspect() does not rescan; can() may refresh engine
+geometry already marked dirty. The controller has no per-frame DOM measurement
+loop. destroy() removes observers, listeners and timers.
 
-## Диагностика и стоимость
+Input/change events update checkbox state. Call rescan() after a property change
+without an event. Source changes cancel the old context action; new content is
+not silently substituted into a running story.
 
-`buddy.intelligence` — фасад только для чтения. `state()` отдаёт кэш анализа,
-последнее событие, профиль, переключатели, счётчик `measures` и состояние таймера.
-`inspect()` добавляет текущий `verdict` с причиной запрета, `candidates` с
-отказами `can()`, реальные опоры `world` и настройки `rhythm`. `last.source`
-различает `semantic` и `ambient`; `last.rejected` сохраняет отказы последней попытки.
-Возвращаются глубоко замороженные копии без ссылок на DOM и состояние движка.
-`reactionState()` сохранён как короткий путь к `state()`.
-Поле `context.issues` показывает ошибки размеченных структур: например,
-разные единицы пары, отсутствующий узел связи или область вне картинки.
-Причина подходящего вида также попадает в отказ `can()`.
-
-Геометрия анализируется при смене слайда, изменении DOM, загрузке медиа и изменении размеров.
-Мутации объединяются за 140 мс. `inspect()` не сканирует слайд заново; проверка
-`can()` может обновить уже помеченную грязной геометрию движка. У контроллера нет
-собственного `requestAnimationFrame` и измерений DOM на каждом кадре. После
-`destroy()` его наблюдатели, события и таймеры снимаются.
-События `input` / `change` внутри активного слайда обновляют состояние checkbox.
-После программного изменения свойства без события нужен `buddy.rescan()`.
-Изменение источника отменяет использующий его контекстный номер; новая версия
-не подменяется внутри уже начавшейся истории.
-
-`attachSlideIntelligence({stage,buddy,...})` остаётся отдельным экспортом для
-интеграции с собственным адаптером персонажа. У `createBuddy()` контроллер уже
-есть всегда: для его переключения используйте методы экземпляра, не второй
-контроллер поверх него.
+`attachSlideIntelligence({ stage, buddy, ... })` remains an export for custom
+character adapters. A createBuddy instance already owns one controller; use its
+methods rather than attaching another.
