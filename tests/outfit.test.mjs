@@ -1,7 +1,7 @@
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
-import { parseColor, pickAccent, hoodiePalette, collectColorSamples, resolveHoodie, defaultHoodie, isAccentColor } from '../outfit.js'
-import { createBuddy } from '../index.js'
+import { parseColor, pickAccent, hoodiePalette, collectColorSamples, resolveHoodie, defaultHoodie, isAccentColor } from '../src/outfit.js'
+import { createBuddy } from '../src/index.js'
 import { runtimeFixture } from './support/runtime-fixture.mjs'
 
 // Мини-сцена: элементы с текстом, фоном и рамкой, стили отдаёт карта, а не браузер.

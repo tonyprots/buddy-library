@@ -7,7 +7,7 @@ test('импорт сборки не перезаписывает Three.js пр�
   const previous = globalThis.window, sentinel = {}
   globalThis.window = { THREE: sentinel }
   try {
-    const vendor = await import('../vendor.js')
+    const vendor = await import('../src/vendor.js')
     assert.equal(globalThis.window.THREE, sentinel)
     assert.equal(globalThis.window.BUDDY_GLB, undefined)
     assert.equal(globalThis.window.Buddy3D, undefined)
@@ -20,7 +20,7 @@ test('импорт сборки не перезаписывает Three.js пр�
 })
 
 test('разные риги сохраняют независимые viewport, прозрачность, оттенок и капсулы AO', async () => {
-  const source = await readFile(new URL('../vendor.js', import.meta.url), 'utf8'),
+  const source = await readFile(new URL('../src/vendor.js', import.meta.url), 'utf8'),
     context = new Proxy({}, { get: () => () => {} }),
     document = { createElement: () => ({ width: 0, height: 0, getContext: () => context }) }
 

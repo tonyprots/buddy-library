@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict'
 import { test } from 'node:test'
-import { analyzeSlideContext, createSlideContext, extractContextNumbers, matchContextConcepts } from '../slide-context.js'
+import { analyzeSlideContext, createSlideContext, extractContextNumbers, matchContextConcepts } from '../src/slide-context.js'
 
 function fixture() {
   let reads = 0

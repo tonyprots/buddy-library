@@ -35,7 +35,7 @@ test('leap/flip сохраняют видимую позицию и масшта
     }
   if (process.env.BUDDY_LEAP_ENTRY_REPORT) writeFileSync(process.env.BUDDY_LEAP_ENTRY_REPORT,
     JSON.stringify({ created: new Date().toISOString(), hz: 120,
-      runtimeSHA: createHash('sha256').update(readFileSync(new URL('../runtime.js', import.meta.url))).digest('hex'), rows }, null, 2) + '\n')
+      runtimeSHA: createHash('sha256').update(readFileSync(new URL('../src/runtime.js', import.meta.url))).digest('hex'), rows }, null, 2) + '\n')
   for (const row of rows) {
     const detail = JSON.stringify(row)
     assert.deepEqual(row.armed, row.start, 'Нет синхронного скачка до первого кадра. ' + detail)

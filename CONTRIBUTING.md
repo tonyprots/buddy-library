@@ -6,6 +6,12 @@ Only the package.json `files` allowlist is included in the TGZ.
 
 ## Architecture
 
+Runtime modules and TypeScript declarations live in `src/`. Ready-to-use scripts
+are in `dist/`; runnable decks in `examples/`; guides in `docs/`; development
+checks in `tests/` and tooling in `scripts/`. Package import names stay unchanged.
+
+The module names below are relative to `src/` (except build scripts).
+
 | Module | Responsibility |
 |---|---|
 | index.js | createBuddy, validation, catalog and presets |

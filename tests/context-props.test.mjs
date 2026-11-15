@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict'
 import { test } from 'node:test'
-import { createContextPropBuilders } from '../context-props.js'
+import { createContextPropBuilders } from '../src/context-props.js'
 
 const conceptNames = ['memory', 'target', 'team', 'chain', 'link', 'cloud', 'rules', 'search']
 
@@ -16,7 +16,7 @@ async function fixture(run) {
   const previous = globalThis.document, canvases = []
   globalThis.document = { createElement() { const canvas = canvasStub(); canvases.push(canvas); return canvas } }
   try {
-    const { Buddy3D, THREE: T } = await import('../vendor.js'), rig = Buddy3D.create({ outline: false }), roots = new Map()
+    const { Buddy3D, THREE: T } = await import('../src/vendor.js'), rig = Buddy3D.create({ outline: false }), roots = new Map()
     await rig.loaded
     const before = canvases.length
     assert.equal(rig.registerPropBuilders(kit => Object.fromEntries(

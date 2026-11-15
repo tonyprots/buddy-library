@@ -22,7 +22,7 @@ const buddy = await createBuddy({ stage: document.querySelector('#stage') })
 buddy.destroy()
 ```
 
-Without a bundler, serve the source folder over HTTP and import `./buddy-library/index.js`.
+Without a bundler, serve the source folder over HTTP and import `./buddy-library/src/index.js`.
 ES modules do not work through `file://`; use the classic bundle for double-click playback.
 Create instances after the browser DOM mounts, not during SSR. Importing the
 `techniques` catalog is safe without a DOM.

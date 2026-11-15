@@ -7,7 +7,7 @@ test('подготовка парашюта сохраняет реальную 
   const f = runtimeFixture(), previous = document, context = new Proxy({}, { get: () => () => {} }), rows = []
   try {
     globalThis.document = { createElement: () => ({ getContext: () => context }) }
-    const { Buddy3D, THREE: T } = await import('../vendor.js'), rig = Buddy3D.create({ outline: false })
+    const { Buddy3D, THREE: T } = await import('../src/vendor.js'), rig = Buddy3D.create({ outline: false })
     await rig.loaded; globalThis.document = previous
     const meshes = [], point = new T.Vector3()
     rig.root.traverse(o => { if (o.isSkinnedMesh && /Feet/u.test(o.name + o.parent.name)) meshes.push(o) })

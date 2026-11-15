@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict'
 import { test } from 'node:test'
-import { createRuntime } from '../runtime.js'
+import { createRuntime } from '../src/runtime.js'
 import { runtimeFixture } from './support/runtime-fixture.mjs'
 
 function fixture(withBrand = true) {

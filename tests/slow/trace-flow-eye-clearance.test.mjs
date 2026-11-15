@@ -9,7 +9,7 @@ import { createEyeOcclusionProbe } from '../support/eye-occlusion.mjs'
 
 test('traceFlow сохраняет свободные глаза и направляет физическую указку на источник во всём цикле трёх связей', async () => {
   const source = process.env.BUDDY_TRACE_EYE_SOURCE ? pathToFileURL(resolve(process.env.BUDDY_TRACE_EYE_SOURCE))
-    : new URL('../../context-stories.js', import.meta.url), { createStoryPlayer } = await import(source.href),
+    : new URL('../../src/context-stories.js', import.meta.url), { createStoryPlayer } = await import(source.href),
     report = { created: new Date().toISOString(), hz: 120, source: source.href,
       sourceSHA: createHash('sha256').update(await readFile(source)).digest('hex'), cases: [] }
   for (const face of [-1, 1]) {
@@ -24,7 +24,7 @@ test('traceFlow сохраняет свободные глаза и направ
     let player
     try {
       globalThis.document = { createElement: () => ({ getContext: () => context }) }
-      const { Buddy3D, THREE: T } = await import('../../vendor.js'), rig = Buddy3D.create({ outline: false })
+      const { Buddy3D, THREE: T } = await import('../../src/vendor.js'), rig = Buddy3D.create({ outline: false })
       await rig.loaded
       globalThis.document = previousDocument
       previousDocument.createElement = tag => tag === 'canvas' ? { getContext: () => context } : originalCreate(tag)

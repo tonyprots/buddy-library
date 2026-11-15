@@ -45,7 +45,7 @@ test('assembleList передаёт 3/4/8 пунктов через одну к�
     } finally { f.close() }
   }
   const report = { startedAtUTC, endedAtUTC: new Date().toISOString(), hz: 120,
-    contextSourceSHA: createHash('sha256').update(readFileSync(new URL('../context-stories.js', import.meta.url))).digest('hex'),
+    contextSourceSHA: createHash('sha256').update(readFileSync(new URL('../src/context-stories.js', import.meta.url))).digest('hex'),
     method: 'Настоящие runtime/solve и prop callbacks; без GLB, WebGL/FPS/native capture.', rows }
   if (process.env.BUDDY_LIST_HANDOFF_REPORT) writeFileSync(process.env.BUDDY_LIST_HANDOFF_REPORT, JSON.stringify(report, null, 2) + '\n')
   for (const row of rows) {

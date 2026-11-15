@@ -258,7 +258,7 @@ try {
   await browser.navigate(`http://127.0.0.1:${server.address().port}`)
   for (let i = 0; i < 200 && !await ev('!!globalThis.buddy'); i++) await browser.sleep(50)
   assert.equal(await ev('!!globalThis.buddy'), true)
-  await ev(`globalThis.qaModule=await import('./index.js');buddy.pause()`)
+  await ev(`globalThis.qaModule=await import('./src/index.js');buddy.pause()`)
   report.browser = await ev('navigator.userAgent')
   report.devicePixelRatio = await ev('devicePixelRatio')
   report.renderer = await ev('buddy.renderer')

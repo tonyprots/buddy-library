@@ -3,17 +3,17 @@ import { createHash } from 'node:crypto'
 import { readFileSync, writeFileSync } from 'node:fs'
 import { test } from 'node:test'
 import { runtimeFixture } from '../support/runtime-fixture.mjs'
-import { createContextPlayer } from '../../context-abilities.js'
+import { createContextPlayer } from '../../src/context-abilities.js'
 
 test('сидячие позы опираются тазом и настоящими подошвами GLB на одну плоскость', async () => {
   const started = Date.now(), f = runtimeFixture(), previous = document,
     context = new Proxy({}, { get: () => () => {} }), cases = [],
-    sha = file => createHash('sha256').update(readFileSync(new URL('../../' + file, import.meta.url))).digest('hex'),
+    sha = file => createHash('sha256').update(readFileSync(new URL('../../src/' + file, import.meta.url))).digest('hex'),
     sourceSHA = { runtime: sha('runtime.js'), vendor: sha('vendor.js'), contextAbilities: sha('context-abilities.js') }
   let player
   try {
     globalThis.document = { createElement: () => ({ width: 0, height: 0, getContext: () => context }) }
-    const { Buddy3D, THREE: T } = await import('../../vendor.js'), rig = Buddy3D.create({ outline: false })
+    const { Buddy3D, THREE: T } = await import('../../src/vendor.js'), rig = Buddy3D.create({ outline: false })
     await rig.loaded
     globalThis.document = previous
     const stand = f.raw.tools.pose(), meshes = [], groups = [], point = new T.Vector3(),

@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict'
 import { test } from 'node:test'
-import { contextTechniques, createContextPlayer } from '../context-abilities.js'
+import { contextTechniques, createContextPlayer } from '../src/context-abilities.js'
 import { runtimeFixture } from './support/runtime-fixture.mjs'
 
 function fixture(id, face = 1, renderer = 'svg') {

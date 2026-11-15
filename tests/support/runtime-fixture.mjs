@@ -1,4 +1,4 @@
-import { createRuntime } from '../../runtime.js'
+import { createRuntime } from '../../src/runtime.js'
 
 /** Настоящие позы, решатель и модельное время; заглушены DOM и браузерный планировщик. */
 export function runtimeFixture(face = 1, { logos = {} } = {}) {

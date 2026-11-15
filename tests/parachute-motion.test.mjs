@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict'
 import { test } from 'node:test'
 import { runtimeFixture } from './support/runtime-fixture.mjs'
-import { createPreviewCamera } from '../camera.js'
+import { createPreviewCamera } from '../src/camera.js'
 
 const nodes = root => [root, ...root.children.flatMap(nodes)],
   worldPoints = raw => {

@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict'
-import { createStoryPlayer, storyTechniques } from '../../context-stories.js'
+import { createStoryPlayer, storyTechniques } from '../../src/context-stories.js'
 import { runtimeFixture } from './runtime-fixture.mjs'
 
 /** Контекст для проверки физического хвата; настоящий runtime и исходные данные истории. */

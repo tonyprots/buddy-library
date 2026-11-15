@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.10.0 — 2026-11-15
+
+- New README leads with the presentation experience, a real climb-and-magnet GIF
+  and a one-script quick start. Added a replayable, offline showcase.
+- Runtime modules and TypeScript declarations now live in `src/`, keeping the
+  repository root focused. Package exports and `dist/buddy.js` are unchanged.
+  Direct source-file imports must add `src/` to their path.
+- Updated build, export, consumer fixtures and browser snapshots for the new
+  layout. Active defaults and runtime behavior are unchanged.
+
 ## 0.9.1 — 2026-11-15
 
 - English is now the primary language for README, API and agent guides,

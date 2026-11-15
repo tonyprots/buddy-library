@@ -15,7 +15,7 @@ const root = resolve(dirname(fileURLToPath(import.meta.url)), '../..'),
         const count = Number(url.searchParams.get('slides') || 1)
         assert.ok([1, 3, 6].includes(count))
         response.setHeader('Content-Type', 'text/html')
-        response.end(`<!doctype html><html lang="ru"><meta charset="utf-8"><link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'/%3E"><style>body{margin:0;background:white}#stage{position:relative;width:1280px;height:720px}.slide{display:none;position:absolute;inset:0}.slide.on{display:block}h1{margin:40px;font:40px Arial}</style><div id="stage">${Array.from({ length: count }, (_, i) => `<section class="slide${i ? '' : ' on'}"><h1>Глава ${i + 1}</h1></section>`).join('')}</div><script type="module">import {createBuddy} from '/index.js';globalThis.buddy=await createBuddy({stage:document.getElementById('stage')})</script></html>`)
+        response.end(`<!doctype html><html lang="ru"><meta charset="utf-8"><link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'/%3E"><style>body{margin:0;background:white}#stage{position:relative;width:1280px;height:720px}.slide{display:none;position:absolute;inset:0}.slide.on{display:block}h1{margin:40px;font:40px Arial}</style><div id="stage">${Array.from({ length: count }, (_, i) => `<section class="slide${i ? '' : ' on'}"><h1>Глава ${i + 1}</h1></section>`).join('')}</div><script type="module">import {createBuddy} from '/src/index.js';globalThis.buddy=await createBuddy({stage:document.getElementById('stage')})</script></html>`)
         return
       }
       const file = resolve(root, '.' + decodeURIComponent(url.pathname))

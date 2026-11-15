@@ -5,7 +5,7 @@ Geometry is created lazily, using shared toon materials, colored contact shadows
 and screen-space outlines. No external images or downloads are needed.
 
 ```js
-import { createAbilityPropBuilders } from './ability-props.js'
+import { createAbilityPropBuilders } from './src/ability-props.js'
 raw.tools.registerPropBuilders(createAbilityPropBuilders) // Once per instance
 const prop = raw.tools.prop3('abilityOrb', (state, skeleton) => ({
   at: skeleton.arms[0].hand, t: state.t, fade: state.fade,

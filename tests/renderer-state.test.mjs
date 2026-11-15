@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict'
 import { test } from 'node:test'
 import { runtimeFixture } from './support/runtime-fixture.mjs'
-import { createRuntime } from '../runtime.js'
+import { createRuntime } from '../src/runtime.js'
 import { writeFileSync } from 'node:fs'
 const rendererRuntime = process.env.BUDDY_RENDERER_SOURCE
   ? (await import(new URL(process.env.BUDDY_RENDERER_SOURCE, import.meta.url))).createRuntime : createRuntime

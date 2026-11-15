@@ -22,7 +22,7 @@ const root = resolve(dirname(fileURLToPath(import.meta.url)), '../..'),
 <style>body{margin:24px;background:white;color:#20252f;font:16px system-ui}h1{font-size:22px;margin:0 0 12px}p{margin:0 0 16px}#viewport{width:1100px;height:640px;overflow:hidden;position:relative;background:#edf4ff;border-radius:12px}#stage{width:1280px;height:720px;position:absolute;transform-origin:0 0}.slide{position:absolute;inset:0}#platform{position:absolute;left:580px;top:370px;width:120px;height:300px;background:#b8cceb;border-radius:8px;display:none}#floorLine{position:absolute;left:0;top:700px;width:1280px;border-top:2px solid #65798e;pointer-events:none}</style>
 <h1>Полные циклы прыжка</h1><p id="status" role="status">Подключаю персонажа…</p><div id="viewport"><div id="stage"><section class="slide on"><div id="platform" data-buddy-land></div></section><div id="floorLine" aria-hidden="true"></div></div></div>
 <script type="module">
-import { createBuddy } from '/index.js';
+import { createBuddy } from '/src/index.js';
 const stage=document.getElementById('stage');
 globalThis.buddy=await createBuddy({stage,renderer:'auto',motion:'full',autoplay:false,reactions:false,seed:14,presets:{superhuman:true}});
 buddy.pause();buddy.progress(1);buddy.rescan();buddy.reset();
@@ -60,9 +60,9 @@ function encoder(file) {
 }
 
 await mkdir(output, { recursive: true })
-for (const file of ['runtime.js', 'index.js', 'vendor.js', 'tests/browser/jump-browser-check.mjs'])
+for (const file of ['src/runtime.js', 'src/index.js', 'src/vendor.js', 'tests/browser/jump-browser-check.mjs'])
   report.sources[file] = createHash('sha256').update(await readFile(join(root, file))).digest('hex')
-const runtime = await readFile(join(root, 'runtime.js'), 'utf8')
+const runtime = await readFile(join(root, 'src/runtime.js'), 'utf8')
 report.jumpToSha = createHash('sha256').update(runtime.split('  function jumpTo(')[1].split('\n  function leap(')[0]).digest('hex')
 const server = createServer(async (request, response) => {
   try {

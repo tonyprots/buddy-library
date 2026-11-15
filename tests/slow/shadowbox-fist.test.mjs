@@ -10,7 +10,7 @@ test('shadowbox плавно сжимает настоящие пальцы об
       context = new Proxy({}, { get: () => () => {} })
     try {
       globalThis.document = { createElement: () => ({ width: 0, height: 0, getContext: () => context }) }
-      const { Buddy3D } = await import('../../vendor.js'), rig = Buddy3D.create({ outline: false })
+      const { Buddy3D } = await import('../../src/vendor.js'), rig = Buddy3D.create({ outline: false })
       await rig.loaded
       globalThis.document = previousDocument
       const bones = new Map()

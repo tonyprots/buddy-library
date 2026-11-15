@@ -47,7 +47,7 @@ test('кувырок после падения сохраняет объём г�
   if (process.env.ROLL_CONTACT_REPORT) {
     mkdirSync(dirname(process.env.ROLL_CONTACT_REPORT), { recursive: true })
     writeFileSync(process.env.ROLL_CONTACT_REPORT, JSON.stringify({ date: new Date().toISOString(),
-      runtimeSHA: createHash('sha256').update(readFileSync(new URL('../runtime.js', import.meta.url))).digest('hex'),
+      runtimeSHA: createHash('sha256').update(readFileSync(new URL('../src/runtime.js', import.meta.url))).digest('hex'),
       invariant: 'Нижняя граница объёмов головы radius7.2, шеи radius2.6 и плеч radius4.2 после render-squash не ниже пола более чем на 0.15 px сцены.', cases }, null, 2) + '\n')
   }
   for (const c of cases) assert.ok(c.worst.value <= .15,

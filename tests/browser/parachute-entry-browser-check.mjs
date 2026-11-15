@@ -5,6 +5,7 @@ import { mkdir, readFile, readdir, stat, writeFile } from 'node:fs/promises'
 import { dirname, extname, join, resolve, sep } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { openBrowser } from './cdp.mjs'
+import { publicSourceFiles } from '../support/source-files.mjs'
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '../..'),
   output = resolve(root, process.env.BUDDY_REPORT_DIR || 'drafts/parachute-v6/native-entry'),
@@ -19,8 +20,7 @@ assert.ok(Number.isInteger(frameLimit) && frameLimit >= 40 && frameLimit <= 900)
 assert.ok(['auto', 'closeup', 'overview'].includes(cameraMode))
 report.cameraMode = cameraMode
 await mkdir(output, { recursive: true })
-const sourceFiles = [...(await readdir(root)).filter(name => /\.(?:js|html|json|d\.ts)$/u.test(name)),
-  ...(await readdir(join(root, 'presets'))).filter(name => name.endsWith('.js')).map(name => 'presets/' + name),
+const sourceFiles = [...await publicSourceFiles(root),
   'tests/browser/parachute-entry-browser-check.mjs', 'tests/browser/cdp.mjs']
 for (const name of sourceFiles) {
   const data = await readFile(join(root, name))

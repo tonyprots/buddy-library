@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict'
 import { test } from 'node:test'
 
-import { createAbilityPlayer, extraTechniques, reachArm } from '../new-abilities.js'
+import { createAbilityPlayer, extraTechniques, reachArm } from '../src/new-abilities.js'
 import { runtimeFixture } from './support/runtime-fixture.mjs'
 
 function fixture(face = 1) {

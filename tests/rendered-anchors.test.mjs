@@ -10,7 +10,7 @@ test('WebGL: eye origin совпадает со skin-маской, legacy hand a
   const f = runtimeFixture(), previous = document, context = new Proxy({}, { get: () => () => {} }), rows = []
   try {
     globalThis.document = { createElement: () => ({ getContext: () => context }) }
-    const { Buddy3D, THREE: T } = await import(process.env.BUDDY_ANCHOR_VENDOR || '../vendor.js'),
+    const { Buddy3D, THREE: T } = await import(process.env.BUDDY_ANCHOR_VENDOR || '../src/vendor.js'),
       rig = Buddy3D.create({ outline: false }), other = Buddy3D.create({ outline: false })
     await Promise.all([rig.loaded, other.loaded])
     globalThis.document = previous

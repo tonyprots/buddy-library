@@ -1,8 +1,8 @@
 import assert from 'node:assert/strict'
 import { after, test } from 'node:test'
 import { readFile } from 'node:fs/promises'
-import * as runtime from '../runtime.js'
-import { resolveBrand } from '../brand.js'
+import * as runtime from '../src/runtime.js'
+import { resolveBrand } from '../src/brand.js'
 import { runtimeFixture } from './support/runtime-fixture.mjs'
 
 const origins = JSON.parse(await readFile(new URL('./support/fixtures/actor-framing-poses.json', import.meta.url), 'utf8'))
@@ -17,7 +17,7 @@ async function setup() {
   let raw
   try {
     globalThis.document = { createElement: () => ({ getContext: () => context }) }
-    const { Buddy3D, THREE: T } = await import('../vendor.js'), rig = Buddy3D.create({ outline: false })
+    const { Buddy3D, THREE: T } = await import('../src/vendor.js'), rig = Buddy3D.create({ outline: false })
     await rig.loaded; globalThis.document = saved; f.raw.destroy()
     const marker = 'rescan, B, W, MAKE, LEVELS, leap, fall, jumpTo, begin, plan,'
     assert.ok(runtime.createRuntime.toString().includes(marker), 'Тестовый доступ к актуальному private actorEnvelope')

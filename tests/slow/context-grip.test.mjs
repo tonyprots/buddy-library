@@ -17,7 +17,7 @@ test('пять context props: actual GLB хват в обе стороны, 120 
   let rig
   try {
     globalThis.document = { createElement: () => ({ getContext: () => ctx }) }
-    const { Buddy3D, THREE: T } = await import('../../vendor.js')
+    const { Buddy3D, THREE: T } = await import('../../src/vendor.js')
     rig = Buddy3D.create({ outline: false }); await rig.loaded; globalThis.document = previous
     const geometry = palmGeometry(rig, T), head = propGeometry(rig, T), v = new T.Vector3(),
       originState = () => ['UpperArmL', 'UpperArmR', 'LowerArmL', 'LowerArmR', 'WristL', 'WristR']
@@ -159,7 +159,7 @@ test('пять context props: actual GLB хват в обе стороны, 120 
   const report = { startedAtUTC, endedAtUTC: new Date().toISOString(), hz: 120,
     method: 'Node direct-call actual GLB skin+solid geometry. Не WebGL, FPS или GPU-time.',
     hashes: Object.fromEntries(['context-stories.js', 'context-story-props.js', 'vendor.js', 'runtime.js'].map(name =>
-      [name, createHash('sha256').update(readFileSync(new URL('../../' + name, import.meta.url))).digest('hex')])), rows }
+      [name, createHash('sha256').update(readFileSync(new URL('../../src/' + name, import.meta.url))).digest('hex')])), rows }
   if (process.env.BUDDY_CONTEXT_GRIP_REPORT) writeFileSync(process.env.BUDDY_CONTEXT_GRIP_REPORT, JSON.stringify(report, null, 2) + '\n')
   for (const row of rows) {
     const detail = JSON.stringify(row)

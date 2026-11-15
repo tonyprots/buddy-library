@@ -1,2 +1,2 @@
 // Отдельный демонстрационный набор изображений; в buddy.js не импортируется.
-export { logos, brand } from '../presets/y360.js'
+export { logos, brand } from '../src/presets/y360.js'

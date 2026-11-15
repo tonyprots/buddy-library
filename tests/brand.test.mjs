@@ -1,8 +1,8 @@
 import assert from 'node:assert/strict'
 import { test } from 'node:test'
-import { createBuddy } from '../index.js'
-import { resolveBrand } from '../brand.js'
-import { brand as y360, logos } from '../presets/y360.js'
+import { createBuddy } from '../src/index.js'
+import { resolveBrand } from '../src/brand.js'
+import { brand as y360, logos } from '../src/presets/y360.js'
 import { runtimeFixture } from './support/runtime-fixture.mjs'
 
 const withBuddy = async (options, run) => {

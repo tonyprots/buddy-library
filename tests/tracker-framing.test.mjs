@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict'
 import { test } from 'node:test'
-import { createPreviewCamera } from '../camera.js'
+import { createPreviewCamera } from '../src/camera.js'
 import { runtimeFixture } from './support/runtime-fixture.mjs'
 
 // Знак живёт дольше жеста: камера должна удерживать его до исчезновения,

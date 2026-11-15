@@ -5,13 +5,13 @@ import { mkdir, readFile, readdir, stat, writeFile } from 'node:fs/promises'
 import { dirname, extname, join, resolve, sep } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { openBrowser } from './cdp.mjs'
+import { publicSourceFiles } from '../support/source-files.mjs'
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '../..'),
   output = resolve(root, process.env.BUDDY_REPORT_DIR || 'drafts/concept-variants/native'),
   sourceRoot = join(output, 'sources'), hash = value => createHash('sha256').update(value).digest('hex'),
   concepts = ['memory', 'target', 'team', 'chain', 'link', 'cloud', 'rules', 'search'],
-  files = [...(await readdir(root)).filter(name => /\.(?:js|html|json|d\.ts)$/u.test(name)),
-    ...(await readdir(join(root, 'presets'))).filter(name => name.endsWith('.js')).map(name => 'presets/' + name),
+  files = [...await publicSourceFiles(root),
     'tests/browser/concept-variants-browser-check.mjs', 'tests/browser/cdp.mjs'],
   sources = new Map(await Promise.all(files.map(async name => [name, await readFile(join(root, name))]))),
   html = sources.get('index.html').toString().replace('if (buddy && !switching) {',

@@ -1,7 +1,7 @@
 // Вход готовой сборки dist/buddy.js: один классический скрипт без модулей и сервера (работает и через file://).
 // Глобальный объект window.Buddy. С атрибутом data-stage скрипт сам подключает бадди к сцене.
-import { createBuddy, techniques, abilityPresets, autoplayProfiles, behaviorModes, characters } from '../index.js'
-import { attachDeckEffects } from '../effects.js'
+import { createBuddy, techniques, abilityPresets, autoplayProfiles, behaviorModes, characters } from '../src/index.js'
+import { attachDeckEffects } from '../src/effects.js'
 
 export { createBuddy, techniques, abilityPresets, autoplayProfiles, behaviorModes, characters, attachDeckEffects }
 

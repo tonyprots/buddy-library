@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict'
 import { test } from 'node:test'
-import { createBuddy } from '../index.js'
+import { createBuddy } from '../src/index.js'
 import { runtimeFixture } from './support/runtime-fixture.mjs'
 
 test('пресет без файла знаков предупреждает один раз и использует нейтральный реквизит', async () => {

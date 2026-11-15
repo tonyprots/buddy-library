@@ -10,7 +10,7 @@ test('wave разворачивает широкую сторону ладони
     let maxWristStep = 0
     try {
       globalThis.document = { createElement: () => ({ width: 0, height: 0, getContext: () => context }) }
-      const { Buddy3D, THREE: T } = await import('../../vendor.js'), rig = Buddy3D.create({ outline: false })
+      const { Buddy3D, THREE: T } = await import('../../src/vendor.js'), rig = Buddy3D.create({ outline: false })
       await rig.loaded
       globalThis.document = previous
       const bones = new Map()

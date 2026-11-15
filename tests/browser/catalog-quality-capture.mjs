@@ -9,6 +9,7 @@ import { once } from 'node:events'
 import { fileURLToPath, pathToFileURL } from 'node:url'
 import { createGzip } from 'node:zlib'
 import { openBrowser } from './cdp.mjs'
+import { publicSourceFiles } from '../support/source-files.mjs'
 
 // Сборщик evidence, а не независимый принимающий: оценок качества здесь нет.
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '../..'), fps = 24, numericHz = 120,
@@ -55,9 +56,7 @@ const output = resolve(root, destination), sourceRoot = join(output, 'sources')
 assert.ok(output.startsWith(join(root, 'drafts') + sep), 'Уникальное evidence сохраняется в drafts проекта, не в tmp')
 if (!performanceOnly) { await access(ffmpeg); await access(ffprobe) }
 
-const sourceFiles = (await readdir(root)).filter(file => /\.(?:js|html|json|d\.ts)$/u.test(file)),
-  presetFiles = (await readdir(join(root, 'presets'))).filter(file => file.endsWith('.js')).map(file => 'presets/' + file),
-  files = [...new Set([...sourceFiles, ...presetFiles, 'tests/browser/catalog-quality-capture.mjs', 'tests/browser/cdp.mjs'])].sort(),
+const files = [...await publicSourceFiles(root), 'tests/browser/catalog-quality-capture.mjs', 'tests/browser/cdp.mjs'].sort(),
   contents = new Map(await Promise.all(files.map(async file => [file, await readFile(join(root, file))]))),
   originalHtml = contents.get('index.html').toString(),
   bridge = `\nglobalThis.qaUI={setBuddy(value){buddy=value;globalThis.buddy=value},state(){return{switching,selected:selected.id}},cameraMode};\n`,
@@ -89,7 +88,7 @@ if (!existingManifest) {
 } else for (const [file, expected] of Object.entries(hashes))
   assert.equal(hash(await readFile(join(sourceRoot, file))), expected, 'Повреждён сохранённый исходник ' + file)
 
-const { techniques } = await import(pathToFileURL(join(sourceRoot, 'index.js')).href), registry = JSON.parse(JSON.stringify(techniques)),
+const { techniques } = await import(pathToFileURL(join(sourceRoot, 'src/index.js')).href), registry = JSON.parse(JSON.stringify(techniques)),
   ids = requested === 'all' ? registry.map(item => item.id) : [...new Set(requested.split(/[\s,]+/u).filter(Boolean))],
   known = new Set(registry.map(item => item.id))
 assert.ok(ids.length && ids.every(id => known.has(id)), 'BUDDY_CAPTURE_IDS содержит неизвестный ID')
@@ -203,7 +202,7 @@ async function probe(file) {
 
 // Выполняется в браузере; обёртка сохраняет тот же create/rig и не меняет рендеринг.
 async function installHarness() {
-  const module = await import('/index.js'), vendor = await import('/vendor.js'), original = vendor.Buddy3D.create,
+  const module = await import('/src/index.js'), vendor = await import('/src/vendor.js'), original = vendor.Buddy3D.create,
     resourceOwners = new WeakMap(), native = {}, listenerRecords = new Set(),
     production = /\/[^/\s]+\.js[:?]/u
   let owner = null, nextInstanceId = 0
@@ -515,7 +514,7 @@ async function installHarness() {
     try {
     const fresh = await module.createBuddy({ stage, autoplay: false, reactions: false, motion: 'full', renderer: 'auto', seed: 14,
       presets: { superhuman: true, y360: entry.preset === 'brand' },
-      logos: entry.preset === 'brand' ? (await import('./presets/y360.js')).logos : {} })
+      logos: entry.preset === 'brand' ? (await import('./src/presets/y360.js')).logos : {} })
     record.buddy = fresh; record.host = stage.querySelector(':scope > .buddy')
     qaResources(record); record.initialResources = Object.fromEntries(Object.entries(record.owned).map(([kind, values]) => [kind, values.size]))
     fresh.pause(); fresh.reset(); fresh.progress(1); fresh.rescan(); fresh.experimental.autonomous(false)

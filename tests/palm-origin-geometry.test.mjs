@@ -9,7 +9,7 @@ test('lightning: origin находится в центре настоящей sk
   const boot = runtimeFixture(), doc = document, ctx = new Proxy({}, { get: () => () => {} }), rows = []
   try {
     globalThis.document = { createElement: () => ({ getContext: () => ctx }) }
-    const { Buddy3D, THREE: T } = await import(process.env.BUDDY_ANCHOR_VENDOR || '../vendor.js'), rig = Buddy3D.create({ outline: false })
+    const { Buddy3D, THREE: T } = await import(process.env.BUDDY_ANCHOR_VENDOR || '../src/vendor.js'), rig = Buddy3D.create({ outline: false })
     await rig.loaded; globalThis.document = doc
     const patches = palmPatch(rig, T), bones = new Map()
     rig.root.traverse(o => { if (o.isBone) bones.set(o.name, o) })

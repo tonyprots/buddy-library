@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict'
 import { test } from 'node:test'
 
-import { createRuntime } from '../runtime.js'
+import { createRuntime } from '../src/runtime.js'
 
 // Геометрия и время движений проверяются на настоящем ядре, без WebGL и браузерного планировщика.
 function fixture(count = 1) {

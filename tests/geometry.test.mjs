@@ -1,6 +1,6 @@
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
-import { pullupCandidates, trackerCandidates } from '../runtime.js'
+import { pullupCandidates, trackerCandidates } from '../src/runtime.js'
 
 test('Подтягивания требуют досягаемой кромки внутри маршрута и ближе 420px', () => {
   const valid = { gap: 45, footX: 200 }, body = { x: 300 }, level = { reach: 110 }, range = [176, 900],

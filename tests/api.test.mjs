@@ -1,6 +1,6 @@
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
-import { createBuddy, techniques, abilityPresets } from '../index.js'
+import { createBuddy, techniques, abilityPresets } from '../src/index.js'
 import { runtimeFixture } from './support/runtime-fixture.mjs'
 
 test('Каталог доступен при импорте без браузера, приёмы имеют уникальные идентификаторы', () => {
@@ -191,7 +191,7 @@ test('знаки Я360 требуют явного включения, посл�
       assert.throws(() => buddy.play(id))
     }
     buddy.destroy()
-    const { logos } = await import('../presets/y360.js')
+    const { logos } = await import('../src/presets/y360.js')
     buddy = await createBuddy({ stage: f.stage, renderer: 'svg', autoplay: false, reactions: false, presets: { y360: true }, logos })
     assert.equal(buddy.presets.y360, true)
     for (const id of ['disk', 'mail']) {

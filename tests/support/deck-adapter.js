@@ -1,6 +1,6 @@
 // Локальный адаптер контрольной деки; маршруты задаёт deck-integration-check.mjs.
-import { createBuddy } from '/library/index.js'
-import { attachDeckEffects } from '/library/effects.js'
+import { createBuddy } from '/library/src/index.js'
+import { attachDeckEffects } from '/library/src/effects.js'
 
 const params = new URLSearchParams(location.search), stage = document.querySelector('#deck'),
   rawShow = globalThis.go, slides = [...stage.querySelectorAll(':scope > .slide')]

@@ -7,7 +7,7 @@ import { fileURLToPath } from 'node:url'
 
 const url = new URL('./browser/catalog-quality-capture.mjs', import.meta.url), source = readFileSync(url, 'utf8'),
   AsyncFunction = Object.getPrototypeOf(async () => {}).constructor,
-  prefix = source.slice(source.indexOf('// Сборщик evidence'), source.indexOf('\nconst sourceFiles ='))
+  prefix = source.slice(source.indexOf('// Сборщик evidence'), source.indexOf('\nconst files ='))
     .replaceAll('import.meta.url', JSON.stringify(url.href)),
   coverage = source.slice(source.indexOf('function cycleCompletionCheck('), source.indexOf('\nawait saveReport()')),
   env = { BUDDY_CAPTURE_IDS: 'wave', BUDDY_REPORT_DIR: 'drafts/offline-performance-only-contract' }

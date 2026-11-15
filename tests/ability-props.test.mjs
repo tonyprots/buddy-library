@@ -1,12 +1,12 @@
 import assert from 'node:assert/strict'
 import { test } from 'node:test'
-import { createAbilityPropBuilders } from '../ability-props.js'
+import { createAbilityPropBuilders } from '../src/ability-props.js'
 
 test('объёмный реквизит переиспользует меши и материалы, скрывается и освобождает ресурсы', async () => {
   const previous = globalThis.document, context = new Proxy({}, { get: () => () => {} })
   globalThis.document = { createElement: () => ({ width: 0, height: 0, getContext: () => context }) }
   try {
-    const { Buddy3D } = await import('../vendor.js'), rig = Buddy3D.create({ outline: false })
+    const { Buddy3D } = await import('../src/vendor.js'), rig = Buddy3D.create({ outline: false })
     await rig.loaded
     const builtRoots = [], rootsByName = new Map(), createdMaterials = []
     assert.equal(rig.registerPropBuilders(kit => {
@@ -136,7 +136,7 @@ test('thumbsUp использует настоящие кости и не мен
   const previous = globalThis.document, context = new Proxy({}, { get: () => () => {} })
   globalThis.document = { createElement: () => ({ width: 0, height: 0, getContext: () => context }) }
   try {
-    const { Buddy3D, THREE: T } = await import('../vendor.js'), rig = Buddy3D.create({ outline: false })
+    const { Buddy3D, THREE: T } = await import('../src/vendor.js'), rig = Buddy3D.create({ outline: false })
     await rig.loaded
     const bones = new Map()
     rig.root.traverse(object => { if (object.isBone) bones.set(object.name, object) })

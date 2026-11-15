@@ -74,12 +74,12 @@ try {
   assert.ok(gaps.every(item => item.gap >= 7.5), JSON.stringify(gaps))
   check('Зазоры между соседними блоками не меньше 8px', gaps)
   await browser.navigate(base + '/fixture')
-  await ev(`document.body.innerHTML = '<div id="fixture"></div>';globalThis.THREE={host:true}; globalThis.module = await import('./index.js'); globalThis.makeStage = (kind='floor') => { const stage=document.createElement('div'); stage.style.cssText='position:relative;width:1280px;height:720px;background:white;'; stage.innerHTML='<section class="slide on" style="position:absolute;inset:0"><h2 style="position:absolute;left:60px;top:40px">Проверка бадди</h2></section><div class="brand" style="position:absolute;left:45px;top:660px;height:40px;width:180px"><span data-perch-text>Buddy</span></div>'; document.querySelector('#fixture').append(stage); return stage }; globalThis.testStage=makeStage(); globalThis.testBuddy=await module.createBuddy({stage:testStage,autoplay:false,reactions:false,seed:14}); testBuddy.progress(1); testBuddy.reset(); testBuddy.pause();`)
+  await ev(`document.body.innerHTML = '<div id="fixture"></div>';globalThis.THREE={host:true}; globalThis.module = await import('./src/index.js'); globalThis.makeStage = (kind='floor') => { const stage=document.createElement('div'); stage.style.cssText='position:relative;width:1280px;height:720px;background:white;'; stage.innerHTML='<section class="slide on" style="position:absolute;inset:0"><h2 style="position:absolute;left:60px;top:40px">Проверка бадди</h2></section><div class="brand" style="position:absolute;left:45px;top:660px;height:40px;width:180px"><span data-perch-text>Buddy</span></div>'; document.querySelector('#fixture').append(stage); return stage }; globalThis.testStage=makeStage(); globalThis.testBuddy=await module.createBuddy({stage:testStage,autoplay:false,reactions:false,seed:14}); testBuddy.progress(1); testBuddy.reset(); testBuddy.pause();`)
   assert.equal(await ev('globalThis.THREE.host'), true)
   check('Библиотека сохраняет THREE основного приложения')
   assert.equal(await ev('testBuddy.presets.y360'), false)
   assert.match(await ev(`testBuddy.can('disk')`), /is off/)
-  assert.equal(browser.requests.some(url => url.includes('/presets/y360.js')), false)
+  assert.equal(browser.requests.some(url => url.includes('/src/presets/y360.js')), false)
   check('Я360 выключен и не загружается по умолчанию')
   await ev(`globalThis.otherStage=makeStage(); otherStage.style.position='absolute';otherStage.style.top='0';otherStage.style.left='0'; globalThis.otherBuddy=await module.createBuddy({stage:otherStage,autoplay:false,reactions:false});otherBuddy.pause()`)
   assert.equal(await ev(`(() => {const ids=[...document.querySelectorAll('.buddy [id]')].map(e=>e.id);return ids.length===new Set(ids).size})()`), true)
@@ -155,7 +155,7 @@ try {
   if (report.techniques.length) check('Все приёмы проверены на конечные координаты и SVG', report.techniques.length)
   const reaction = await ev(`await (async () => {
     testBuddy.reset();testBuddy.resume();testStage.querySelector('.slide').setAttribute('data-buddy-scene','number');
-    const {attachSlideIntelligence}=await import('./slide-intelligence.js'), events=[],controller=attachSlideIntelligence({stage:testStage,buddy:testBuddy,quietMs:60,cooldownMs:100,revisitMs:100,staleMs:3000,onReaction:event=>events.push(event)});
+    const {attachSlideIntelligence}=await import('./src/slide-intelligence.js'), events=[],controller=attachSlideIntelligence({stage:testStage,buddy:testBuddy,quietMs:60,cooldownMs:100,revisitMs:100,staleMs:3000,onReaction:event=>events.push(event)});
     await new Promise(r=>setTimeout(r,40));const early=events.length;await new Promise(r=>setTimeout(r,250));
     const measures=controller.state().measures;for(let i=0;i<20;i++){const node=document.createElement('i');node.textContent='x';testStage.querySelector('.buddy').append(node);node.remove()}
     await new Promise(r=>setTimeout(r,250));const after=controller.state().measures;controller.destroy();
@@ -213,7 +213,7 @@ try {
     testStage.innerHTML='<section class="slide cover on" style="position:absolute;inset:0;background:#edf4ff"><h1 style="position:absolute;left:70px;top:180px;font-size:64px">Сейчас начнётся</h1></section><section class="slide" style="position:absolute;inset:0;background:#edf4ff"><h2 style="position:absolute;left:70px;top:70px">Следующий слайд</h2><div data-buddy-land style="position:absolute;left:360px;top:420px;width:300px;height:200px;background:#dde8fa">Площадка</div></section>';
     testStage.style.setProperty('--paper','#edf4ff');testStage.style.setProperty('--flame','#1340e0');
     globalThis.introBuddy=await module.createBuddy({stage:testStage,autoplay:false,reactions:false});
-    const {attachDeckEffects}=await import('./effects.js'),slides=[...testStage.querySelectorAll('.slide')];
+    const {attachDeckEffects}=await import('./src/effects.js'),slides=[...testStage.querySelectorAll('.slide')];
     globalThis.introEffects=attachDeckEffects({stage:testStage,buddy:introBuddy,show:index=>slides.forEach((slide,i)=>slide.classList.toggle('on',i===index))});
     const armed=introEffects.armIntro('line');await new Promise(r=>setTimeout(r,150));const glass=introEffects.glass;
     introEffects.go(1,0);await new Promise(r=>setTimeout(r,2200));

@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict'
 import { readFile } from 'node:fs/promises'
 import { test } from 'node:test'
-import { logos } from '../presets/y360.js'
+import { logos } from '../src/presets/y360.js'
 
 test('основная сборка не содержит знаков; отдельная сборка содержит весь пример', async () => {
   const [main, example] = await Promise.all(['buddy', 'buddy-y360'].map(name =>

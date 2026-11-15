@@ -65,7 +65,7 @@ try {
     await page.locator(`[data-id="${id}"]`).click()
     const result = await page.evaluate(async id => {
       buddy.pause()
-      const metadata = (await import('/index.js')).techniques.find(item => item.id === id)
+      const metadata = (await import('/src/index.js')).techniques.find(item => item.id === id)
       for (let i = 0; i < 1800 && buddy.state().act !== id; i++) buddy.step(1 / 60)
       if (buddy.state().act !== id) throw new Error('История не запущена: ' + id)
       buddy.step(Math.max(0, metadata.duration * .45 - buddy.experimental.B.act.t))

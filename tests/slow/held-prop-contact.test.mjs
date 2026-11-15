@@ -13,8 +13,8 @@ test('четыре удерживаемых предмета: actual GLB кон�
   let rig
   try {
     globalThis.document = { createElement: () => ({ getContext: () => context }) }
-    const { Buddy3D, THREE: T } = await import('../../vendor.js')
-    const { createAbilityPlayer } = await import(process.env.BUDDY_HELD_ABILITY || '../../new-abilities.js')
+    const { Buddy3D, THREE: T } = await import('../../src/vendor.js')
+    const { createAbilityPlayer } = await import(process.env.BUDDY_HELD_ABILITY || '../../src/new-abilities.js')
     rig = Buddy3D.create({ outline: false }); await rig.loaded; globalThis.document = previous
     const geometry = palmGeometry(rig, T), roots = new Map(), solids = new Map(), point = new T.Vector3(), headRefs = [],
       plain = p => { const q = { ...p }; delete q.handTask; return q },
@@ -170,7 +170,7 @@ test('четыре удерживаемых предмета: actual GLB кон�
     }
   } finally { globalThis.document = previous; rig?.dispose?.(); boot.close() }
   const report = { startedAtUTC, endedAtUTC: new Date().toISOString(), hz: 120,
-    hashes: Object.fromEntries(['runtime.js', 'vendor.js', 'new-abilities.js', 'ability-props.js'].map(name => [name, createHash('sha256').update(readFileSync(new URL('../../' + name, import.meta.url))).digest('hex')])),
+    hashes: Object.fromEntries(['runtime.js', 'vendor.js', 'new-abilities.js', 'ability-props.js'].map(name => [name, createHash('sha256').update(readFileSync(new URL('../../src/' + name, import.meta.url))).digest('hex')])),
     method: 'Node direct-call actual GLB skin/prop geometry; без WebGL, browser FPS и GPU-time.', rows }
   if (process.env.BUDDY_HELD_PROP_REPORT) writeFileSync(process.env.BUDDY_HELD_PROP_REPORT, JSON.stringify(report, null, 2) + '\n')
   for (const row of rows) {

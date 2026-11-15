@@ -1,7 +1,7 @@
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
-import { createBuddy, techniques } from '../index.js'
-import { createBehaviorPolicy } from '../behavior.js'
+import { createBuddy, techniques } from '../src/index.js'
+import { createBehaviorPolicy } from '../src/behavior.js'
 import { runtimeFixture } from './support/runtime-fixture.mjs'
 
 async function fixture(options = {}) {

@@ -6,7 +6,7 @@ test('Только синий худи получает rim цвета ткан�
   const f = runtimeFixture(), previous = document, context = new Proxy({}, { get: () => () => {} })
   try {
     globalThis.document = { createElement: () => ({ getContext: () => context }) }
-    const { Buddy3D, THREE: T } = await import(process.env.BUDDY_RIM_VENDOR || '../vendor.js'), rig = Buddy3D.create({ outline: false })
+    const { Buddy3D, THREE: T } = await import(process.env.BUDDY_RIM_VENDOR || '../src/vendor.js'), rig = Buddy3D.create({ outline: false })
     await rig.loaded
     globalThis.document = previous
     const materials = new Set(), warm = new T.Color('#FFE7D2').multiplyScalar(.32), blue = new T.Color('#1340E0')

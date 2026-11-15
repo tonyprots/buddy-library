@@ -7,6 +7,7 @@
 
 - [README](README.md): dist/buddy.js, one-script integration and active defaults.
 - [Agent integration](docs/agent-integration.md): preserve navigation and verify with a light check.
+- [Showcase](examples/showcase.html): real climb-and-magnet sequence with replay and pause.
 - [Quick-start deck](examples/quick-start.html): no server or build step.
 - [Presentation brand](examples/brand.html): a fictional brand configured through JSON.
 

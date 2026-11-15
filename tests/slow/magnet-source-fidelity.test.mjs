@@ -41,7 +41,7 @@ function styledIcon(f, initial) {
 }
 
 test('magnet точно восстанавливает style источника и сохраняет concurrent изменения владельца', () => {
-  const started = Date.now(), cases = [], sourceSHA = createHash('sha256').update(readFileSync(new URL('../../runtime.js', import.meta.url))).digest('hex'),
+  const started = Date.now(), cases = [], sourceSHA = createHash('sha256').update(readFileSync(new URL('../../src/runtime.js', import.meta.url))).digest('hex'),
     styles = [null, '', 'color: tomato;', ' COLOR: tomato; visibility : visible !important; --theme: stable; '],
     scenarios = [{ name: 'unchanged' },
       { name: 'host-color', edit: node => node.style.setProperty('color', 'blue') },

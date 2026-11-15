@@ -87,7 +87,7 @@ for (const id of ['web', 'climb', 'finale']) test(id + ': локальная с�
   cases.push(...rows)
   if (process.env.BUDDY_LEGACY_BRANCH_REPORT) writeFileSync(process.env.BUDDY_LEGACY_BRANCH_REPORT,
     JSON.stringify({ created: new Date().toISOString(), fps: 120,
-      runtimeSha: createHash('sha256').update(readFileSync(new URL('../runtime.js', import.meta.url))).digest('hex'), cases }, null, 2) + '\n')
+      runtimeSha: createHash('sha256').update(readFileSync(new URL('../src/runtime.js', import.meta.url))).digest('hex'), cases }, null, 2) + '\n')
   for (const row of rows) {
     const detail = JSON.stringify({ id, face: row.face, maxAngle: { time: row.maxAngle.time, ...row.maxAngle.angle },
       maxHand: { time: row.maxHand.time, step: row.maxHand.handStep, bodyStep: row.maxHand.bodyStep },

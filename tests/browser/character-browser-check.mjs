@@ -5,14 +5,14 @@ import { mkdir, readFile, readdir, stat, writeFile } from 'node:fs/promises'
 import { dirname, extname, join, resolve, sep } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { openBrowser } from './cdp.mjs'
+import { publicSourceFiles } from '../support/source-files.mjs'
 
 // Native PNG и диагностика; графических оценок и production-изменений этот сборщик не делает.
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '../..'),
   output = resolve(root, process.env.BUDDY_CHARACTER_REPORT || 'drafts/character-quality/native'),
   rimDiagnostic = process.env.BUDDY_CHARACTER_RIM === '1',
   snapshotRoot = join(output, 'sources'), hash = data => createHash('sha256').update(data).digest('hex'),
-  names = [...(await readdir(root)).filter(file => /\.(js|json|d\.ts)$/.test(file)),
-    ...(await readdir(join(root, 'presets'))).filter(file => file.endsWith('.js')).map(file => 'presets/' + file),
+  names = [...await publicSourceFiles(root),
     'tests/browser/character-browser-check.mjs', 'tests/browser/cdp.mjs'],
   sources = new Map(await Promise.all(names.map(async name => [name, await readFile(join(root, name))])))
 assert.ok(output.startsWith(join(root, 'drafts') + sep), 'Сохраняйте evidence в drafts проекта')
@@ -26,8 +26,8 @@ const html = `<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta n
 const nativeContext=HTMLCanvasElement.prototype.getContext;
 HTMLCanvasElement.prototype.getContext=function(kind,...args){const gl=nativeContext.call(this,kind,...args);if(gl&&/^webgl/.test(kind)&&!gl.__qaPrograms){gl.__qaPrograms=[];const original=gl.createProgram.bind(gl);gl.createProgram=()=>{const program=original();gl.__qaPrograms.push(program);return program};this.__qaGL=gl}return gl};
 globalThis.qaRigs={};globalThis.qaRimDefaults={};globalThis.qaRimSerial=0;
-if(${JSON.stringify(rimDiagnostic)}){const vendor=await import('/vendor.js'),original=vendor.Buddy3D.create;vendor.Buddy3D.create=function(...args){const rig=original.apply(this,args);qaRigs[globalThis.qaCreatingId]=rig;qaRimDefaults[globalThis.qaCreatingId]=rig.G.uRimCol.value.toArray();return rig}}
-const{createBuddy}=await import('/index.js');globalThis.qaBuddies={};
+if(${JSON.stringify(rimDiagnostic)}){const vendor=await import('/src/vendor.js'),original=vendor.Buddy3D.create;vendor.Buddy3D.create=function(...args){const rig=original.apply(this,args);qaRigs[globalThis.qaCreatingId]=rig;qaRimDefaults[globalThis.qaCreatingId]=rig.G.uRimCol.value.toArray();return rig}}
+const{createBuddy}=await import('/src/index.js');globalThis.qaBuddies={};
 for(const id of['a','b']){globalThis.qaCreatingId=id;const stage=document.getElementById(id),buddy=await createBuddy({stage,renderer:'auto',motion:'full',autoplay:false,reactions:false,keyboard:false,seed:14,presets:{superhuman:true}});buddy.pause();buddy.progress(1);buddy.reset();qaBuddies[id]=buddy}
 globalThis.qaCamera=(id,scale=12,focus='body')=>{const buddy=qaBuddies[id],stage=document.getElementById(id),pane=stage.parentElement,r=buddy.experimental,b=r.B,k=b.kk,sc=r.tools.S*b.scale,world=p=>[b.x+(p[0]*Math.cos(b.yaw)-p[2]*Math.sin(b.yaw))*sc,b.y+p[1]*sc],box=buddy.framing().actor;let center=[(box[0]+box[2])/2,(box[1]+box[3])/2];if(focus==='face')center=world(k.head);if(focus==='hand')center=world(k.arms[b.face>0?0:1].hand);stage.style.transform='translate('+(pane.clientWidth/2-center[0]*scale)+'px,'+(pane.clientHeight/2-center[1]*scale)+'px) scale('+scale+')';return{scale,focus,center}};
 globalThis.qaPose=(id,face,cam,expression={})=>{const buddy=qaBuddies[id],r=buddy.experimental;buddy.reset();buddy.pause();r.B.face=face;r.posed(expression,cam);r.B.yaw=face>0?cam*Math.PI/2:Math.PI-cam*Math.PI/2;r.B.yawV=0;buddy.step(.5,60);return qaCamera(id,12)};

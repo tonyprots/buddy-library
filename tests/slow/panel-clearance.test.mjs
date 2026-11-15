@@ -8,12 +8,12 @@ import { propGeometry } from '../support/prop-geometry.mjs'
 
 test('физические карточки сравнения, списка и цитаты не пересекают голову в обе стороны', async () => {
   const moduleURL = process.env.BUDDY_PANEL_SOURCE ? pathToFileURL(process.env.BUDDY_PANEL_SOURCE)
-    : new URL('../../context-stories.js', import.meta.url), { createStoryPlayer } = await import(moduleURL),
+    : new URL('../../src/context-stories.js', import.meta.url), { createStoryPlayer } = await import(moduleURL),
     f = runtimeFixture(), originalDocument = globalThis.document, originalCreate = originalDocument.createElement,
     context = new Proxy({ measureText: text => ({ width: text.length * 20 }) }, { get: (target, key) => target[key] ?? (() => {}) }), cases = []
   try {
     globalThis.document = { createElement: () => ({ getContext: () => context }) }
-    const { Buddy3D, THREE: T } = await import('../../vendor.js'), rig = Buddy3D.create({ outline: false })
+    const { Buddy3D, THREE: T } = await import('../../src/vendor.js'), rig = Buddy3D.create({ outline: false })
     await rig.loaded; globalThis.document = originalDocument
     originalDocument.createElement = tag => tag === 'canvas' ? { getContext: () => context } : originalCreate(tag)
     const roots = new Map(), probe = propGeometry(rig, T)

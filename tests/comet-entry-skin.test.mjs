@@ -2,14 +2,14 @@ import assert from 'node:assert/strict'
 import { test } from 'node:test'
 import { writeFileSync } from 'node:fs'
 import { runtimeFixture } from './support/runtime-fixture.mjs'
-import { createAbilityPlayer } from '../new-abilities.js'
+import { createAbilityPlayer } from '../src/new-abilities.js'
 import { palmGeometry } from './support/palm-geometry.mjs'
 
 test('comet: настоящие пальцы входят из показанного handOpen без скачка при public player.play', async () => {
   const boot = runtimeFixture(), doc = document, ctx = new Proxy({}, { get: () => () => {} }), rows = []
   try {
     globalThis.document = { createElement: () => ({ getContext: () => ctx }) }
-    const { Buddy3D, THREE: T } = await import('../vendor.js'), rig = Buddy3D.create({ outline: false })
+    const { Buddy3D, THREE: T } = await import('../src/vendor.js'), rig = Buddy3D.create({ outline: false })
     await rig.loaded; globalThis.document = doc
     const geometry = palmGeometry(rig, T), fingers = [...geometry.bones].filter(([name]) => /^(Index|Middle|Ring|Pinky)/.test(name)),
       read = raw => {

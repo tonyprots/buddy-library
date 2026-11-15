@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict'
 import { test } from 'node:test'
 import { writeFileSync } from 'node:fs'
-import { createBuddy, techniques } from '../index.js'
+import { createBuddy, techniques } from '../src/index.js'
 import { runtimeFixture } from './support/runtime-fixture.mjs'
 
 async function observe({ count = 1, index = 0, seed = 1, options = {}, seconds = 90 } = {}) {

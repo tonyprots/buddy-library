@@ -50,7 +50,7 @@ try {
       check(`${page}: пакет подключён`, await ready())
       const result = await b.evaluate(`await (async () => {
         buddy.destroy()
-        const create = globalThis.Buddy?.createBuddy || (await import('./node_modules/@tony-prots/buddy/index.js')).createBuddy,
+        const create = globalThis.Buddy?.createBuddy || (await import('./node_modules/@tony-prots/buddy/src/index.js')).createBuddy,
           stage = document.getElementById('stage'), warn = console.warn, warnings = [], runs = []
         console.warn = message => warnings.push(message)
         try {
@@ -79,7 +79,7 @@ try {
           if(globalThis.Buddy) {
             await new Promise((resolve,reject)=>{const script=document.createElement('script');script.src='./node_modules/@tony-prots/buddy/dist/buddy-y360.js';script.onload=resolve;script.onerror=reject;document.head.append(script)})
             logos=BuddyY360.logos
-          } else logos=(await import('./node_modules/@tony-prots/buddy/presets/y360.js')).logos
+          } else logos=(await import('./node_modules/@tony-prots/buddy/src/presets/y360.js')).logos
           window.buddy=await create({stage,mode:'manual',presets:{y360:true},logos})
           buddy.pause();buddy.progress(1);buddy.play('disk');buddy.step(.5)
           return {runs,withoutLogosWarnings,wrongSizeWarnings,scaledWarnings,

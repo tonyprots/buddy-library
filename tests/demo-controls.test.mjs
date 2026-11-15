@@ -2,9 +2,9 @@ import { test } from 'node:test'
 import assert from 'node:assert/strict'
 import { readFile } from 'node:fs/promises'
 import { runInNewContext } from 'node:vm'
-import { techniques } from '../index.js'
-import { createPreviewCamera } from '../camera.js'
-import { logos as y360Logos } from '../presets/y360.js'
+import { techniques } from '../src/index.js'
+import { createPreviewCamera } from '../src/camera.js'
+import { logos as y360Logos } from '../src/presets/y360.js'
 
 /** Выполняет настоящий модуль стенда; браузерные элементы и библиотека заменены по их интерфейсу. */
 async function demo() {

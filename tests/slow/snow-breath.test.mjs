@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict'
 import { writeFileSync } from 'node:fs'
 import { test } from 'node:test'
-import { createAbilityPlayer } from '../../new-abilities.js'
+import { createAbilityPlayer } from '../../src/new-abilities.js'
 import { runtimeFixture } from '../support/runtime-fixture.mjs'
 
 const target = mouth => ({ eyesW: [[0, 0], [0, 0]], handsW: [[0, 0], [0, 0]], eyeOn: [true, true],
@@ -12,7 +12,7 @@ test('рот WebGL совпадает с front skin shader-рта при Head/Ne
   const f = runtimeFixture(), previous = document, context = new Proxy({}, { get: () => () => {} })
   try {
     globalThis.document = { createElement: () => ({ getContext: () => context }) }
-    const { Buddy3D, THREE: T } = await import('../../vendor.js'), rig = Buddy3D.create({ outline: false }), other = Buddy3D.create({ outline: false })
+    const { Buddy3D, THREE: T } = await import('../../src/vendor.js'), rig = Buddy3D.create({ outline: false }), other = Buddy3D.create({ outline: false })
     await Promise.all([rig.loaded, other.loaded])
     globalThis.document = previous
     let mesh, head

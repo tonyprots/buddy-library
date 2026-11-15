@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict'
 import { test } from 'node:test'
 import { runtimeFixture } from './support/runtime-fixture.mjs'
-import { createPreviewCamera } from '../camera.js'
+import { createPreviewCamera } from '../src/camera.js'
 
 test('calendar передаёт удивлённый взгляд в хлопок по лбу без скачка головы', () => {
   for (const face of [-1, 1]) {

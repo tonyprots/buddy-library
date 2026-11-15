@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Slides, meet Buddy</title>
+<meta name="description" content="Watch Buddy climb slide content and pull an object into his hands. A real, offline HTML presentation demo.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath d='M7 31v-9q0-9 9-9t9 9v9' fill='%231340e0'/%3E%3Ccircle cx='16' cy='9' r='7' fill='%23efc3a2'/%3E%3C/svg%3E">
+<style>
+:root{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:#20252f;background:#fff;font-synthesis:none}
+*{box-sizing:border-box}body{margin:0}main{max-width:1280px;margin:auto;padding:24px}
+#viewport{width:100%;aspect-ratio:16/9;overflow:hidden;position:relative;background:#edf4ff;border-radius:16px}
+#stage{width:1280px;height:720px;position:absolute;transform-origin:0 0;overflow:hidden;--paper:#edf4ff;--flame:#1340e0}
+.slide{position:absolute;inset:0;background:#edf4ff}
+h1{position:absolute;left:76px;top:52px;margin:0;font-size:88px;line-height:1.08;font-weight:780;letter-spacing:-3.5px}
+.intro{position:absolute;left:80px;top:173px;margin:0;font-size:29px;line-height:1.4;color:#465875}
+.platform{position:absolute;left:400px;top:490px;width:300px;height:150px;padding:24px 28px;border-radius:18px;background:#cadcf8}
+.platform h2{font-size:28px;line-height:1.15;letter-spacing:-.4px;margin:0;font-weight:700;max-width:244px}
+.platform p{font-size:18px;line-height:1.4;margin:16px 0 0;color:#344868}
+.idea{position:absolute;left:790px;top:350px;width:64px;height:64px}
+.idea-label{position:absolute;left:738px;top:438px;width:168px;text-align:center;font-size:22px;color:#344868;margin:0}
+nav{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-top:24px}
+button{font:inherit;font-size:16px;min-height:44px;padding:10px 18px;border:0;border-radius:8px;background:#dfebfd;color:#20334f;cursor:pointer}
+button:hover{background:#cbdcfa}button:disabled{opacity:.55;cursor:default}:focus-visible{outline:3px solid #123aa6;outline-offset:3px}
+a{color:#123aa6;display:inline-flex;min-height:44px;align-items:center;margin-left:auto}#status{font-size:15px;line-height:1.5;color:#465875;margin:16px 0 0}
+@media(max-width:600px){main{padding:16px}#viewport{border-radius:10px}nav{margin-top:16px;gap:8px}a{margin-left:0}button{flex:1}}
+body.capture main{padding:0;max-width:none}body.capture #viewport{border-radius:0}body.capture nav,body.capture #status{display:none}
+</style>
+</head>
+<body>
+<main>
+  <div id="viewport">
+    <div id="stage">
+      <section class="slide on">
+        <h1>Slides, meet Buddy.</h1>
+        <p class="intro">A small companion with a big repertoire.</p>
+        <div class="platform"><h2>A higher<br>point of view.</h2><p>Yes, he can climb this.</p></div>
+        <svg class="idea" role="img" aria-label="A blue gem" viewBox="0 0 64 64"><path fill="#1340e0" d="M16 5h32l15 20-31 35L1 25Z"/><path fill="#88adf3" d="m16 5 16 20L48 5Z"/><path fill="#416ed6" d="M1 25h31L16 5Zm31 0h31L48 5Z"/><path fill="#0c2a98" d="m32 25 31 0-31 35Z"/><path fill="#cadcf8" d="m16 5 5 20h11Z"/></svg>
+        <p class="idea-label">An idea to borrow.</p>
+      </section>
+    </div>
+  </div>
+  <nav aria-label="Demo controls"><button id="replay" disabled>Replay</button><button id="pause" disabled>Pause</button><a href="../README.md">Get Buddy</a></nav>
+  <p id="status" role="status">A scripted demo, performed by the same library you add to your slides.</p>
+</main>
+<script src="../dist/buddy.js"></script>
+<script>
+const stage = document.getElementById('stage'), viewport = document.getElementById('viewport'),
+  replay = document.getElementById('replay'), pause = document.getElementById('pause'), status = document.getElementById('status'),
+  capture = new URLSearchParams(location.search).has('capture'),
+  resize = () => { stage.style.transform = `scale(${viewport.clientWidth / 1280})` }
+if (capture) document.body.classList.add('capture')
+resize()
+addEventListener('resize', resize)
+async function start() {
+  buddy.reset()
+  buddy.progress(1)
+  window.demoResult = null
+  const handle = buddy.story(['climb', {wait:.6}, 'descend', 'magnet', {wait:.4}, 'bow'])
+  status.textContent = 'Climbing the slide, borrowing an idea, then taking a bow.'
+  window.demoHandle = handle
+  const result = await handle.finished
+  if (window.demoHandle !== handle) return
+  window.demoResult = result
+  status.textContent = result.status === 'completed' ? 'Your content. His playground. Replay, or add Buddy to your own slides.'
+    : result.status === 'skipped' ? 'Reduced motion is enabled. Buddy will stay still.' : 'Demo stopped. Replay whenever you like.'
+}
+Buddy.createBuddy({stage, mode:'manual', seed:1, hoodie:'default'}).then(instance => {
+  window.buddy = instance
+  if (capture) buddy.pause()
+  replay.disabled = pause.disabled = buddy.state().reducedMotion
+  replay.addEventListener('click', () => { buddy.resume(); pause.textContent = 'Pause'; pause.setAttribute('aria-pressed','false'); start() })
+  pause.addEventListener('click', () => { buddy.paused ? buddy.resume() : buddy.pause(); pause.textContent = buddy.paused ? 'Resume' : 'Pause'; pause.setAttribute('aria-pressed',String(buddy.paused)) })
+  window.startDemo = start
+  start()
+}).catch(error => { status.textContent = 'Buddy could not start: ' + error.message })
+</script>
+</body>
+</html>

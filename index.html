@@ -68,10 +68,10 @@ header a{display:inline-flex;align-items:center;min-height:44px;padding:0 4px}
 </main>
 <footer>Buddy · local library · <a href="docs/api.md#action-catalog">API reference</a>. All files work without external downloads. Brand images are optional.</footer>
 <script type="module">
-import { createBuddy, techniques } from './index.js'
-import { attachDeckEffects } from './effects.js'
-import { createPreviewCamera } from './camera.js'
-import { logos as y360Logos } from './presets/y360.js'
+import { createBuddy, techniques } from './src/index.js'
+import { attachDeckEffects } from './src/effects.js'
+import { createPreviewCamera } from './src/camera.js'
+import { logos as y360Logos } from './src/presets/y360.js'
 
 const $ = id => document.getElementById(id), stage = $('stage'), slides = [...stage.querySelectorAll(':scope > .slide')],
   groups = [...new Set(techniques.map(item => item.group))], camera = createPreviewCamera(),
@@ -114,7 +114,7 @@ function describe() {
   $('description').textContent = selected.description + (selected.preset === 'brand' && !$('y360').checked
     ? ' Playing this action enables the Y360 example and prepares the scene.' : '')
   $('code').textContent = selected.preset === 'brand'
-    ? `import { logos } from './presets/y360.js';\nconst buddy = await createBuddy({ stage, presets: { y360: true }, logos });\nbuddy.play('${selected.id}')`
+    ? `import { logos } from './src/presets/y360.js';\nconst buddy = await createBuddy({ stage, presets: { y360: true }, logos });\nbuddy.play('${selected.id}')`
     : `buddy.play('${selected.id}')`
   renderList()
 }

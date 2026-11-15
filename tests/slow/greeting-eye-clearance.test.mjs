@@ -8,9 +8,9 @@ import { createEyeOcclusionProbe } from '../support/eye-occlusion.mjs'
 
 test('кисти приветствия и оклика не закрывают глазной glyph во всём цикле с шагом 60 Hz', async () => {
   const root = new URL('../../', import.meta.url), source = process.env.BUDDY_EYE_SOURCE
-    ? pathToFileURL(resolve(process.env.BUDDY_EYE_SOURCE) + '/') : root,
+    ? pathToFileURL(resolve(process.env.BUDDY_EYE_SOURCE) + '/') : new URL('src/', root),
     fixtureSource = (await readFile(new URL('tests/support/runtime-fixture.mjs', root), 'utf8'))
-      .replace("'../../runtime.js'", JSON.stringify(new URL('runtime.js', source).href)),
+      .replace("'../../src/runtime.js'", JSON.stringify(new URL('runtime.js', source).href)),
     { runtimeFixture } = await import('data:text/javascript;base64,' + Buffer.from(fixtureSource).toString('base64')),
     { createAbilityPlayer } = await import(new URL('new-abilities.js', source).href),
     fixture = runtimeFixture(), { raw } = fixture, previous = document, context = new Proxy({}, { get: () => () => {} }),

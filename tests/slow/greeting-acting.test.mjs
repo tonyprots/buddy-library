@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict'
 import { writeFileSync } from 'node:fs'
 import { test } from 'node:test'
-import { createAbilityPlayer } from '../../new-abilities.js'
+import { createAbilityPlayer } from '../../src/new-abilities.js'
 import { runtimeFixture } from '../support/runtime-fixture.mjs'
 import { palmGeometry } from '../support/palm-geometry.mjs'
 
@@ -11,7 +11,7 @@ test('приветствие оставляет глаза открытыми, �
   let player
   try {
     globalThis.document = { createElement: () => ({ width: 0, height: 0, getContext: () => context }) }
-    const { Buddy3D, THREE: T } = await import('../../vendor.js'), rig = Buddy3D.create({ outline: false })
+    const { Buddy3D, THREE: T } = await import('../../src/vendor.js'), rig = Buddy3D.create({ outline: false })
     await rig.loaded
     globalThis.document = previous
     const geometry = palmGeometry(rig, T), anchors = { eyesW: [[0, 0], [0, 0]], handsW: [[0, 0], [0, 0]], eyeOn: [true, true] }

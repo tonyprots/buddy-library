@@ -2,8 +2,8 @@ import assert from 'node:assert/strict'
 import { readFileSync, writeFileSync } from 'node:fs'
 import { createHash } from 'node:crypto'
 import { test } from 'node:test'
-import { storyTechniques, createStoryPlayer } from '../context-stories.js'
-import { contextTechniques, createContextPlayer } from '../context-abilities.js'
+import { storyTechniques, createStoryPlayer } from '../src/context-stories.js'
+import { contextTechniques, createContextPlayer } from '../src/context-abilities.js'
 import { runtimeFixture } from './support/runtime-fixture.mjs'
 
 const allIds = ['thinkKeyword', 'compareValues', 'followChart', 'chartClimb', 'cardRoute', 'traceFlow',
@@ -157,7 +157,7 @@ test('двадцать новых траекторий 60 Hz непрерывн�
   }
   if (process.env.STORY_TRAJECTORY_REPORT) writeFileSync(process.env.STORY_TRAJECTORY_REPORT,
     JSON.stringify({ date: new Date().toISOString(), sources: Object.fromEntries(['context-stories.js', 'context-abilities.js'].map(file =>
-      [file, createHash('sha256').update(readFileSync(new URL('../' + file, import.meta.url))).digest('hex')])), trajectories }, null, 2) + '\n')
+      [file, createHash('sha256').update(readFileSync(new URL('../src/' + file, import.meta.url))).digest('hex')])), trajectories }, null, 2) + '\n')
 })
 
 test('числа, цитата и состояние списка сохраняются буквально без автоматических оценок', () => {
@@ -251,7 +251,7 @@ test('traceFlow плавно перенаводится между двумя и
     } finally { f.close() }
   }
   if (process.env.STORY_FLOW_REPORT) writeFileSync(process.env.STORY_FLOW_REPORT, JSON.stringify({ date: new Date().toISOString(),
-    sourceSha: createHash('sha256').update(readFileSync(new URL('../context-stories.js', import.meta.url))).digest('hex'), cases }, null, 2) + '\n')
+    sourceSha: createHash('sha256').update(readFileSync(new URL('../src/context-stories.js', import.meta.url))).digest('hex'), cases }, null, 2) + '\n')
 })
 
 test('точный crop и пара изображений используют исходный media, не условные заглушки', () => {

@@ -15,12 +15,12 @@ const root = resolve(dirname(fileURLToPath(import.meta.url)), '../..'),
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ctext y='26' font-size='28'%3E🪂%3C/text%3E%3C/svg%3E">
 <style>*{box-sizing:border-box}body{margin:0;padding:28px;background:#fff;color:#233554;font:16px system-ui}h1{font-size:24px;margin:0}p{margin:12px 0 24px}#viewport{width:1280px;height:720px;position:relative;overflow:hidden;background:#edf4ff}#stage{position:absolute;left:0;top:0;width:1280px;height:720px;transform-origin:0 0}.slide{position:absolute;inset:0;background:#edf4ff}</style>
 <h1>Проверка парашюта</h1><p id="status">Подключение персонажа</p><div id="viewport"><div id="stage"><section class="slide on"></section></div></div>
-<script type="module">import {createBuddy} from './index.js';
+<script type="module">import {createBuddy} from './src/index.js';
 globalThis.actor=await createBuddy({stage:document.getElementById('stage'),renderer:new URL(location.href).searchParams.get('renderer')||'auto',motion:'full',autoplay:false,reactions:false,seed:14});
 actor.progress(1);actor.pause();document.getElementById('status').textContent='Отрисовка: '+actor.renderer;</script></html>`
 
 await mkdir(output, { recursive: true })
-for (const file of ['runtime.js', 'index.js', 'vendor.js', 'tests/browser/parachute-browser-check.mjs'])
+for (const file of ['src/runtime.js', 'src/index.js', 'src/vendor.js', 'tests/browser/parachute-browser-check.mjs'])
   report.sources[file] = createHash('sha256').update(await readFile(join(root, file))).digest('hex')
 const server = createServer(async (request, response) => {
   try {

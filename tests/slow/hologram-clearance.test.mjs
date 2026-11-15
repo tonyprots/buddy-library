@@ -8,13 +8,13 @@ import { propGeometry } from '../support/prop-geometry.mjs'
 
 test('все восемь объёмных понятий сохраняют зазор перед настоящей геометрией головы', async () => {
   const moduleURL = process.env.BUDDY_HOLOGRAM_SOURCE ? pathToFileURL(process.env.BUDDY_HOLOGRAM_SOURCE)
-    : new URL('../../context-abilities.js', import.meta.url), { createContextPlayer } = await import(moduleURL),
+    : new URL('../../src/context-abilities.js', import.meta.url), { createContextPlayer } = await import(moduleURL),
     fixture = runtimeFixture(), originalDocument = globalThis.document,
     canvasContext = new Proxy({}, { get: () => () => {} }), cases = []
   let rig
   try {
     globalThis.document = { createElement: () => ({ getContext: () => canvasContext }) }
-    const { Buddy3D, THREE: T } = await import('../../vendor.js')
+    const { Buddy3D, THREE: T } = await import('../../src/vendor.js')
     rig = Buddy3D.create({ outline: false }); await rig.loaded; globalThis.document = originalDocument
     const roots = new Map(), probe = propGeometry(rig, T),
       concepts = process.env.BUDDY_HOLOGRAM_QUICK ? ['memory'] : ['memory', 'target', 'team', 'chain', 'link', 'cloud', 'rules', 'search']

@@ -98,7 +98,7 @@ try {
   await ev('buddy.pause()')
   report.browser = await ev('navigator.userAgent')
   await check('Метаданные и группа контекстных приёмов', async () => {
-    const metadata = await ev(`globalThis.qaModule=await import('./index.js');qaModule.techniques.filter(t=>${JSON.stringify(cases.map(([id]) => id))}.includes(t.id)).map(t=>({id:t.id,kinds:t.contextKinds,tags:t.tags}))`)
+    const metadata = await ev(`globalThis.qaModule=await import('./src/index.js');qaModule.techniques.filter(t=>${JSON.stringify(cases.map(([id]) => id))}.includes(t.id)).map(t=>({id:t.id,kinds:t.contextKinds,tags:t.tags}))`)
     assert.deepEqual(metadata.map(item => item.id).sort(), cases.map(item => item[0]).sort())
     assert.ok(metadata.every(item => item.kinds.length && item.tags.includes('context')))
     await choose('group', 'Slide context')
@@ -203,7 +203,7 @@ try {
     assert.deepEqual(layout.clipped, [])
     if (width === 1440) {
       assert.deepEqual(layout.hiddenIds, [], 'На широком экране видны все идентификаторы')
-      const total = await ev(`globalThis.qaModule=await import('./index.js');qaModule.techniques.length`)
+      const total = await ev(`globalThis.qaModule=await import('./src/index.js');qaModule.techniques.length`)
       assert.equal(await ev(`document.querySelectorAll('#list button').length`), total)
     } else {
       const selected = await ev(`document.querySelector('#list button.selected')?.dataset.id`),
@@ -221,7 +221,7 @@ try {
   await check('Новый SVG-instance: точное число, подчёркивание и очистка', async () => {
     // Навигация завершает UI вместе с его rAF; отдельно destroy живого стенда вызвал бы его собственный stale callback.
     await browser.metrics(1440, 1000, 1); await browser.navigate(base + '/fixture')
-    await ev(`globalThis.qaModule=await import('./index.js');globalThis.buddy=await qaModule.createBuddy({stage:document.getElementById('fallbackStage'),renderer:'svg',autoplay:false,reactions:false,motion:'full',seed:14,presets:{superhuman:true}});buddy.progress(1);buddy.pause();document.getElementById('fallbackThink').onclick=()=>buddy.play('thinkNumber');document.getElementById('fallbackTrace').onclick=()=>buddy.play('traceFocus')`)
+    await ev(`globalThis.qaModule=await import('./src/index.js');globalThis.buddy=await qaModule.createBuddy({stage:document.getElementById('fallbackStage'),renderer:'svg',autoplay:false,reactions:false,motion:'full',seed:14,presets:{superhuman:true}});buddy.progress(1);buddy.pause();document.getElementById('fallbackThink').onclick=()=>buddy.play('thinkNumber');document.getElementById('fallbackTrace').onclick=()=>buddy.play('traceFocus')`)
     assert.equal(await ev('buddy.renderer'), 'svg')
     assert.equal(await ev(`document.querySelectorAll('.buddy canvas').length`), 0)
     await browser.click('#fallbackThink'); await waitFor('thinkNumber'); await toTime(4)

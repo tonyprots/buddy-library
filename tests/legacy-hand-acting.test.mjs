@@ -2,7 +2,7 @@ import assert from 'node:assert/strict'
 import { createHash } from 'node:crypto'
 import { readFileSync, writeFileSync } from 'node:fs'
 import { test } from 'node:test'
-import * as runtimeModule from '../runtime.js'
+import * as runtimeModule from '../src/runtime.js'
 import { runtimeFixture } from './support/runtime-fixture.mjs'
 import { palmGeometry } from './support/palm-geometry.mjs'
 
@@ -32,7 +32,7 @@ test('legacy construct/grapple/finale/parachute используют насто�
   let rig
   try {
     globalThis.document = { createElement: () => ({ getContext: () => context }) }
-    const { Buddy3D, THREE: T } = await import('../vendor.js')
+    const { Buddy3D, THREE: T } = await import('../src/vendor.js')
     rig = Buddy3D.create({ outline: false }); await rig.loaded
     globalThis.document = previous
     const geometry = palmGeometry(rig, T), anchors = { eyesW: [[0, 0], [0, 0]], handsW: [[0, 0], [0, 0]], eyeOn: [true, true] },
@@ -80,8 +80,8 @@ test('legacy construct/grapple/finale/parachute используют насто�
     }
   } finally { previous === undefined ? delete globalThis.document : globalThis.document = previous }
   if (process.env.BUDDY_LEGACY_HAND_REPORT) writeFileSync(process.env.BUDDY_LEGACY_HAND_REPORT, JSON.stringify({ startedAtUTC,
-    finishedAtUTC: new Date().toISOString(), runtimeSha: createHash('sha256').update(readFileSync(new URL('../runtime.js', import.meta.url))).digest('hex'),
-    vendorSha: createHash('sha256').update(readFileSync(new URL('../vendor.js', import.meta.url))).digest('hex'), rows }, null, 2) + '\n')
+    finishedAtUTC: new Date().toISOString(), runtimeSha: createHash('sha256').update(readFileSync(new URL('../src/runtime.js', import.meta.url))).digest('hex'),
+    vendorSha: createHash('sha256').update(readFileSync(new URL('../src/vendor.js', import.meta.url))).digest('hex'), rows }, null, 2) + '\n')
   for (const row of rows) {
     assert.ok(row.fingerSkinVertices.every(count => count > 20), 'Измерены настоящие skin vertices всех четырёх пальцев')
     assert.ok(row.maxFingerSkinErrorFromClosed.every(error => error < .05), 'Четыре пальца сомкнуты на настоящем GLB: ' + JSON.stringify(row))

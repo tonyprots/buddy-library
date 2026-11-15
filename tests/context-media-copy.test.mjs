@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict'
 import { test } from 'node:test'
-import { createStoryPlayer } from '../context-stories.js'
+import { createStoryPlayer } from '../src/context-stories.js'
 import { runtimeFixture } from './support/runtime-fixture.mjs'
 
 class Style {

@@ -6,7 +6,7 @@ import { runtimeFixture } from './support/runtime-fixture.mjs'
 
 test('разворот переходит в шаг без рывка колена, потери опоры и движения после остановки', () => {
   const started = Date.now(), cases = [], sourceSHA = createHash('sha256')
-    .update(readFileSync(new URL('../runtime.js', import.meta.url))).digest('hex')
+    .update(readFileSync(new URL('../src/runtime.js', import.meta.url))).digest('hex')
   for (const id of ['stroll', 'stumble']) for (const face of [-1, 1]) {
     const f = runtimeFixture(face), { raw } = f, samples = []
     try {

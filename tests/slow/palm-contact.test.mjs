@@ -3,14 +3,14 @@ import { writeFileSync } from 'node:fs'
 import { test } from 'node:test'
 import { runtimeFixture } from '../support/runtime-fixture.mjs'
 import { palmGeometry } from '../support/palm-geometry.mjs'
-import { createRuntime } from '../../runtime.js'
-import { resolveBrand } from '../../brand.js'
+import { createRuntime } from '../../src/runtime.js'
+import { resolveBrand } from '../../src/brand.js'
 
 test('clap и handstand: реальные ладони сохраняют контакт и плавность в полном цикле120Hz', async () => {
   const startedAtUTC = new Date().toISOString(), f = runtimeFixture(), previous = document, context = new Proxy({}, { get: () => () => {} }), cases = []
   try {
     globalThis.document = { createElement: () => ({ getContext: () => context }) }
-    const { Buddy3D, THREE: T } = await import('../../vendor.js'), rig = Buddy3D.create({ outline: false })
+    const { Buddy3D, THREE: T } = await import('../../src/vendor.js'), rig = Buddy3D.create({ outline: false })
     await rig.loaded; globalThis.document = previous
     const geometry = palmGeometry(rig, T), boneList = [...geometry.bones.values()], plain = p => { const q = { ...p }; delete q.handContact; delete q.handContactAmount; return q },
       boneState = () => boneList.map(b => [b.name, ...b.position.toArray(), ...b.quaternion.toArray(), ...b.scale.toArray()]),

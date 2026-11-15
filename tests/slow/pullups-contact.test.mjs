@@ -25,7 +25,7 @@ test('pullups: непрерывный fly→pull и реальный GLB хва�
   let rig
   try {
     globalThis.document = { createElement: () => ({ getContext: () => context }) }
-    const { Buddy3D, THREE: T } = await import('../../vendor.js')
+    const { Buddy3D, THREE: T } = await import('../../src/vendor.js')
     rig = Buddy3D.create({ outline: false }); await rig.loaded; globalThis.document = previous
     const geometry = palmGeometry(rig, T)
     const neutral = boot.raw.tools.pose({ hp: 14, tl: 7 }), neutralK = boot.raw.tools.solve(neutral, 1, .4),

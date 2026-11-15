@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict'
 import { test } from 'node:test'
-import { createPreviewCamera, fitFrame, unionBounds } from '../camera.js'
+import { createPreviewCamera, fitFrame, unionBounds } from '../src/camera.js'
 
 test('кадр вмещает предмет и персонажа с полями на широком и узком экране', () => {
   const bounds = unionBounds([610, 650, 670, 710], [700, 0, 780, 160])

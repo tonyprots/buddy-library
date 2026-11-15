@@ -1,7 +1,7 @@
 {
   "name": "@tony-prots/buddy",
-  "version": "0.9.1",
-  "description": "An animated 3D companion for HTML presentations: autonomous movement, slide reactions and brand-aware tricks in one local script",
+  "version": "0.10.0",
+  "description": "Animated 3D companion for HTML presentations. Climbs slide content, performs tricks and grows bolder toward the finale. One local script.",
   "keywords": [
     "presentation",
     "slides",
@@ -26,58 +26,36 @@
     "url": "https://github.com/tonyprots/buddy-library/issues"
   },
   "type": "module",
-  "types": "./index.d.ts",
+  "types": "./src/index.d.ts",
   "exports": {
     ".": {
-      "types": "./index.d.ts",
-      "import": "./index.js",
-      "default": "./index.js"
+      "types": "./src/index.d.ts",
+      "import": "./src/index.js",
+      "default": "./src/index.js"
     },
     "./effects": {
-      "types": "./effects.d.ts",
-      "import": "./effects.js",
-      "default": "./effects.js"
+      "types": "./src/effects.d.ts",
+      "import": "./src/effects.js",
+      "default": "./src/effects.js"
     },
     "./intelligence": {
-      "types": "./slide-intelligence.d.ts",
-      "import": "./slide-intelligence.js",
-      "default": "./slide-intelligence.js"
+      "types": "./src/slide-intelligence.d.ts",
+      "import": "./src/slide-intelligence.js",
+      "default": "./src/slide-intelligence.js"
     },
     "./presets/y360": {
-      "types": "./presets/y360.d.ts",
-      "import": "./presets/y360.js",
-      "default": "./presets/y360.js"
+      "types": "./src/presets/y360.d.ts",
+      "import": "./src/presets/y360.js",
+      "default": "./src/presets/y360.js"
     },
     "./context": {
-      "types": "./slide-context.d.ts",
-      "import": "./slide-context.js",
-      "default": "./slide-context.js"
+      "types": "./src/slide-context.d.ts",
+      "import": "./src/slide-context.js",
+      "default": "./src/slide-context.js"
     }
   },
   "files": [
-    "index.js",
-    "index.d.ts",
-    "runtime.js",
-    "outfit.js",
-    "behavior.js",
-    "brand.js",
-    "playback.js",
-    "vendor.js",
-    "new-abilities.js",
-    "ability-props.js",
-    "slide-intelligence.js",
-    "slide-intelligence.d.ts",
-    "slide-context.js",
-    "slide-context.d.ts",
-    "context-abilities.js",
-    "context-props.js",
-    "context-source.js",
-    "context-stories.js",
-    "context-story-props.js",
-    "camera.js",
-    "effects.js",
-    "effects.d.ts",
-    "presets",
+    "src",
     "dist",
     "index.html",
     "docs/slide-context.md",
@@ -93,17 +71,18 @@
     "README.md",
     "CHANGELOG.md",
     "LICENSE",
-    "THIRD_PARTY_NOTICES.md"
+    "THIRD_PARTY_NOTICES.md",
+    "docs/media"
   ],
   "sideEffects": [
-    "./vendor.js"
+    "./src/vendor.js"
   ],
   "scripts": {
     "test": "node --test tests/*.test.mjs",
     "test:slow": "node --test tests/slow/*.test.mjs",
     "test:all": "node --test tests/*.test.mjs tests/slow/*.test.mjs",
     "test:browser": "node tests/browser/browser-check.mjs",
-    "check": "node --check index.js && node --check runtime.js && node --check effects.js && node --check new-abilities.js && node --check ability-props.js && node --check slide-intelligence.js && node --check camera.js && node --check slide-context.js && node --check context-abilities.js && node --check context-source.js && node --check context-props.js && node --check context-stories.js && node --check context-story-props.js && node --check outfit.js && node --check behavior.js && node --check playback.js && node --check brand.js",
+    "check": "node --check src/index.js && node --check src/runtime.js && node --check src/effects.js && node --check src/new-abilities.js && node --check src/ability-props.js && node --check src/slide-intelligence.js && node --check src/camera.js && node --check src/slide-context.js && node --check src/context-abilities.js && node --check src/context-source.js && node --check src/context-props.js && node --check src/context-stories.js && node --check src/context-story-props.js && node --check src/outfit.js && node --check src/behavior.js && node --check src/playback.js && node --check src/brand.js",
     "build": "node scripts/build.mjs",
     "prepack": "node scripts/build.mjs",
     "export": "python3 scripts/export-public.py"

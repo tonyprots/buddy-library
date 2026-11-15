@@ -1,8 +1,8 @@
 import assert from 'node:assert/strict'
 import { writeFileSync } from 'node:fs'
 import { test } from 'node:test'
-import { createRuntime } from '../runtime.js'
-import { createAbilityPlayer } from '../new-abilities.js'
+import { createRuntime } from '../src/runtime.js'
+import { createAbilityPlayer } from '../src/new-abilities.js'
 import { runtimeFixture } from './support/runtime-fixture.mjs'
 
 test('звезда падает сверху, весь путь в резерве и native DPR2 помещается при CSS3.75 без роста caps', () => {

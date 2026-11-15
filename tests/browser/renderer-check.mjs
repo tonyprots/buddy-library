@@ -19,7 +19,7 @@ const root = resolve(dirname(fileURLToPath(import.meta.url)), '../..'),
       const path = resolve(root, '.' + decodeURIComponent(new URL(request.url, 'http://localhost').pathname))
       if (!path.startsWith(root + sep) || !(await stat(path)).isFile()) { response.writeHead(404).end(); return }
       response.setHeader('Content-Type', mime[extname(path)] || 'application/octet-stream')
-      response.end(await readFile(path === join(root, 'runtime.js') && process.env.BUDDY_RENDER_RUNTIME
+      response.end(await readFile(path === join(root, 'src/runtime.js') && process.env.BUDDY_RENDER_RUNTIME
         ? resolve(process.env.BUDDY_RENDER_RUNTIME) : path))
     } catch { response.writeHead(404).end() }
   })
@@ -27,7 +27,7 @@ await mkdir(output, { recursive: true })
 await new Promise((resolve, reject) => { server.once('error', reject); server.listen(0, '127.0.0.1', resolve) })
 const base = `http://127.0.0.1:${server.address().port}`, report = { date: new Date().toISOString(), environment: {}, zoom: [], trajectories: [], sources: {} }
 for (const name of ['runtime.js', 'vendor.js', 'index.js', 'new-abilities.js', 'ability-props.js']) {
-  const data = await readFile(name === 'runtime.js' && process.env.BUDDY_RENDER_RUNTIME ? resolve(process.env.BUDDY_RENDER_RUNTIME) : join(root, name))
+  const data = await readFile(name === 'runtime.js' && process.env.BUDDY_RENDER_RUNTIME ? resolve(process.env.BUDDY_RENDER_RUNTIME) : join(root, 'src', name))
   report.sources[name] = createHash('sha256').update(data).digest('hex')
 }
 let browser
@@ -37,7 +37,7 @@ try {
   await browser.navigate(base + '/fixture')
   await browser.evaluate(`const getContext=HTMLCanvasElement.prototype.getContext;HTMLCanvasElement.prototype.getContext=function(kind,...args){const gl=getContext.call(this,kind,...args);
     if(gl&&/^webgl/.test(kind)&&!gl.__buddyPrograms){gl.__buddyPrograms=[];const create=gl.createProgram.bind(gl);gl.createProgram=()=>{const program=create();gl.__buddyPrograms.push(program);return program};this.__buddyGL=gl}return gl};
-    globalThis.mod=await import('/index.js'); globalThis.stage=document.querySelector('.stage');
+    globalThis.mod=await import('/src/index.js'); globalThis.stage=document.querySelector('.stage');
     globalThis.b=await mod.createBuddy({stage,autoplay:false,reactions:false,seed:14});b.pause();b.progress(1);b.reset();
     globalThis.raw=b.experimental;raw.mind().update=()=>{};raw.mind().apply=()=>{};
     raw.posed({smile:.4},.4);raw.B.yaw=.4*Math.PI/2;raw.B.yawV=0;b.step(1/60);

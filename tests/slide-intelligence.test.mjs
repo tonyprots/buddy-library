@@ -1,6 +1,6 @@
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
-import { classifySlideEvidence, createReactionPolicy, attachSlideIntelligence, autoplayProfiles } from '../slide-intelligence.js'
+import { classifySlideEvidence, createReactionPolicy, attachSlideIntelligence, autoplayProfiles } from '../src/slide-intelligence.js'
 
 test('общая политика фильтрует и семантическую реакцию, и фоновые номера', () => {
   const d = director({ profile: 'show', autoplay: true, attrs: { 'data-buddy-react': 'dance' }, allowAutomatic: id => id === 'wave' })

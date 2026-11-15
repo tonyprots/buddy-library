@@ -82,13 +82,13 @@ def main():
     web = collect([
         "README.md", "CONTRIBUTING.md", "CHANGELOG.md", "LICENSE", "THIRD_PARTY_NOTICES.md",
         "llms.txt", "docs/api.md", "docs/agent-integration.md", "docs/slide-context.md",
-        "docs/slide-reactions.md", "docs/slide-intelligence.md", "docs/buddy-preview.png",
-        "examples/quick-start.html", "examples/brand.html",
+        "docs/slide-reactions.md", "docs/slide-intelligence.md", "docs/buddy-preview.png", "docs/media",
+        "examples/quick-start.html", "examples/brand.html", "examples/showcase.html",
     ])
     web["buddy.js"] = source["dist/buddy.js"]
     web["llms.txt"] = web["llms.txt"].replace(b"dist/buddy.js", b"buddy.js")
     web["README.md"] = web["README.md"].replace(b"](dist/buddy.js)", b"](buddy.js)")
-    for example in ["examples/quick-start.html", "examples/brand.html"]:
+    for example in ["examples/quick-start.html", "examples/brand.html", "examples/showcase.html"]:
         web[example] = web[example].replace(b"../dist/buddy.js", b"../buddy.js")
     web["CONTRIBUTING.md"] = ("# Contributing\n\nThis archive is for integration. "
         "Sources, build tools and checks are in buddy-" + version + "-source.zip.\n"

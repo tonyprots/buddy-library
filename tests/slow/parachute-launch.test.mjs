@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict'
 import { after, test } from 'node:test'
 import { writeFileSync } from 'node:fs'
-import { createBuddy } from '../../index.js'
+import { createBuddy } from '../../src/index.js'
 import { runtimeFixture } from '../support/runtime-fixture.mjs'
 
 const rows = [], G = 9.81 * 100 / 1.75 * .45,

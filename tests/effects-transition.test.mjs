@@ -6,7 +6,7 @@ import { test } from 'node:test'
 import { pathToFileURL } from 'node:url'
 
 const effectsURL = process.env.BUDDY_EFFECTS_SOURCE ? pathToFileURL(resolve(process.env.BUDDY_EFFECTS_SOURCE))
-  : new URL('../effects.js', import.meta.url), { attachDeckEffects } = await import(effectsURL)
+  : new URL('../src/effects.js', import.meta.url), { attachDeckEffects } = await import(effectsURL)
 
 function fixture({ reduced = false, attach = attachDeckEffects, keyboard = false } = {}) {
   let now = 0, serial = 0, randomSeed = 14, reducedValue = reduced

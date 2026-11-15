@@ -5,13 +5,13 @@ import { mkdir, readFile, readdir, stat, writeFile } from 'node:fs/promises'
 import { dirname, extname, join, resolve, sep } from 'node:path'
 import { fileURLToPath, pathToFileURL } from 'node:url'
 import { openBrowser } from './cdp.mjs'
+import { publicSourceFiles } from '../support/source-files.mjs'
 
 // Узкая диагностика настоящего rAF автокамеры; покадровые screenshots здесь не используются.
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '../..'),
   output = resolve(root, process.env.BUDDY_REPORT_DIR || 'drafts/camera-native/present'),
   sourceRoot = join(output, 'sources'), hash = value => createHash('sha256').update(value).digest('hex'),
-  files = [...(await readdir(root)).filter(name => /\.(?:js|html|json|d\.ts)$/u.test(name)),
-    ...(await readdir(join(root, 'presets'))).filter(name => name.endsWith('.js')).map(name => 'presets/' + name),
+  files = [...await publicSourceFiles(root),
     'tests/browser/camera-native-browser-check.mjs', 'tests/browser/cdp.mjs'],
   sources = new Map(await Promise.all(files.map(async name => [name, await readFile(join(root, name))]))),
   report = { created: new Date().toISOString(), cycles: [], errors: [], limits: [
@@ -27,7 +27,7 @@ for (const [name, data] of sources) {
 }
 report.hashes = Object.fromEntries([...sources].map(([name, data]) => [name, hash(data)]))
 report.snapshotId = hash(JSON.stringify(report.hashes))
-const { techniques } = await import(pathToFileURL(join(sourceRoot, 'index.js'))),
+const { techniques } = await import(pathToFileURL(join(sourceRoot, 'src/index.js'))),
   promisedSeconds = techniques.find(entry => entry.id === 'present').duration
 report.promisedSeconds = promisedSeconds
 await writeFile(join(output, 'source-manifest.json'), JSON.stringify({ snapshotId: report.snapshotId, hashes: report.hashes }, null, 2), { flag: 'wx' })

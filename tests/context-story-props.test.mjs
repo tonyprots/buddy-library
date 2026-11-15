@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict'
 import { test } from 'node:test'
-import { createStoryPropBuilders } from '../context-story-props.js'
+import { createStoryPropBuilders } from '../src/context-story-props.js'
 
 async function fixture(run) {
   const previous = globalThis.document
@@ -10,7 +10,7 @@ async function fixture(run) {
     return { width: 0, height: 0, drawn, getContext: () => context }
   } }
   try {
-    const { Buddy3D, THREE: T } = await import('../vendor.js'), rig = Buddy3D.create({ outline: false }), roots = new Map()
+    const { Buddy3D, THREE: T } = await import('../src/vendor.js'), rig = Buddy3D.create({ outline: false }), roots = new Map()
     await rig.loaded
     assert.equal(rig.registerPropBuilders(kit => Object.fromEntries(Object.entries(createStoryPropBuilders(kit))
       .map(([name, factory]) => [name, () => { const prop = factory(); roots.set(name, prop.g); return prop }]))), 6)

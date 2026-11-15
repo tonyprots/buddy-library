@@ -94,7 +94,7 @@ test('прыжки ordinary/quick/flip/roll в обе стороны прохо�
     mkdirSync(dirname(process.env.JUMP_MOTION_REPORT), { recursive: true })
     writeFileSync(process.env.JUMP_MOTION_REPORT, JSON.stringify({ date: new Date().toISOString(), fps: 60,
       fieldSemantics: { jumpStageCompletedAt: 'Окончание jumpTo, включая передачу кувырку.', fullCycleIdleAt: 'Первый idle после всех дочерних действий.', jumpStageExitPoseError: 'Последняя собственная поза jumpTo относительно STAND; при roll это поза передачи.', observedUntil: 'Конец наблюдения, не ранее 0.6 s после первого idle.' },
-      functionSha: createHash('sha256').update(readFileSync(new URL('../runtime.js', import.meta.url), 'utf8')
+      functionSha: createHash('sha256').update(readFileSync(new URL('../src/runtime.js', import.meta.url), 'utf8')
         .split('  function jumpTo(')[1].split('\n  function leap(')[0]).digest('hex'), cases,
       cheer: [-1, 1].map(face => trajectory({ id: 'cheer', options: { apex: 14, arms: 'V', cam: .9 } }, face)) }, null, 2) + '\n')
   }
